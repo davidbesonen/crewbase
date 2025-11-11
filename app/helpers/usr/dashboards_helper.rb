@@ -1,0 +1,2 @@
+module Usr::DashboardsHelper
+end

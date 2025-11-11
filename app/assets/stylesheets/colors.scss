@@ -1,0 +1,237 @@
+// colors.scss
+
+// ===========================
+// Campus Clash Color Palette
+// ===========================
+
+// Primary Colors
+$primary: #1B4965;
+
+// Secondary Colors
+$secondary: #62B6CB;
+
+// Logo Color
+$logo: #5FA8D3;
+
+// Background Colors
+$background-base: #E9E2D9;
+$background-card: #FFF9F0;
+$background-alt: #FAEBC8;
+
+// Text Colors
+$text-primary: #1D3557;
+$text-secondary: #457B9D;
+$text-disabled: #A29F9F;
+
+// UI Element Colors
+$danger: #E63946;
+$success: #BEE9E8;
+$info: #A8DADC;
+$neutral: #CAE9FF;
+
+// Optional Dark Mode Colors
+$dark-bg-primary: #1D3557;
+$dark-bg-card: #2B2B2B;
+$dark-text-primary: #F1F1F1;
+
+// ===========================
+// Button Utility Classes
+// ===========================
+
+.btn {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  &-primary {
+    background-color: $primary;
+    color: #fff;
+
+    &:hover {
+      background-color: darken($primary, 10%);
+    }
+  }
+
+  &-secondary {
+    background-color: $secondary;
+    color: #fff;
+
+    &:hover {
+      background-color: darken($secondary, 10%);
+    }
+  }
+
+  &-logo {
+    background-color: $logo;
+    color: #fff;
+
+    &:hover {
+      background-color: darken($logo, 10%);
+    }
+  }
+
+  &-neutral {
+    background-color: $neutral;
+    color: $text-primary;
+
+    &:hover {
+      background-color: darken($neutral, 5%);
+    }
+  }
+
+  &-danger {
+    background-color: $danger;
+    color: #fff;
+
+    &:hover {
+      background-color: darken($danger, 10%);
+    }
+  }
+
+  &-info {
+    background-color: $info;
+    color: $primary;
+
+    &:hover {
+      background-color: darken($info, 10%);
+    }
+  }
+
+  &-success {
+    background-color: $success;
+    color: #fff;
+
+    &:hover {
+      background-color: darken($success, 10%);
+    }
+  }
+}
+
+/* ALERTS */
+.alert-info,
+.alert-warning,
+.alert-success,
+.alert-error,
+.alert-dark {
+  color: white;
+}
+
+.alert-info {
+  background-color: $info;
+  border-color: darken($info, 10%);
+  color: $primary;
+}
+
+.alert-warning {
+  background-color: lighten($danger, 15%);
+  border-color: $danger;
+}
+
+.alert-success {
+  background-color: $success;
+  border-color: darken($success, 10%);
+}
+
+.alert-error,
+.alert-dark {
+  background-color: $danger;
+  border-color: darken($danger, 15%);
+}
+
+// ===========================
+// Background Utility Classes
+// ===========================
+
+.bg-base {
+  background-color: $background-base !important;
+}
+
+.bg-card {
+  background-color: $background-card !important;
+}
+
+.bg-alt {
+  background-color: $background-alt !important;
+}
+
+.bg-dark-primary {
+  background-color: $dark-bg-primary !important;
+}
+
+.bg-dark-card {
+  background-color: $dark-bg-card !important;
+}
+
+.bg-secondary {
+  background-color: $secondary !important;
+}
+
+.bg-neutral {
+  background-color: $neutral !important;
+}
+
+.bg-dark-header {
+  background-color: #434548; /* slightly lighter/brighter */
+}
+
+
+// ===========================
+// Text Color Utility Classes
+// ===========================
+
+.text-primary {
+  color: $text-primary !important;
+}
+
+.text-secondary {
+  color: $text-secondary !important;
+}
+
+.text-logo {
+  color: $logo !important;
+}
+
+.text-secondary-brown {
+  color: $secondary !important;
+}
+
+.text-disabled {
+  color: $text-disabled !important;
+}
+
+.text-error {
+  color: $danger !important;
+}
+
+.text-success {
+  color: $success !important;
+}
+
+.text-info {
+  color: $info !important;
+}
+
+.text-neutral {
+  color: $neutral !important;
+}
+
+.text-dark-primary {
+  color: $dark-text-primary !important;
+}
+
+.text-sidenav-dark-header {
+  color: #64666a;
+}
+
+.border-secondary-brown {
+  border-color: $secondary !important;
+  border-width: 3px !important;
+}
+
+// ===========================
+// End of Campus Clash Palette
+// ===========================

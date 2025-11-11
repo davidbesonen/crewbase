@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  sign_in_ip: 
+  signed_out_at: 2025-11-10 16:58:29
+  user_id: 1
+
+two:
+  sign_in_ip: 
+  signed_out_at: 2025-11-10 16:58:29
+  user_id: 1

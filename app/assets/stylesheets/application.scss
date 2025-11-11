@@ -1,0 +1,260 @@
+@import "bootstrap";
+@import "colors";
+
+/* ---------- Global layout & overflow clamps ---------- */
+html, body {
+  height: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* prevent page-wide side scroll */
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container { /* main page containers grow, footer sticks */
+  flex: 1 0 auto;
+}
+
+.footer {
+  flex-shrink: 0;
+}
+
+/* Long words / unbroken strings (IDs, URLs, etc.) */
+.text-break, .break-all {
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Tables should scroll internally rather than the page */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* ---------- Small utilities ---------- */
+.header-btns {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+
+.team-fallback-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #464545;
+  color: #fff;
+  width: 35px;
+  height: 35px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.avatar-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: $logo;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.avatar-toggle.dropdown-toggle::after {
+  display: none;
+}
+
+.avatar-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.progress { padding: 0 !important; border: none !important; }
+.progress-bar { margin-left: 0 !important; }
+.turbo-progress-bar { visibility: hidden; }
+
+.auth-card { width: 100%; }
+
+/* ---------- App shell (sidenav + content) ---------- */
+/* Flex layout on desktop, offcanvas for mobile */
+.app-shell {
+  display: flex;
+  min-height: 100vh; /* full height; if you want to subtract a fixed navbar, change to calc(100vh - <nav-height>) */
+}
+
+/* Desktop sidenav width */
+.sidenav-wrapper {
+  flex: 0 0 280px;  /* keep in sync with .aside if you set inline width */
+  min-width: 0;     /* allow shrink without x-scroll */
+}
+
+/* Collapsed sidenav width (Stimulus adds .sidenav-collapsed on <body>) */
+.sidenav-collapsed .sidenav-wrapper {
+  flex-basis: 64px;
+}
+
+/* Sidebar containers */
+.aside,
+.sidenav {
+  width: 100%;
+  transition: width 150ms ease;
+  overflow-x: hidden; /* never scroll horizontally in the sidebar */
+}
+
+/* Keep aside scrollable and full height */
+.aside {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Content area */
+.app-content {
+  flex: 1 1 auto;
+  overflow-x: hidden; /* clamps rogue wide children */
+  padding-bottom: 2rem;
+}
+
+/* Mobile: hide desktop sidebar, rely on offcanvas */
+@media (max-width: 991.98px) {
+  .sidenav-wrapper {
+    display: none !important;
+  }
+}
+
+/* ---------- Sidenav header & toggle ---------- */
+.sidenav-header {
+  min-height: 75px; /* stable centering for logo/toggle */
+  position: relative;
+}
+
+.sidenav-toggle {
+  z-index: 2; /* keep clickable if overlapping logo */
+  flex-shrink: 0;
+}
+
+/* Hide big centered logo when collapsed */
+.sidenav-collapsed .sidenav-logo { display: none; }
+
+/* Optional: hide title text when collapsed */
+.sidenav-collapsed .sidenav-title { display: none !important; }
+
+/* ---------- Sidenav overflow hardening ---------- */
+/* Kill negative margins/gutters from Bootstrap rows inside the sidenav */
+.sidenav .row {
+  --bs-gutter-x: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Zero column padding so content doesn't push width */
+.sidenav .col,
+.sidenav [class^="col-"],
+.sidenav [class*=" col-"] {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Ensure images/logos never exceed the sidebar width */
+.sidenav img,
+.sidenav .img-fluid {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Truncate ultra-long labels instead of expanding the sidebar */
+.sidenav .nav-link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Sidenav links & icons ---------- */
+.sidenav .nav-link {
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: .5rem;
+  transition: background-color 120ms ease, color 120ms ease, transform 60ms ease;
+}
+
+.sidenav .nav-link:hover,
+.sidenav .nav-link:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+}
+
+.sidenav .nav-link:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+  outline-offset: 2px;
+}
+
+.sidenav .nav-link.active,
+.sidenav .nav-item .nav-link[aria-current="page"] {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidenav .nav-link i.bi {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.sidenav .nav-link:hover i.bi,
+.sidenav .nav-link:focus i.bi {
+  transform: translateX(2px);
+  opacity: 1;
+}
+
+/* Hide/show label text when collapsed */
+.nav-text {
+  transition: opacity 120ms ease;
+}
+
+.sidenav-collapsed .nav-text {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  display: inline-block;
+}
+
+.logo-square {
+  width: 40px;            /* uniform square size */
+  height: 40px;
+  background-color: #434548; /* neutral background */
+  border-radius: 8px;     /* rounded corners */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;       /* clip to rounded shape */
+}
+
+/* Target the table-responsive with custom scrollbar */
+.table-responsive::-webkit-scrollbar {
+  width: 8px; /* thickness of vertical scrollbar */
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #1e1e1e; /* dark track */
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background-color: #555; /* scrollbar handle */
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background-color: #777; /* lighter on hover */
+}
+
+/* Firefox scrollbar styling */
+.table-responsive {
+  scrollbar-width: thin;
+  scrollbar-color: #555 #1e1e1e; /* thumb, track */
+}

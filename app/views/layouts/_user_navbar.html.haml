@@ -1,0 +1,12 @@
+%nav.navbar.navbar-light.bg-light
+  .container-fluid.d-flex.align-items-center.justify-content-between
+    %a.navbar-brand{ href: "#" }
+      = render Shared::CrewbaseLogoTextComponent.new
+    .dropdown
+      = button_tag type: "button", class: "avatar-toggle dropdown-toggle", data: { bs_toggle: "dropdown" }, aria: { expanded: "false" } do
+        = render Usr::Shared::UserAvatarIconComponent.new(user: current_user)
+      %ul.dropdown-menu.dropdown-menu-end
+        %li
+          = link_to destroy_user_session_path, data: { turbo_method: :delete }, class: "dropdown-item d-flex align-items-center gap-2" do
+            %i.bi.bi-box-arrow-right
+            Sign Out

@@ -1,0 +1,26 @@
+.min-vh-100.d-flex.align-items-center.justify-content-center
+  .row.justify-content-center.w-100
+    .col-md-4
+      = render Shared::CrewbaseLogoTextComponent.new
+      .card.mt-3
+        .card-body
+          %h2.fw-bold.mb-4 Sign up
+          = simple_form_for(resource, as: resource_name, url: registration_path(resource_name), builder: BootstrapFormBuilder) do |f|
+            = render "devise/shared/error_messages", resource: resource
+
+            .mt-2
+              = f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control-muted", required: true
+            .mt-2
+              = f.text_field :first_name, autocomplete: "given-name", class: "form-control-muted", required: true
+            .mt-2
+              = f.text_field :last_name, autocomplete: "family-name", class: "form-control-muted", required: true
+            .mt-2
+              = f.password_field :password, autocomplete: "new-password", class: "form-control-muted", required: true
+            - if @minimum_password_length
+              %em.form-text.text-muted
+                (#{@minimum_password_length} characters minimum)
+            .mt-2
+              = f.password_field :password_confirmation, label: "Password Confirmation", autocomplete: "new-password", class: "form-control-muted", required: true
+            .actions.d-grid.mt-2.mb-4
+              = f.submit "Sign up"
+          = render "devise/shared/links"

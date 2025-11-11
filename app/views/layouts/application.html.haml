@@ -1,0 +1,41 @@
+!!!
+%html
+  %head
+    %meta{name: "viewport", content: "width=device-width, initial-scale=1"}
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title= @page_title || "crewbase"
+    %meta{:content => "width=device-width,initial-scale=1", :name => "viewport"}/
+    %meta{:content => "yes", :name => "apple-mobile-web-app-capable"}/
+    %meta{:content => "yes", :name => "mobile-web-app-capable"}/
+    %meta{property: "og:title", content: "Crewbase"}
+    %meta{property: "og:description", content: "Compete with friends in college football pick'em. Make your picks, join leagues, and climb the leaderboard!"}
+    -# %meta{property: "og:image", content: image_url('campus_clash_logo.png')}
+    %meta{property: "og:url", content: request.original_url}
+    %meta{name: "twitter:card", content: "summary_large_image"}
+    %meta{name: "twitter:title", content: "Crewbase"}
+    %meta{name: "twitter:description", content: "Compete with friends in college football pick'em. Make your picks, join leagues, and climb the leaderboard!"}
+    -# %meta{name: "twitter:image", content: image_url('campus_clash_logo.png')}
+    %link{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" }
+    -# %link{ rel: "apple-touch-icon", sizes: "180x180", href: asset_path('campus_clash_logo.png') }
+    -# %link{ rel: "icon", type: "image/png", sizes: "192x192", href: asset_path('campus_clash_logo.png') }
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = javascript_importmap_tags
+    -# = favicon_link_tag asset_path('campus_clash_text_logo.png')
+
+  %body.vh-100#page-top{ "data-turbo-prefetch" => "false" }
+    - if current_user && current_user.has_role?(:admin)
+      = render "layouts/admin_navbar"
+    - elsif current_user && current_user.has_role?(:user)
+      = render "layouts/user_navbar"
+    .app-content
+      .container-fluid
+        #wrapper.h-100.container-fluid.p-5
+          = yield
+    
+    = turbo_frame_tag "remote_modal", target: "_top"
+    -# = render "flash"
+
+    %footer.text-center.mt-5.mb-3.text-muted
+      © #{Time.current.year} Crewbase
