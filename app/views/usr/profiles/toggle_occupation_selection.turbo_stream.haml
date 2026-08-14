@@ -1,0 +1,7 @@
+= turbo_stream.replace "occupation_form" do
+  .card.border-0.shadow-sm.mb-4{ id: "occupation_form" }
+    .card-body
+      = render Usr::ProfileConfig::OccupationFormComponent.new(profile: @profile, occupations: @occupations, profile_occupations: @profile_occupations, show_navigation: !@completed_profile_mode, source: @source)
+
+= turbo_stream.replace "skill_equipment_selection_content" do
+  = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, skills: @skills, equipment: @equipment, profile_occupations: @profile_occupations, profile_skills: @profile_skills, profile_equipment: @profile_equipment, show_navigation: false, source: @source)

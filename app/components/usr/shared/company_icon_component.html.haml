@@ -1,0 +1,5 @@
+- if company&.image_url.present?
+  = image_tag company.image_url, alt: company&.name, class: "rounded-circle", style: "width: #{size}px; height: #{size}px; flex: 0 0 #{size}px; object-fit: cover;"
+- else
+  %div.avatar-toggle{ style: "width: #{size}px; height: #{size}px; flex: 0 0 #{size}px; font-size: #{(size * 0.4).round}px;" }
+    = @first_letter

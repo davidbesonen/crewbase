@@ -1,0 +1,10 @@
+.row.mb-4
+  .col-12
+    %h1.fw-bold.mb-1 Start a Project
+    %p.text-muted.mb-0= "Create a lightweight project for #{@company.name} and add job postings when you're ready."
+
+.row
+  .col-12
+    - if @project.errors[:base].any?
+      .alert.alert-warning{ data: { plan_limit_message: true } }= @project.errors[:base].to_sentence
+    = render Usr::Company::ProjectFormComponent.new(company: @company, project: @project)

@@ -1,0 +1,47 @@
+.row
+  .col-lg-10.mx-auto
+    - if @completed_profile_mode
+      %h1.fw-bold.text-center.mb-1 Edit Your Profile
+      %h4.fw-semibold.text-center.mb-5 Update your information and save when you're done.
+    - else
+      %h1.fw-bold.text-center.mb-1="Welcome #{current_user.first_name} 👋"
+      %h4.fw-semibold.text-center.mb-5 Tell us about yourself...
+
+    - visible_form = @current_page
+    .row{ id: "profile_information_card" }
+      .col-sm-12
+        = simple_form_for [:usr, @profile], url: usr_profile_path(@profile, source: @source), data: { turbo_stream: true } do |f|
+          = f.error_notification
+          .card.border-0.shadow-sm.mb-4{ id: "location_form", class: ("d-none" if !@completed_profile_mode && visible_form != "location_form") }
+            .card-body
+              = render Usr::ProfileConfig::LocationFormComponent.new(f: f, show_navigation: !@completed_profile_mode)
+
+          - if @completed_profile_mode
+            .card.border-0.shadow-sm.mb-4{ id: "bio_form" }
+              .card-body
+                = render Usr::ProfileConfig::BioFormComponent.new(f: f)
+
+          .card.border-0.shadow-sm.mb-4{ id: "occupation_form", class: ("d-none" if !@completed_profile_mode && visible_form != "occupation_form") }
+            .card-body
+              = render Usr::ProfileConfig::OccupationFormComponent.new(profile: @profile, occupations: @occupations, profile_occupations: @profile_occupations, show_navigation: !@completed_profile_mode, source: @source)
+
+          .card.border-0.shadow-sm.mb-4{ id: "skill_equipment_form", class: ("d-none" if !@completed_profile_mode && visible_form != "skill_equipment_form") }
+            .card-body
+              = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, skills: @skills, equipment: @equipment, profile_occupations: @profile_occupations, profile_skills: @profile_skills, profile_equipment: @profile_equipment, f: f, show_navigation: !@completed_profile_mode, source: @source)
+
+          - if @completed_profile_mode
+            .card.border-0.shadow-sm.mb-4{ id: "experience_form" }
+              .card-body
+                = render Usr::ProfileConfig::ExperienceFormComponent.new(f: f, credits: @credits, add_experience: params[:add_experience].present?)
+
+            .card.border-0.shadow-sm.mb-4{ id: "credits_form" }
+              .card-body
+                = render Usr::ProfileConfig::CreditsFormComponent.new(f: f, profile: @profile, credits: @credits, applications_by_job_id: @credit_applications_by_job_id)
+
+          .card.border-0.shadow-sm.mb-4{ id: "availability_form", class: ("d-none" if !@completed_profile_mode && visible_form != "availability_form") }
+            .card-body
+              = render Usr::ProfileConfig::AvailabilityFormComponent.new(profile: @profile, show_navigation: !@completed_profile_mode, show_embedded_sync_form: !@completed_profile_mode, embedded_in_profile_form: !@completed_profile_mode, source: @source)
+
+          .card.border-0.shadow-sm{ id: "online_presence_form", class: ("d-none" if !@completed_profile_mode && visible_form != "online_presence_form") }
+            .card-body
+              = render Usr::ProfileConfig::OnlinePresenceFormComponent.new(profile: @profile, f: f, show_navigation: !@completed_profile_mode, source: @source)

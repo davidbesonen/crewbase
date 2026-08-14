@@ -1,0 +1,55 @@
+.tab-pane.fade#company-jobs{ role: "tabpanel", aria: { labelledby: "company-jobs-tab" } }
+  .d-flex.flex-column.flex-md-row.align-items-md-center.justify-content-between.gap-3.mb-3
+    %div
+      %h5.fw-semibold.mb-1 Open Jobs
+      %p.text-muted.mb-0="#{jobs.count} open #{'role'.pluralize(jobs.count)} for this company."
+    - if company.is_owner?(current_user)
+      .d-flex.flex-wrap.gap-2
+        = link_to "View All Jobs", usr_company_jobs_path(company), class: "btn btn-quiet"
+        = link_to new_usr_company_job_path(company), class: "btn btn-outline-primary" do
+          %i.bi.bi-plus-lg.me-1
+          Create a New Job
+
+  - if jobs.any?
+    .table-responsive
+      %table.table.align-middle.mb-0
+        %thead
+          %tr
+            %th Role
+            - if company.is_owner?(current_user)
+              %th.text-center Project
+            %th.text-center Type
+            %th.text-center Workplace
+            %th.text-center Location
+            %th.text-center Published
+            %th.text-center Status
+            %th.text-center Compensation
+        %tbody
+          - jobs.each do |job|
+            %tr
+              %td
+                .fw-semibold= link_to job.title, usr_job_path(job), class: "text-dark text-decoration-none"
+                - if job.plain_description.present?
+                  .text-muted.small= truncate(job.plain_description, length: 60)
+              - if company.is_owner?(current_user)
+                %td.text-center.small
+                  - if job.project.present?
+                    = link_to job.project.name, usr_project_path(job.project), class: "text-dark text-decoration-none"
+                  - else
+                    %span.text-muted N/A
+              %td.text-center.small= job.employment_type&.humanize || "N/A"
+              %td.text-center.small= job.workplace_type&.humanize || "N/A"
+              %td.text-center.text-muted.small= job.formatted_location
+              %td.text-center.text-muted.small= job.published_at ? l(job.published_at.to_date, format: :long) : "N/A"
+              %td.text-center
+                %span.badge.bg-light.text-dark.border= job.status&.humanize || "N/A"
+              %td.text-center
+                .small
+                  - if job.compensation_range.present?
+                    = job.compensation_range
+                    - if job.pay_period.present?
+                      = " / #{job.pay_period.humanize}"
+                  - else
+                    %span.text-muted N/A
+  - else
+    %p.text-muted.mb-0 No currently open jobs for this company.

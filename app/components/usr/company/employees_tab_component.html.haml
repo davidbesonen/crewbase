@@ -1,0 +1,11 @@
+.tab-pane.fade#company-employees{ role: "tabpanel", aria: { labelledby: "company-employees-tab" } }
+  %h5.fw-semibold="#{company.employees.count} #{'Employee'.pluralize(company.employees.count)}"
+  %p.text-muted Meet a few of the people who keep projects moving.
+  .row.g-3
+    - company.company_assignments.each do |employee|
+      .col-sm-4
+        .d-flex.align-items-center.gap-2
+          .rounded-circle.bg-secondary.text-white.d-inline-flex.align-items-center.justify-content-center{ style: "width: 36px; height: 36px;" }= employee.user.initials
+          %div
+            %div.fw-semibold= employee.user.full_name
+            %div.text-muted.small= employee.role.titleize

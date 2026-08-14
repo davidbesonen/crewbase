@@ -1,0 +1,109 @@
+= turbo_stream.replace "availability_calendar" do
+  %div{ id: "availability_calendar" }
+    .row
+      .col-sm-12.d-flex.align-items-center.justify-content-between.mb-3
+        - if @previous_month_disabled
+          %button.btn.btn-outline-light.btn-sm{ type: "button", disabled: true }
+            %i.bi.bi-chevron-left
+        - else
+          = link_to previous_month_usr_profile_calendar_events_path(profile_id: @profile.id, month: @month_start.strftime("%Y-%m-%d")), class: "btn btn-quiet btn-icon btn-sm" do
+            %i.bi.bi-chevron-left.text-secondary
+        %h5.mb-0= @month_start.strftime("%B %Y")
+        - if @next_month_disabled
+          %button.btn.btn-outline-light.btn-sm{ type: "button", disabled: true }
+            %i.bi.bi-chevron-right
+        - else
+          = link_to next_month_usr_profile_calendar_events_path(profile_id: @profile.id, month: @month_start.strftime("%Y-%m-%d")), class: "btn btn-quiet btn-icon btn-sm" do
+            %i.bi.bi-chevron-right.text-secondary
+    .table-responsive
+      %table.table.table-borderless.text-center.align-middle.mb-0.availability-table
+        %thead.table-dark.rounded-top
+          %tr
+            - Date::ABBR_DAYNAMES.each do |day_name|
+              %th.small.fw-normal= day_name
+        %tbody
+          - @weeks.each do |week|
+            %tr
+              - week.each do |day|
+                - in_month = day.month == @month_start.month && day.year == @month_start.year
+                - past_day = day < Date.current
+                - selectable = in_month && !past_day
+                %td{ class: (selectable ? "" : "text-muted bg-light") }
+                  %div{ id: "availability_date_#{day.to_s}", class: "d-flex justify-content-center align-items-center" }
+                    - day_key = day.strftime("%Y-%m-%d")
+                    - if selectable && @calendar_events.key?(day_key)
+                      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: day, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: @month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+                        = day.day
+                    - elsif selectable
+                      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: day, toggle_action: "add", month: @month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+                        = day.day
+                    - else
+                      %button.btn.btn-outline-secondary.rounded-pill.px-3.py-2.fw-normal.availability-date-pill.text-muted{ type: "button", disabled: true }
+                        = day.day
+
+= turbo_stream.replace "blockout_dates_list" do
+  %div{ id: "blockout_dates_list" }
+    .card.mb-3.d-flex.flex-column{ style: "height: 470px;" }
+      .card-header
+        .row
+          .col-sm-12.d-flex.align-items-center
+            %h5.mb-0 Blockout Dates
+      .card-body.overflow-auto
+        - if @calendar_events.empty?
+          .d-flex.h-100.align-items-center.justify-content-center
+            %h1.text-center.text-muted.opacity-50
+              %i.bi.bi-calendar-x.me-2.text-muted
+            %p.mb-0.text-center.text-muted.opacity-50.fs-4 No blockout dates
+        - else
+          .row
+            .col-sm-6
+              %p.text-muted="#{@calendar_events.size} blockout date#{'s' if @calendar_events.size != 1}"
+            .col-sm-6.text-end
+              = link_to destroy_all_usr_profile_calendar_events_path(profile_id: @profile.id, month: @month_start.strftime("%Y-%m-%d")), method: :delete, class: "btn btn-sm btn-outline-danger" do
+                %i.bi.bi-trash
+                Clear all
+            .col-sm-12
+              %table.table.table-striped.table-hover.table-sm.mb-0
+                %tbody
+                  - @calendar_events.sort_by { |date_str, _| Date.parse(date_str) }.each do |date_str, event_id|
+                    - date = Date.parse(date_str)
+                    %tr
+                      %td.align-middle
+                        %p.mb-0.mx-2
+                          %i.bi.bi-x-circle-fill.text-danger.me-2
+                          = date.strftime("%A, %B %d, %Y")
+                      %td.text-end
+                        = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: date, toggle_action: "remove", calendar_event_id: event_id, month: @month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-sm btn-outline-danger my-1" do
+                          %i.bi.bi-trash
+                          Remove
+
+= turbo_stream.replace "ical_feed_form" do
+  %div{ id: "ical_feed_form" }
+    .card.mb-4
+      .card-body
+        %h5.mb-3 Connect your calendar
+        %p.text-muted.small
+          Paste the private ICS subscription link from Google, Outlook, or Apple Calendar. We'll sync future events as blockouts.
+        %p.text-muted.small
+          Events detected on your synced calendar will be treated as blockouts.
+        - if (sync_error = @ical_feed_error.presence || @profile.ical_sync_error.presence)
+          .alert.alert-danger.mt-2.mb-3
+            Calendar sync failed. #{sync_error}
+        - if @profile.ical_feed_url.present?
+          %p.text-success.mb-2
+            %i.bi.bi-check-circle.me-1
+            Feed saved.
+          - if @profile.ical_last_synced_at.present?
+            %p.small.text-muted 
+              %i.bi.bi-clock-history.me-1
+              Last synced #{time_ago_in_words(@profile.ical_last_synced_at)} ago
+          - elsif @profile.ical_sync_attempted_at.present?
+            %p.small.text-muted
+              %i.bi.bi-exclamation-circle.me-1
+              Last attempted #{time_ago_in_words(@profile.ical_sync_attempted_at)} ago
+        = form_with model: @profile, url: update_calendar_usr_profile_path(@profile), method: :patch, local: false do |cal_f|
+          = hidden_field_tag :month, @month_start.strftime("%Y-%m-%d")
+          .mb-3
+            = cal_f.label :ical_feed_url, "Calendar feed URL", class: "form-label"
+            = cal_f.text_field :ical_feed_url, value: @profile.ical_feed_url, class: "form-control", placeholder: "https://example.com/calendar.ics"
+          = cal_f.submit "Sync", class: "btn btn-primary"

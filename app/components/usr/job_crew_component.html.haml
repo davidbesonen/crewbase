@@ -1,0 +1,95 @@
+.d-flex.flex-wrap.align-items-start.justify-content-between.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Crew for #{job.title}
+    %p.text-muted.mb-0 Define the roles you need, staff them, and check availability for the job dates.
+  .d-flex.flex-wrap.gap-2
+    = link_to "Review Applications", usr_company_applications_path(job.company, job_id: job.id, return_to: "staffing"), class: "btn btn-primary"
+    = link_to "Back to Job", usr_job_path(job), class: "btn btn-quiet"
+
+.row.g-4
+  .col-12.col-xl-7
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h4.fw-semibold.mb-3 Required Positions
+        = form_with model: CrewPosition.new, url: usr_job_crew_positions_path(job), class: "row g-3 align-items-end mb-4" do |form|
+          .col-md-8
+            = form.label :title, "Position title", class: "form-label"
+            = form.text_field :title, class: "form-control", required: true, styled: true
+          .col-md-4
+            = form.label :headcount, "Needed", class: "form-label"
+            = form.number_field :headcount, min: 1, value: 1, class: "form-control", required: true, styled: true
+          .col-12
+            = form.label :description, "Position description", class: "form-label"
+            = form.text_area :description, rows: 3, class: "form-control", placeholder: "Responsibilities, experience, and other role details", styled: true
+          .col-md-4
+            = form.label :pay_min, "Minimum pay", class: "form-label"
+            = form.number_field :pay_min, min: 0, step: 0.01, class: "form-control", styled: true
+          .col-md-4
+            = form.label :pay_max, "Maximum pay", class: "form-label"
+            = form.number_field :pay_max, min: 0, step: 0.01, class: "form-control", styled: true
+          .col-md-4
+            = form.label :pay_period, "Pay period", class: "form-label"
+            = form.select :pay_period, compensation_period_options, { include_blank: "Select pay period" }, class: "form-select"
+          .col-12.col-sm-4.ms-sm-auto
+            = form.submit "Add", class: "btn btn-primary w-100"
+
+        - if positions.any?
+          .d-flex.flex-column.gap-3
+            - positions.each do |position|
+              .border.rounded-3.p-3{ data: { crew_position: true } }
+                .d-flex.justify-content-between.align-items-start.gap-3.mb-3
+                  %div
+                    %h5.fw-semibold.mb-1= position.title
+                    %div.text-muted.small= "#{position.crew_assignments.size} of #{position.headcount} staffed"
+                    - if position.compensation_range.present?
+                      %div.text-muted.small= "#{position.compensation_range} #{position.pay_period&.humanize&.downcase}".strip
+                    - if position.description.present?
+                      %p.text-muted.small.mb-0.mt-2= position.description
+                  = button_to "Remove position", usr_crew_position_path(position), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "Remove this position and its assignments?" } }
+
+                - position.crew_assignments.each do |assignment|
+                  .border-top.py-3{ data: { assigned_crew_member: assignment.profile_id } }
+                    .d-flex.align-items-start.justify-content-between.gap-3
+                      .flex-grow-1
+                        .fw-semibold= assignment.profile.user.full_name
+                        .text-muted.small= assignment.profile.formatted_headline
+                      = button_to "Remove", usr_crew_assignment_path(assignment), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "Remove #{assignment.profile.user.full_name} from this position?" } }
+                    - if replacement_candidates(assignment).any?
+                      %button.btn.btn-sm.btn-quiet.mt-3{ type: "button", data: { bs_toggle: "modal", bs_target: "##{replacement_modal_id(assignment)}" } }
+                        Change assignment
+
+                - if position.crew_assignments.size < position.headcount
+                  - if available_candidates(position).any?
+                    .border-top.pt-3{ data: { open_crew_spot: true } }
+                      %h6.fw-semibold.mb-1 Fill open spot
+                      %p.text-muted.small.mb-3 Choose from applicants and shortlisted people connected to this job.
+                      %button.btn.btn-primary{ type: "button", data: { bs_toggle: "modal", bs_target: "##{assignment_modal_id(position)}" } }
+                        Choose Crew Member
+                  - else
+                    .border-top.pt-3{ data: { open_crew_spot: true } }
+                      %h6.fw-semibold.mb-1 Fill open spot
+                      %p.text-muted.small.mb-0 Add applicants or people from a company shortlist before staffing this position.
+        - else
+          %p.text-muted.mb-0 No required positions have been added.
+
+  .col-12.col-xl-5
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h4.fw-semibold.mb-1 Crew Schedule
+        %p.text-muted.small.mb-3
+          - if job.starts_at.present? && job.ends_at.present?
+            = "#{l(job.starts_at.to_date, format: :long)} – #{l(job.ends_at.to_date, format: :long)}"
+          - else
+            Add job start and end dates to check availability.
+        - if schedule_rows.any?
+          .d-flex.flex-column.gap-2
+            - schedule_rows.each do |row|
+              .border.rounded-3.p-3{ data: { crew_schedule_row: true, availability_conflict: row.conflict?.to_s } }
+                .d-flex.flex-column.gap-2
+                  %div
+                    .fw-semibold= row.profile.user.full_name
+                    .text-muted.small= row.position.title
+                  %span.crew-schedule-availability.status-badge{ class: row.conflict? ? "status-unavailable" : "status-available" }
+                    = row.availability_label
+        - else
+          %p.text-muted.mb-0 Assigned crew will appear here.

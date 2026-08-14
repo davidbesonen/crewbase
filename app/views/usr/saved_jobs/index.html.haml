@@ -1,0 +1,23 @@
+.d-flex.justify-content-between.align-items-center.mb-4
+  %div
+    %h1.fw-bold.mb-1 Saved Jobs
+    %p.text-muted.mb-0 Roles you want to revisit.
+  = link_to "Browse Jobs", usr_jobs_path, class: "btn btn-outline-primary"
+
+- if @saved_jobs.any?
+  .row.g-3
+    - @saved_jobs.each do |saved_job|
+      - job = saved_job.job
+      .col-12
+        .card.border-0.shadow-sm
+          .card-body.d-flex.justify-content-between.align-items-start.gap-3
+            %div
+              %h5.mb-1= link_to job.title, usr_job_path(job), class: "text-dark text-decoration-none"
+              %div.text-muted= job.company&.name || "Company not listed"
+              %div.text-muted.small.mt-1= job.formatted_location
+            = button_to "Remove", usr_job_saved_job_path(job), method: :delete, class: "btn btn-outline-danger btn-sm"
+- else
+  .card.border-0.shadow-sm
+    .card-body
+      %h5 No Saved Jobs Yet
+      %p.text-muted.mb-0 Save a job to keep it handy here.

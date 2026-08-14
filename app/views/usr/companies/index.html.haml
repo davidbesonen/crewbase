@@ -1,0 +1,97 @@
+.row
+  .col-sm-12
+    .d-flex.flex-column.flex-xl-row.align-items-start.gap-4
+      .flex-grow-1.w-100
+        .row.mb-4
+          .col-12
+            %h1.fw-bold.mb-1 Companies
+            %p.text-muted.mb-0 Browse companies across the network.
+
+        - if @companies.any?
+          .row.g-3
+            .col-6.d-flex.align-items-center
+              %p.text-muted.mb-1
+                Showing
+                %strong= @pagy.from
+                -
+                %span.text-muted
+                  of
+                  %strong= @pagy.to
+                  results
+                  %em="(#{@pagy.count} total)"
+            - if @pagy.pages > 1
+              .col-6.d-flex.align-items-center.justify-content-end.mb-1
+                = bootstrap_pagy_nav(@pagy)
+            - @companies.each do |company|
+              .col-12
+                .card.border-0.shadow-sm.h-100.card-accent.card-accent-cyan
+                  .card-body.p-4
+                    .d-flex.flex-column.flex-lg-row.justify-content-between.align-items-lg-start.gap-3
+                      .flex-grow-1
+                        .d-flex.flex-wrap.align-items-center.gap-2.mb-2
+                          %h4.fw-semibold.mb-0= link_to company.name, usr_company_path(company), class: "text-dark text-decoration-none"
+                          - if company.is_public?
+                            %span.badge.text-bg-light.border Public
+                          - else
+                            %span.badge.text-bg-secondary Private
+                        %p.text-muted.mb-2
+                          - if company.industries.any?
+                            = company.industry_names_text
+                          - else
+                            Industry not listed
+                        .d-flex.flex-wrap.align-items-center.gap-2.text-muted.small
+                          - if company.formatted_location.present?
+                            %span
+                              %i.bi.bi-geo-alt.me-1
+                              = company.formatted_location
+                          - if company.founded_at.present?
+                            - if company.formatted_location.present?
+                              %span •
+                            %span
+                              %i.bi.bi-calendar-event.me-1
+                              Founded
+                              = company.founded_at.year
+                          - if company.contact_email.present?
+                            - if company.formatted_location.present? || company.founded_at.present?
+                              %span •
+                            %span
+                              %i.bi.bi-envelope.me-1
+                              = company.contact_email
+                        - if company.description.present?
+                          %p.text-muted.mb-0.mt-3= truncate(company.description, length: 180)
+                      .text-lg-end
+                        %div.text-muted.small
+                          %i.bi.bi-briefcase.me-1
+                          = pluralize(company.jobs.size, "open job")
+          - if @pagy.pages > 1
+            .row.mt-4
+              .col-12.d-flex.justify-content-end
+                = bootstrap_pagy_nav(@pagy)
+        - else
+          .row
+            .col-12
+              .card.border-0.shadow-sm
+                .card-body.p-4.empty-state.empty-state-cyan
+                  %h5.fw-semibold.mb-2 No Companies Found
+                  %p.text-muted.mb-0 Try adjusting your filters or check back later for newly added companies.
+
+      .w-100.flex-shrink-0.app-sticky-filter{ style: "max-width: 250px;" }
+        .card.shadow-sm.bg-light.user-sidenav-card
+          .card-body.d-flex.flex-column.pt-4.pb-4
+            %h6.text-muted.fw-bold.mb-1 Search Companies
+            %p.text-muted.small.mb-4 Narrow company results by name, industry, or visibility.
+            = search_form_for @q, url: usr_companies_path, html: { class: "d-flex flex-column gap-3" } do |f|
+              %div
+                = f.label :name_cont, "Company Name", class: "form-label"
+                = f.search_field :name_cont, class: "form-control", placeholder: "Search by company name"
+              %div
+                = f.label :industries_name_eq, "Industry", class: "form-label"
+                = f.select :industries_name_eq, @industries.map { |industry| [industry.name, industry.name] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :is_public_eq, "Visibility", class: "form-label"
+                = f.select :is_public_eq, [["Any", nil], ["Public", true], ["Private", false]], {}, class: "form-select"
+              .d-flex.flex-wrap.gap-2.pt-2
+                %button.btn.btn-primary{ type: "submit" }
+                  %i.bi.bi-search.me-1
+                  Search
+                = link_to "Clear", usr_companies_path, class: "btn btn-quiet"

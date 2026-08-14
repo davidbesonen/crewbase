@@ -1,0 +1,15 @@
+.container.py-5
+  .mx-auto{ style: "max-width: 820px;" }
+    = link_to root_path, class: "d-inline-block mb-4" do
+      = render Shared::CrewbaseLogoTextComponent.new
+    %p.text-uppercase.text-muted.small.fw-semibold Product updates
+    %h1.fw-bold What’s new at Crewbase
+    %p.lead.text-muted.mb-5 Straightforward notes about improvements that help crew members and production teams.
+    - @change_log_entries.each do |entry|
+      %article.card.border-0.shadow-sm.mb-3
+        .card-body.p-4
+          %time.text-muted.small{ datetime: entry.published_at.iso8601 }= l(entry.published_at.to_date, format: :long)
+          %h2.h4.mt-2= entry.title
+          %p.mb-0= entry.summary
+    - if @change_log_entries.empty?
+      %p.text-muted No updates have been published yet.

@@ -1,0 +1,9 @@
+.card.h-100.card-accent.card-accent-navy{ data: { company_tools: true } }
+  .card-body
+    %h2.h5.card-title.fw-semibold.mb-3 Company Tools
+    %nav.company-tools-grid.w-100{ aria: { label: "Company tools" } }
+      - tools.each do |tool|
+        = link_to tool.path, class: "company-tools-grid__item d-flex flex-column align-items-center gap-1 text-decoration-none text-center" do
+          %span.icon-orb{ class: "icon-orb-#{tool.color}" }
+            %i.bi{ class: "bi-#{tool.icon}", aria: { hidden: true } }
+          %span.small.text-muted= tool.label

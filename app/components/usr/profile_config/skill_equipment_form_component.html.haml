@@ -1,0 +1,99 @@
+%div{ id: "skill_equipment_selection_content" }
+  - if skills.empty? && equipment.empty?
+    %p.text-muted.my-4.text-center You have not selected any occupations yet. Please select at least one occupation to choose relevant skills and equipment.
+
+  - if skills.any?
+    %section.mb-5{ id: "skills_selection_section" }
+      %h4.fw-semibold.mb-1 Skills & Services
+      %p.text-muted.mb-3 Search the skills relevant to your selected occupations.
+      .position-relative{
+        data: {
+          controller: "taxonomy-multiselect",
+          taxonomy_multiselect_kind_value: "skill",
+          action: "click@window->taxonomy-multiselect#clickOutside"
+        }
+      }
+        = label_tag :skill_search, "Find a skill", class: "form-label"
+        .input-group
+          %span.input-group-text.bg-white
+            %i.bi.bi-search{ aria: { hidden: true } }
+          = search_field_tag :skill_search, nil, class: "form-control", placeholder: "Search by skill or occupation", role: "combobox", autocomplete: "off", aria: { autocomplete: "list", controls: "skill-search-options", expanded: "true" }, data: { taxonomy_multiselect_target: "input", action: "input->taxonomy-multiselect#search keydown->taxonomy-multiselect#navigate focus->taxonomy-multiselect#show" }
+        #skill-search-options.list-group.mt-2.taxonomy-multiselect-options{
+          role: "listbox",
+          data: { taxonomy_multiselect_target: "options" }
+        }
+          - skill_options.each do |skill, occupation_names|
+            = link_to toggle_skill_selection_usr_profile_path(profile, skill_id: skill.id, source: source), method: :post, class: "list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-3", role: "option", aria: { selected: profile_skills.include?(skill).to_s }, data: { taxonomy_multiselect_target: "option", taxonomy_kind: "skill", taxonomy_name: skill.name, taxonomy_search_text: ([skill.name] + occupation_names).join(" ").downcase } do
+              %span
+                %span.d-block.fw-semibold= skill.name
+                %span.d-block.text-muted.small= occupation_names.to_sentence
+              - if profile_skills.include?(skill)
+                %i.bi.bi-check-circle-fill.text-primary{ aria: { label: "Selected" } }
+        %p.visually-hidden.mb-0{
+          role: "status",
+          aria: { live: "polite" },
+          data: { taxonomy_multiselect_target: "status" }
+        }
+      - if profile_skills.any?
+        %p.fw-semibold.mt-3.mb-2 Selected skills
+        .d-flex.flex-wrap.gap-2
+          - profile_skills.sort_by(&:name).each do |skill|
+            = link_to toggle_skill_selection_usr_profile_path(profile, skill_id: skill.id, source: source), method: :post, class: "selected-occupation-pill text-decoration-none", aria: { label: "Remove #{skill.name}" } do
+              = skill.name
+              %i.bi.bi-x-lg.ms-1{ aria: { hidden: true } }
+
+  - if equipment.any?
+    %section{ id: "equipment_selection_section" }
+      %h4.fw-semibold.mb-1 Equipment & Platforms
+      %p.text-muted.mb-3 Choose systems you can operate proficiently—not simply equipment you own.
+      .position-relative{
+        data: {
+          controller: "taxonomy-multiselect",
+          taxonomy_multiselect_kind_value: "equipment",
+          action: "click@window->taxonomy-multiselect#clickOutside"
+        }
+      }
+        = label_tag :equipment_search, "Find equipment or a platform", class: "form-label"
+        .input-group
+          %span.input-group-text.bg-white
+            %i.bi.bi-search{ aria: { hidden: true } }
+          = search_field_tag :equipment_search, nil, class: "form-control", placeholder: "Search by equipment, platform, or occupation", role: "combobox", autocomplete: "off", aria: { autocomplete: "list", controls: "equipment-search-options", expanded: "true" }, data: { taxonomy_multiselect_target: "input", action: "input->taxonomy-multiselect#search keydown->taxonomy-multiselect#navigate focus->taxonomy-multiselect#show" }
+        #equipment-search-options.list-group.mt-2.taxonomy-multiselect-options{
+          role: "listbox",
+          data: { taxonomy_multiselect_target: "options" }
+        }
+          - equipment_options.each do |item, occupation_names|
+            = link_to toggle_equipment_selection_usr_profile_path(profile, equipment_id: item.id, source: source), method: :post, class: "list-group-item list-group-item-action d-flex justify-content-between align-items-start gap-3", role: "option", aria: { selected: profile_equipment.include?(item).to_s }, data: { taxonomy_multiselect_target: "option", taxonomy_kind: "equipment", taxonomy_name: item.name, taxonomy_search_text: ([item.name] + occupation_names).join(" ").downcase } do
+              %span
+                %span.d-block.fw-semibold= item.name
+                %span.d-block.text-muted.small= occupation_names.to_sentence
+              - if profile_equipment.include?(item)
+                %i.bi.bi-check-circle-fill.text-primary{ aria: { label: "Selected" } }
+        %p.visually-hidden.mb-0{
+          role: "status",
+          aria: { live: "polite" },
+          data: { taxonomy_multiselect_target: "status" }
+        }
+      - if profile_equipment.any?
+        %p.fw-semibold.mt-3.mb-2 Selected equipment
+        .d-flex.flex-wrap.gap-2
+          - profile_equipment.sort_by(&:name).each do |item|
+            = link_to toggle_equipment_selection_usr_profile_path(profile, equipment_id: item.id, source: source), method: :post, class: "selected-occupation-pill text-decoration-none", aria: { label: "Remove #{item.name}" } do
+              = item.name
+              %i.bi.bi-x-lg.ms-1{ aria: { hidden: true } }
+
+- if show_navigation
+  .row.mt-3
+    .col-md-6
+      = link_to previous_page_usr_profile_path(profile, current_page: "skill_equipment_form"), class: "btn btn-quiet" do
+        %i.bi.bi-arrow-left-circle
+        Industry & Occupation
+    .col-md-6.d-flex.justify-content-end.align-items-end
+      - if f.present?
+        %button.btn.btn-primary{ type: "submit", name: "current_page", value: "skill_equipment_form" }
+          %i.bi.bi-arrow-right-circle
+          Availability
+      - else
+        = link_to edit_calendar_usr_profile_path(profile), class: "btn btn-primary" do
+          %i.bi.bi-arrow-right-circle
+          Availability

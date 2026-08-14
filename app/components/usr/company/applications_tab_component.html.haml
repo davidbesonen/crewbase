@@ -1,0 +1,41 @@
+.tab-pane.fade#company-applications{ role: "tabpanel", aria: { labelledby: "company-applications-tab" } }
+  .d-flex.flex-wrap.justify-content-between.align-items-start.gap-2.mb-3
+    %div
+      %h5.fw-semibold.mb-1 Job Applications
+      %p.text-muted.mb-0
+        - if pipeline_available
+          = link_to "#{job_applications.count} application#{'s' unless job_applications.count == 1} across this company's jobs.", usr_company_applications_path(company), class: "text-muted"
+        - else
+          = "#{job_applications.count} application#{'s' unless job_applications.count == 1} across this company's jobs."
+    - if pipeline_available
+      = link_to "Open Pipeline", usr_company_applications_path(company), class: "btn btn-primary btn-sm"
+    - else
+      %span.small.text-primary.fw-semibold{ data: { feature_upgrade: "application-pipeline" } }
+        %i.bi.bi-lock-fill.me-1
+        Pipeline available on Team and Studio
+
+  - if job_applications.any?
+    .table-responsive
+      %table.table.align-middle.mb-0
+        %thead
+          %tr
+            %th Applicant
+            %th Job
+            %th.text-center Status
+            %th.text-center Submitted
+            %th.text-center Action
+        %tbody
+          - job_applications.each do |job_application|
+            %tr
+              %td
+                .text-muted= job_application.profile.user.full_name
+              %td
+                .fw-semibold= link_to job_application.job.title, usr_job_path(job_application.job), class: "text-dark text-decoration-none"
+              %td.text-center
+                %span{ class: job_application_status_badge_class(job_application.status) }= job_application.status.humanize
+              %td.text-center.text-muted
+                = l((job_application.submitted_at || job_application.created_at).to_date, format: :long)
+              %td.text-center
+                = link_to "Review Application", usr_job_application_path(job_application), class: "btn btn-quiet btn-sm"
+  - else
+    %p.text-muted.mb-0 No job applications yet.

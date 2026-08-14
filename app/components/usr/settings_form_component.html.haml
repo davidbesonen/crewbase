@@ -1,0 +1,67 @@
+= form_with model: user, url: helpers.usr_settings_path, method: :patch do |form|
+  - if user.errors.any?
+    .alert.alert-danger{ role: "alert" }
+      %p.fw-semibold.mb-2 Please review the highlighted settings.
+      %ul.mb-0
+        - user.errors.full_messages.each do |message|
+          %li= message
+
+  .card.border-0.shadow-sm.card-accent.card-accent-cyan.mb-4
+    .card-body.p-4
+      %h2.h5.fw-bold.mb-1 Account information
+      %p.text-muted.mb-4 Keep your contact details current so crews and Crewbase can reach you.
+      .row.g-3
+        .col-md-6
+          = form.label :first_name, class: "form-label"
+          = form.text_field :first_name, class: "form-control#{' is-invalid' if user.errors[:first_name].any?}", autocomplete: "given-name"
+          - user.errors.full_messages_for(:first_name).each do |message|
+            .invalid-feedback= message
+        .col-md-6
+          = form.label :last_name, class: "form-label"
+          = form.text_field :last_name, class: "form-control#{' is-invalid' if user.errors[:last_name].any?}", autocomplete: "family-name"
+          - user.errors.full_messages_for(:last_name).each do |message|
+            .invalid-feedback= message
+        .col-md-6
+          = form.label :email, class: "form-label"
+          = form.email_field :email, class: "form-control#{' is-invalid' if user.errors[:email].any?}", autocomplete: "email"
+          - user.errors.full_messages_for(:email).each do |message|
+            .invalid-feedback= message
+        .col-md-6
+          = form.label :phone, "Phone number", class: "form-label"
+          = form.telephone_field :phone, class: "form-control#{' is-invalid' if user.errors[:phone].any?}", autocomplete: "tel"
+          - user.errors.full_messages_for(:phone).each do |message|
+            .invalid-feedback= message
+
+  .card.border-0.shadow-sm.card-accent.card-accent-sky.mb-4
+    .card-body.p-4
+      %h2.h5.fw-bold.mb-1 Notification preferences
+      %p.text-muted.mb-4 Choose how Crewbase contacts you and which updates you want to receive.
+
+      %fieldset.mb-4
+        %legend.h6.fw-bold Delivery channels
+        .form-check.form-switch.mb-3
+          = form.check_box :email_notifications_enabled, class: "form-check-input", role: "switch"
+          = form.label :email_notifications_enabled, "Email notifications", class: "form-check-label fw-semibold"
+          .form-text Receive selected updates at your account email address.
+        .form-check.form-switch
+          = form.check_box :sms_notifications_enabled, class: "form-check-input", role: "switch"
+          = form.label :sms_notifications_enabled, "SMS notifications", class: "form-check-label fw-semibold"
+          .form-text Receive selected updates at your phone number. Message and data rates may apply.
+
+      %fieldset
+        %legend.h6.fw-bold Updates you want
+        .form-check.mb-3
+          = form.check_box :job_alert_notifications_enabled, class: "form-check-input"
+          = form.label :job_alert_notifications_enabled, "Job alerts", class: "form-check-label fw-semibold"
+          .form-text Updates about jobs that match your interests and availability.
+        .form-check.mb-3
+          = form.check_box :recommended_role_notifications_enabled, class: "form-check-input"
+          = form.label :recommended_role_notifications_enabled, "New recommended roles", class: "form-check-label fw-semibold"
+          .form-text Hear when newly posted roles are recommended for your profile.
+        .form-check
+          = form.check_box :upcoming_job_reminder_notifications_enabled, class: "form-check-input"
+          = form.label :upcoming_job_reminder_notifications_enabled, "Upcoming job reminders", class: "form-check-label fw-semibold"
+          .form-text Get reminders before jobs you are booked to work.
+
+  .d-flex.justify-content-end
+    = form.submit "Save settings", class: "btn btn-primary"

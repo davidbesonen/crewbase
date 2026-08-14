@@ -1,0 +1,14 @@
+= form_with model: [ :admin, change_log_entry ] do |form|
+  - if change_log_entry.errors.any?
+    .alert.alert-danger= change_log_entry.errors.full_messages.to_sentence
+  .mb-3
+    = form.label :title, class: "form-label"
+    = form.text_field :title, class: "form-control", required: true
+  .mb-3
+    = form.label :summary, "What changed?", class: "form-label"
+    = form.text_area :summary, class: "form-control", rows: 5, required: true, placeholder: "Explain the benefit without internal terminology."
+  .mb-3
+    = form.label :published_at, "Publish at", class: "form-label"
+    = form.datetime_local_field :published_at, class: "form-control"
+    .form-text Leave blank to save as a draft.
+  = form.submit class: "btn btn-primary"

@@ -1,0 +1,14 @@
+.row
+  .col-lg-10.mx-auto
+    - if @profile.completed_at.present?
+      %h1.fw-bold.text-center.mb-1 Manage Availability
+      %p.text-muted.text-center.mb-5 Keep your calendar and blockout dates up to date.
+    - else
+      %h1.fw-bold.text-center.mb-1="Welcome #{current_user.first_name} 👋"
+      %h4.fw-semibold.text-center.mb-5 Tell us about yourself...
+
+    .row{ id: "profile_information_card" }
+      .col-sm-12
+        .card.border-0.shadow-sm{id: "availability_form" }
+          .card-body
+            = render Usr::ProfileConfig::AvailabilityFormComponent.new(profile: @profile, start_month: @month_start, show_completed_profile_navigation: @profile.completed_at.present?)

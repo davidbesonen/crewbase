@@ -1,0 +1,3 @@
+= render Usr::JobCrewComponent.new(job: @job, positions: @positions, candidates: @candidates, schedule_rows: @schedule_rows)
+= render Usr::JobCrewAssignmentModalsComponent.new(positions: @positions, candidates: @candidates)
+= render Usr::JobCrewSearchComponent.new(job: @job, results: @crew_search_results, occupations: @occupations, skills: @skills, equipment: @equipment, crew_shortlists: @crew_shortlists, filters: params)

@@ -1,0 +1,24 @@
+= simple_form_for [ :usr, profile, credit ] do |f|
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      = f.error_notification
+      .row.g-3
+        .col-md-6
+          = f.input :role, label: "Role", placeholder: "Lighting Designer"
+        .col-md-6
+          = f.input :project_name, label: "Project or Event", placeholder: "Summer Sound Festival"
+        .col-md-6
+          = f.input :company_id, collection: companies.map { |company| [company.name, company.id] }, include_blank: "External or unlisted company", label: "Crewbase Company"
+        .col-md-6
+          = f.input :company_name, label: "Client or Company Name", hint: "Use this when the company is not listed in Crewbase."
+        .col-md-4
+          = f.input :starts_on, as: :string, input_html: { type: "date" }
+        .col-md-4
+          = f.input :ends_on, as: :string, input_html: { type: "date" }
+        .col-md-4
+          = f.input :location, placeholder: "Chicago, IL"
+        .col-12
+          = f.input :description, as: :text, input_html: { rows: 4 }, hint: "Briefly describe the scope, tools, or outcome."
+      .btn-group-responsive.justify-content-between.mt-4
+        = link_to "Cancel", edit_usr_profile_path(profile, source: "completed_profile", anchor: "credits_form"), class: "btn btn-quiet"
+        = f.submit class: "btn btn-primary"

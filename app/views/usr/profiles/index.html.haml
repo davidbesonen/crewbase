@@ -1,0 +1,113 @@
+.row
+  .col-sm-12
+    .d-flex.flex-column.flex-xl-row.align-items-start.gap-4
+      .flex-grow-1.w-100
+        .row.mb-4
+          .col-12
+            .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3
+              %div
+                %h1.fw-bold.mb-1
+                  - if @recommended_people
+                    %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+                    Recommended People
+                  - else
+                    People
+                %p.text-muted.mb-0
+                  - if @recommended_people
+                    People matched to your company’s active jobs.
+                  - else
+                    Browse professionals across the network.
+              - if @recommended_people
+                = link_to "Show all people", usr_profiles_path, class: "btn btn-quiet"
+
+        - if @profiles.any?
+          .row.g-3
+            .col-6.d-flex.align-items-center
+              %p.text-muted.mb-1
+                Showing
+                %strong= @pagy.from
+                -
+                %span.text-muted
+                  of
+                  %strong= @pagy.to
+                  results
+                  %em="(#{@pagy.count} total)"
+            - if @pagy.pages > 1
+              .col-6.d-flex.align-items-center.justify-content-end.mb-1
+                = bootstrap_pagy_nav(@pagy)
+            - @profiles.each do |profile|
+              .col-12
+                .card.border-0.shadow-sm.h-100.card-accent.card-accent-cyan
+                  .card-body.p-4
+                    .d-flex.flex-column.flex-lg-row.justify-content-between.align-items-lg-start.gap-3
+                      .d-flex.gap-3.flex-grow-1
+                        = link_to usr_profile_path(profile), class: "text-decoration-none" do
+                          = render Usr::Shared::UserAvatarIconComponent.new(user: profile.user, size: 72)
+                        .flex-grow-1
+                          .d-flex.flex-wrap.align-items-center.gap-2.mb-2
+                            %h4.fw-semibold.mb-0= link_to profile.user.full_name, usr_profile_path(profile), class: "text-dark text-decoration-none"
+                            - if profile.user == current_user
+                              %span.badge.text-bg-light.border Your Profile
+                          %p.text-muted.mb-2= profile.formatted_headline
+                          .d-flex.flex-wrap.align-items-center.gap-2.text-muted.small
+                            %span
+                              %i.bi.bi-geo-alt.me-1
+                              = profile.formatted_location
+                            - if profile.occupations.any?
+                              %span •
+                              %span
+                                %i.bi.bi-person-workspace.me-1
+                                = profile.occupations.first(3).map(&:name).to_sentence
+                          - if profile.bio.present?
+                            %p.text-muted.mb-0.mt-3= truncate(profile.bio, length: 180)
+                      .text-lg-end
+                        %div.text-muted.small
+                          %i.bi.bi-clock-history.me-1
+                          = profile_joined_label(profile.created_at)
+          - if @pagy.pages > 1
+            .row.mt-4
+              .col-12.d-flex.justify-content-end
+                = bootstrap_pagy_nav(@pagy)
+        - else
+          .row
+            .col-12
+              .card.border-0.shadow-sm
+                .card-body.p-4.empty-state.empty-state-cyan
+                  %h5.fw-semibold.mb-2 No Profiles Found
+                  %p.text-muted.mb-0 Try adjusting your filters or check back later as more members join.
+
+      .w-100.flex-shrink-0.app-sticky-filter{ style: "max-width: 250px;" }
+        .card.shadow-sm.bg-light.user-sidenav-card
+          .card-body.d-flex.flex-column.pt-4.pb-4
+            %h6.text-muted.fw-bold.mb-1 Search Profiles
+            %p.text-muted.small.mb-4 Narrow the directory by role, skill, or location.
+            = search_form_for @q, url: usr_profiles_path, html: { class: "d-flex flex-column gap-3" } do |f|
+              .form-check
+                = check_box_tag :recommended,
+                  "1",
+                  @recommended_people,
+                  class: "form-check-input",
+                  disabled: !@recommendations_available
+                = label_tag :recommended, "Recommended", class: "form-check-label fw-semibold"
+                .form-text{ data: { recommended_filter_help: true } }
+                  - if @recommendations_available
+                    Show people matched to your company’s active jobs.
+                  - else
+                    This filter is available when your company has an open job.
+              %div
+                = f.label :user_first_name_or_user_last_name_cont, "Name", class: "form-label"
+                = f.search_field :user_first_name_or_user_last_name_cont, value: @name_query, class: "form-control", placeholder: "Search by name"
+              %div
+                = f.label :occupations_name_eq, "Occupation", class: "form-label"
+                = f.select :occupations_name_eq, @occupations.map(&:name).uniq.map { |name| [name, name] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :skills_name_eq, "Skill", class: "form-label"
+                = f.select :skills_name_eq, @skills.map(&:name).uniq.map { |name| [name, name] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :locations_city_or_locations_state_or_locations_country_cont, "Location", class: "form-label"
+                = f.search_field :locations_city_or_locations_state_or_locations_country_cont, class: "form-control", placeholder: "Search by location"
+              .d-flex.flex-wrap.gap-2.pt-2
+                %button.btn.btn-primary{ type: "submit" }
+                  %i.bi.bi-search.me-1
+                  Search
+                = link_to "Clear", usr_profiles_path, class: "btn btn-quiet"

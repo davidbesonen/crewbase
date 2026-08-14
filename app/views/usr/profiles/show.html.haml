@@ -1,0 +1,201 @@
+.row
+  .col-sm-12
+    .card.border-0.shadow-sm.app-hero.app-hero-cyan
+      .card-body
+        .row.mx-4
+          .col-sm-12.mt-4
+            = render Usr::Shared::UserAvatarIconComponent.new(user: @profile.user, size: 250)
+        .row.mt-4.mx-4
+          .col-sm-8
+            %h1.fw-bold.mb-0= @profile_name
+            %p.text-muted.fs-5.mb-0= @profile_headline
+          .col-sm-4.d-flex.align-items-center.justify-content-end
+            - if current_user != @profile.user
+              .d-flex.flex-wrap.justify-content-end.gap-2
+                - @available_crew_shortlists.each do |shortlist|
+                  = button_to usr_crew_shortlist_memberships_path(shortlist), params: { profile_id: @profile.id }, class: "btn btn-outline-primary" do
+                    %i.bi.bi-person-plus.me-1
+                    = "Add to #{shortlist.name}"
+                = link_to new_usr_profile_review_path(@profile), class: "btn btn-outline-primary", data: { turbo_frame: "remote_modal" } do
+                  Write a Review
+            - if current_user == @profile.user
+              .d-flex.align-items-center.gap-2
+                = link_to usr_settings_path, class: "btn btn-outline-secondary" do
+                  %i.bi.bi-gear.me-1
+                  Settings
+                = link_to edit_usr_profile_path(@profile, source: "completed_profile"), class: "text-muted" do
+                  %i.bi.bi-pencil.fs-3{ title: "Edit Profile" }
+        .row.mx-4
+          .col-sm-12
+            %p.d-flex.flex-wrap.align-items-center.text-muted.mt-1.mb-0{ style: "font-size: 1.3rem;" }
+              %span
+                %strong
+                  %i.bi.bi-person-workspace.me-1
+              %span.me-2= @location_text
+              - if @profile_occupation_names.present?
+                %span.me-2 •
+                %span= @profile_occupation_names
+              - if current_user == @profile.user
+                %span.badge.bg-secondary.ms-2{ style: "font-size: 0.75rem;" }
+                  Your Profile
+            .d-flex.flex-wrap.mt-2.mb-3
+              - if @profile.website_url.present?
+                = link_to @profile.website_url, target: "_blank", rel: "noopener", class: "text-muted me-3 mb-2" do
+                  %i.bi.bi-globe{ title: "Website" }
+              - if @profile.linkedin_url.present?
+                = link_to @profile.linkedin_url, target: "_blank", rel: "noopener", class: "text-muted me-3 mb-2" do
+                  %i.bi.bi-linkedin{ title: "LinkedIn" }
+              - if @profile.twitter_handle.present?
+                = link_to "https://twitter.com/#{@profile.twitter_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted me-3 mb-2" do
+                  %i.bi.bi-twitter-x{ title: "X (Twitter)" }
+              - if @profile.instagram_handle.present?
+                = link_to "https://instagram.com/#{@profile.instagram_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted me-3 mb-2" do
+                  %i.bi.bi-instagram{ title: "Instagram" }
+              - if @profile.spotify_profile_url.present?
+                = link_to @profile.spotify_profile_url, target: "_blank", rel: "noopener", class: "text-muted me-3 mb-2" do
+                  %i.bi.bi-spotify{ title: "Spotify" }
+
+.row.mt-3
+  .col-12
+    .card.border-0.shadow-sm.card-accent.card-accent-cyan{ id: "profile-about" }
+      .card-body
+        .row
+          .col-lg-4
+            %h5.card-section-title.fw-bold Snapshot
+            - @about_items.each do |item|
+              .d-flex.mb-3
+                .text-secondary.me-3
+                  %i.bi{ class: item[:icon] }
+                %div
+                  %div.fw-semibold= item[:label]
+                  %div.text-muted= item[:value]
+            - if @can_view_profile_reviews
+              .mt-2{ data: { profile_review_summary: true } }
+                %div.fw-semibold.mb-1 Reviews
+                %div.text-muted
+                  - if @review_count.positive?
+                    = "#{@review_count} review#{'s' unless @review_count == 1}"
+                  - else
+                    No reviews yet
+          .col-lg-8.mt-3.mt-lg-0
+            .d-flex.justify-content-between.align-items-start.flex-wrap.mb-3
+              %div
+                %h5.card-section-title.fw-bold About
+              - if @can_view_profile_reviews && @average_rating.present?
+                %span.badge.text-bg-light.border.rounded-pill.mt-2.mt-sm-0
+                  = "#{@average_rating.round(1)} / 5 rating"
+            %p.text-muted.mb-0
+              = @profile.bio.presence || "Add a short bio to describe your background, specialties, and the kind of projects you want to work on."
+
+  - if @profile.user == current_user
+    .col-12.mt-3
+      = render Usr::ProfileAvailabilityComponent.new(overview: @availability_overview, availability_path: edit_calendar_usr_profile_path(@profile))
+
+  - if @profile.user != current_user && @invitable_jobs.any?
+    .col-12.mt-3
+      .card.border-0.shadow-sm
+        .card-body
+          %h5.card-section-title.fw-bold Invite to Apply
+          = form_with url: usr_profile_job_invitations_path(@profile), scope: :job_invitation, class: "d-flex flex-column flex-md-row gap-2" do |form|
+            = form.collection_select :job_id, @invitable_jobs, :id, ->(job) { "#{job.title} — #{job.company.name}" }, { prompt: "Choose an active job" }, { class: "form-select", required: true, aria: { label: "Job to invite this person to" } }
+            = form.submit "Send Invitation", class: "btn btn-primary flex-shrink-0"
+
+  .col-12.mt-3
+    .card.border-0.shadow-sm.card-accent.card-accent-sky{ id: "profile-experience" }
+      .card-body
+        .d-flex.justify-content-between.align-items-center.gap-3
+          %h5.card-section-title.fw-bold Experience
+          %p.text-muted.small.mb-0 Significant, longer-term professional roles.
+          - if current_user == @profile.user
+            = link_to edit_usr_profile_path(@profile, source: "completed_profile", add_experience: 1, anchor: "experience_form"),
+              class: "btn btn-outline-primary btn-sm",
+              aria: { label: "Add experience" },
+              title: "Add experience" do
+              %i.bi.bi-plus-lg{ aria: { hidden: true } }
+        - if @experiences.any?
+          - @experiences.each_with_index do |experience, index|
+            .pt-4{ class: ("border-top mt-4" if index.positive?) }
+              .d-flex.justify-content-between.align-items-start.flex-wrap
+                .d-flex.align-items-start.gap-3
+                  - if experience.company.present?
+                    %div{ data: { experience_company_icon: true } }
+                      = render Usr::Shared::CompanyIconComponent.new(company: experience.company, size: 56)
+                  %div
+                    %h5.fw-bold.mb-1= experience.title
+                    - if experience.company.present?
+                      %p.text-muted.mb-0
+                        = link_to experience.company.name, usr_company_path(experience.company), class: "text-muted text-decoration-none fw-semibold"
+                        - if experience.company.industries.any?
+                          %span.mx-1 •
+                          %span= experience.company.industry_names_text
+                        - if experience.company.formatted_location.present?
+                          %span.mx-1 •
+                          %span= experience.company.formatted_location
+                    - else
+                      %p.text-muted.mb-0= experience.company_name
+                %span.badge.text-bg-light.border.rounded-pill.mt-2.mt-sm-0= experience.display_timeframe
+              - if experience.summary.body.present?
+                .experience-summary.text-muted.mt-3{ data: { controller: "expandable-text" } }
+                  .experience-summary-content{ data: { expandable_text_target: "content" } }
+                    = experience.summary
+                  %button.btn.btn-link.p-0.d-none.experience-summary-toggle{
+                    type: "button",
+                    data: { expandable_text_target: "toggle", action: "expandable-text#toggle" },
+                    aria: { expanded: "false" }
+                  } …more
+              - else
+                %p.text-muted.mt-3.mb-0 No summary added.
+        - else
+          %p.text-muted.mt-3.mb-0 No experience added yet.
+
+  - if @profile.show_credits? || current_user == @profile.user
+    .col-12.mt-3
+      = render Usr::ProfileCreditsComponent.new(credits: @credits, owner_view: current_user == @profile.user, visible: @profile.show_credits?)
+
+  .col-12.mt-3
+    .card.border-0.shadow-sm{ id: "profile-skills" }
+      .card-body
+        .row
+          .col-lg-6
+            %h5.card-section-title.fw-bold Core Skills
+            - if @profile.skills.any?
+              .d-flex.flex-wrap
+                - @profile.skills.each do |skill|
+                  %span.badge.rounded-pill.text-bg-light.border.me-2.mb-2= skill.name
+            - else
+              %p.text-muted.mb-0 No skills listed yet.
+          .col-lg-6.mt-3.mt-lg-0
+            %h5.card-section-title.fw-bold Equipment & Tools
+            - if @profile.equipment.any?
+              .d-flex.flex-wrap
+                - @profile.equipment.each do |item|
+                  %span.badge.rounded-pill.text-bg-light.border.me-2.mb-2= item.name
+            - else
+              %p.text-muted.mb-0 No equipment or tools listed yet.
+
+  - if @can_view_profile_reviews
+    .col-12.mt-3
+      .card.border-0.shadow-sm{ id: "profile-reviews" }
+        .card-body
+          .row
+            .col-lg-4
+              %h5.card-section-title.fw-bold Rating Summary
+              %div.display-6.fw-bold.mb-1= @average_rating.present? ? @average_rating.round(1) : "N/A"
+              %p.text-muted.mb-0
+                - if @review_count.positive?
+                  = "Based on #{@review_count} review#{'s' unless @review_count == 1}."
+                - else
+                  No reviews yet. This section can surface reliability, communication, and on-set performance once feedback is added.
+            .col-lg-8.mt-3.mt-lg-0
+              %h5.card-section-title.fw-bold Recent Feedback
+              - if @recent_reviews.any?
+                - @recent_reviews.each do |review|
+                  .border.rounded-3.p-3.mb-3
+                    .d-flex.justify-content-between.align-items-start.flex-wrap
+                      %div.fw-semibold= review.profile.user.full_name
+                      - if review.overall_rating.present?
+                        %span.badge.text-bg-light.border.rounded-pill.mt-2.mt-sm-0= "#{review.overall_rating.round(1)} / 5"
+                    %p.text-muted.small.mb-2= review.created_at.strftime("%B %-d, %Y")
+                    %p.mb-0= review.body.presence || "No written feedback provided."
+              - else
+                %p.text-muted.mb-0 No written feedback yet.

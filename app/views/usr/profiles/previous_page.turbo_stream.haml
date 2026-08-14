@@ -1,0 +1,5 @@
+- if @current_page.present?
+  = turbo_stream.action :hide, @current_page
+
+- if @previous_page.present?
+  = turbo_stream.action :show, @previous_page

@@ -1,0 +1,53 @@
+= turbo_stream.replace "availability_date_#{@date.to_s}" do
+  %div{ id: "availability_date_#{@date.to_s}", class: "d-flex justify-content-center align-items-center" }
+    - month_start = @month_start || Date.current.beginning_of_month
+    - in_month = @date.month == month_start.month && @date.year == month_start.year
+    - past_day = @date < Date.current
+    - selectable = in_month && !past_day
+    - day_key = @date.strftime("%Y-%m-%d")
+    - if selectable && @calendar_events.key?(day_key)
+      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: @date, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+        = @date.day
+    - elsif selectable
+      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: @date, toggle_action: "add", month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+        = @date.day
+    - else
+      %button.btn.btn-outline-secondary.rounded-pill.px-3.py-2.fw-normal.availability-date-pill.text-muted{ type: "button", disabled: true }
+        = @date.day
+
+= turbo_stream.replace "blockout_dates_list" do
+  %div{ id: "blockout_dates_list" }
+    - month_start = @month_start || Date.current.beginning_of_month
+    .card.mb-3.d-flex.flex-column{ style: "height: 470px;" }
+      .card-header
+        .row
+          .col-sm-12.d-flex.align-items-center
+            %h5.mb-0 Blockout Dates
+      .card-body.overflow-auto
+        - if @calendar_events_sorted.empty?
+          .d-flex.h-100.align-items-center.justify-content-center
+            %h1.text-center.text-muted.opacity-50
+              %i.bi.bi-calendar-x.me-2.text-muted
+            %p.mb-0.text-center.text-muted.opacity-50.fs-4 No blockout dates
+        - else
+          .row
+            .col-sm-6
+              %p.text-muted="#{@calendar_events_sorted.size} blockout date#{'s' if @calendar_events_sorted.size != 1}"
+            .col-sm-6.text-end
+              = link_to destroy_all_usr_profile_calendar_events_path(profile_id: @profile.id, month: month_start.strftime("%Y-%m-%d")), method: :delete, class: "btn btn-sm btn-outline-danger" do
+                %i.bi.bi-trash
+                Clear all
+            .col-sm-12
+              %table.table.table-striped.table-hover.table-sm.mb-0
+                %tbody
+                  - @calendar_events_sorted.each do |date_str, event_id|
+                    - date = Date.parse(date_str)
+                    %tr
+                      %td.align-middle
+                        %p.mb-0.mx-2
+                          %i.bi.bi-x-circle-fill.text-danger.me-2
+                          = date.strftime("%A, %B %d, %Y")
+                      %td.text-end
+                        = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: date, toggle_action: "remove", calendar_event_id: event_id, month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-sm btn-outline-danger my-1" do
+                          %i.bi.bi-trash
+                          Remove

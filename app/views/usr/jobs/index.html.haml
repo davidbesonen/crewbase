@@ -1,0 +1,142 @@
+.row
+  .col-sm-12
+    .d-flex.flex-column.flex-xl-row.align-items-start.gap-4
+      .flex-grow-1.w-100
+        .row.mb-4
+          .col-12
+            %h1.fw-bold.mb-1 Open Jobs
+            %p.text-muted.mb-0 Browse active roles from companies hiring now.
+
+        - if @jobs.any?
+          .row.g-3
+            .col-6.d-flex.align-items-center
+              %p.text-muted.mb-1 
+                Showing
+                %strong= @pagy.from
+                -
+                %span.text-muted
+                  of
+                  %strong= @pagy.to
+                  results
+                  %em="(#{@pagy.count} total)"
+            - if @pagy.pages > 1
+              .col-6.d-flex.align-items-center.justify-content-end.mb-1
+                = bootstrap_pagy_nav(@pagy)
+            - @jobs.each do |job|
+              .col-12
+                .card.border-0.shadow-sm.h-100.card-accent.card-accent-sky
+                  .card-body.p-4
+                    .d-flex.flex-column.flex-lg-row.justify-content-between.align-items-lg-start.gap-3
+                      .flex-grow-1
+                        .d-flex.flex-wrap.align-items-center.gap-2.mb-2
+                          %h4.fw-semibold.mb-0= link_to job.title, usr_job_path(job), class: "text-dark text-decoration-none"
+                        %p.text-muted.mb-2
+                          - if job.company.present?
+                            = link_to job.company.name, usr_company_path(job.company), class: "text-muted text-decoration-none"
+                            - if job.company.industries.any?
+                              •
+                              = job.company.industry_names_text
+                          - else
+                            Unassigned Company
+                        .d-flex.flex-wrap.align-items-center.gap-2.text-muted.small
+                          %span
+                            %i.bi.bi-briefcase.me-1
+                            = job.employment_type&.humanize || "Employment type not listed"
+                          %span •
+                          %span
+                            %i.bi.bi-geo-alt.me-1
+                            = job.formatted_location
+                          %span •
+                          %span
+                            %i.bi.bi-building.me-1
+                            = job.workplace_type&.humanize || "Workplace type not listed"
+                          - if job.requires_travel?
+                            %span •
+                            %span
+                              %i.bi.bi-sign-turn-right.me-1
+                              Travel required
+                      .text-lg-end
+                        - if job.pay_min.present? || job.pay_max.present?
+                          %div.fw-semibold
+                            - if job.pay_min.present? && job.pay_max.present?
+                              = number_to_currency(job.pay_min)
+                              = "-"
+                              = number_to_currency(job.pay_max)
+                            - elsif job.pay_min.present?
+                              = number_to_currency(job.pay_min)
+                            - else
+                              = number_to_currency(job.pay_max)
+                          %div.text-muted.small= job.pay_period&.humanize || "Compensation details"
+                        %div.text-muted.small
+                          %i.bi.bi-clock.me-1
+                          = job.relative_published_at
+                        - if job.application_deadline.present?
+                          %div.text-muted.small.mt-2
+                            Apply by
+                            = l(job.application_deadline.to_date, format: :long)
+          - if @pagy.pages > 1
+            .row.mt-4
+              .col-12.d-flex.justify-content-end
+                = bootstrap_pagy_nav(@pagy)
+        - else
+          .row
+            .col-12
+              .card.border-0.shadow-sm
+                .card-body.p-4.empty-state.empty-state-sky
+                  %h5.fw-semibold.mb-2 No Open Jobs Yet
+                  %p.text-muted.mb-0 Check back later for newly published roles.
+
+      .w-100.flex-shrink-0.app-sticky-filter{ style: "max-width: 250px;" }
+        .card.shadow-sm.bg-light.user-sidenav-card
+          .card-body.d-flex.flex-column.pt-4.pb-4
+            %h6.text-muted.fw-bold.mb-1 Search Jobs
+            %p.text-muted.small.mb-4 Narrow roles by title, industry, schedule, and compensation.
+            = search_form_for @q, url: usr_jobs_path, html: { class: "d-flex flex-column gap-3" } do |f|
+              %div
+                = f.label :title_cont, "Job Title", class: "form-label"
+                = f.search_field :title_cont, class: "form-control", placeholder: "Search by title"
+              %div
+                = f.label :company_industries_name_eq, "Industry", class: "form-label"
+                = f.select :company_industries_name_eq, @industries.map { |industry| [industry.name, industry.name] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :employment_type_eq, "Employment", class: "form-label"
+                = f.select :employment_type_eq, Job.employment_types.map { |label, value| [label.humanize, value] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :workplace_type_eq, "Workplace", class: "form-label"
+                = f.select :workplace_type_eq, Job.workplace_types.map { |label, value| [label.humanize, value] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :pay_period_eq, "Pay Period", class: "form-label"
+                = f.select :pay_period_eq, Job.pay_periods.map { |label, value| [label.humanize, value] }, { include_blank: "Any" }, class: "form-select"
+              %div
+                = f.label :requires_travel_eq, "Travel", class: "form-label"
+                = f.select :requires_travel_eq, [["Any", nil], ["Required", true], ["Not required", false]], {}, class: "form-select"
+              %div
+                = f.label :is_visa_sponsorship_available_eq, "Visa Sponsorship", class: "form-label"
+                = f.select :is_visa_sponsorship_available_eq, [["Any", nil], ["Available", true], ["Not listed", false]], {}, class: "form-select"
+              %div
+                = f.label :pay_min_gteq, "Minimum Pay", class: "form-label"
+                .input-group
+                  %span.input-group-text $
+                  = f.number_field :pay_min_gteq, class: "form-control", placeholder: "0", step: :any
+              %div
+                = f.label :pay_max_lteq, "Maximum Pay", class: "form-label"
+                .input-group
+                  %span.input-group-text $
+                  = f.number_field :pay_max_lteq, class: "form-control", placeholder: "100000", step: :any
+              %div
+                = f.label :published_at_gteq, "Published After", class: "form-label"
+                = f.date_field :published_at_gteq, class: "form-control"
+              %div
+                = f.label :application_deadline_lteq, "Apply By", class: "form-label"
+                = f.date_field :application_deadline_lteq, class: "form-control"
+              %div
+                = f.label :starts_at_gteq, "Starts After", class: "form-label"
+                = f.date_field :starts_at_gteq, class: "form-control"
+              %div
+                = f.label :ends_at_lteq, "Ends Before", class: "form-label"
+                = f.date_field :ends_at_lteq, class: "form-control"
+              .d-flex.flex-wrap.gap-2.pt-2
+                %button.btn.btn-primary{ type: "submit" }
+                  %i.bi.bi-search.me-1
+                  Search
+                = link_to "Clear", usr_jobs_path, class: "btn btn-quiet"

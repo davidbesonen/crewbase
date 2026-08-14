@@ -1,0 +1,37 @@
+- form_url = if @review.persisted?
+  - usr_review_path(@review)
+- elsif @reviewable.is_a?(Company)
+  - usr_company_reviews_path(@reviewable)
+- else
+  - usr_profile_reviews_path(@reviewable)
+= simple_form_for @review, url: form_url, data: { turbo_frame: "_top", controller: "review-form", action: "change->review-form#update" } do |f|
+  .row
+    .col-sm-12
+      %p.text-muted 
+        %i.bi.bi-info-circle-fill.me-1
+        Please provide honest feedback to help company owners make informed staffing decisions. Your review is visible only to company owners, so please be respectful and constructive.
+    .col-sm-12
+      - if @review.reviewable_type == "Company"
+        - @company_rating_fields.each do |label_text, key|
+          .mb-4
+            %label.form-label= label_text
+            %br
+            .btn-group.review-rating-group{ role: "group", "aria-label": label_text }
+              - (1..5).each do |rating|
+                - input_id = "#{f.object_name}_rating_data_#{key}_#{rating}"
+                %input.btn-check{ type: "radio", id: input_id, name: "review[rating_data][#{key}]", value: rating, required: true, checked: @review.rating_data&.[](key).to_s == rating.to_s }
+                %label.btn.btn-outline-secondary.review-rating-btn{ for: input_id }= rating
+      - elsif @review.reviewable_type == "Profile"
+        - @worker_rating_fields.each do |label_text, key|
+          .mb-4
+            %label.form-label= label_text
+            %br
+            .btn-group.review-rating-group{ role: "group", "aria-label": label_text }
+              - (1..5).each do |rating|
+                - input_id = "#{f.object_name}_rating_data_#{key}_#{rating}"
+                %input.btn-check{ type: "radio", id: input_id, name: "review[rating_data][#{key}]", value: rating, required: true, checked: @review.rating_data&.[](key).to_s == rating.to_s }
+                %label.btn.btn-outline-secondary.review-rating-btn{ for: input_id }= rating
+    .col-sm-12.mt-3
+      = f.input :body, as: :text, label: "Review", input_html: { rows: 5 }, required: false
+    .col-sm-12.mt-1
+      = f.submit "Submit Review", class: "btn btn-primary", data: { review_form_target: "submit" }, disabled: true

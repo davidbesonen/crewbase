@@ -1,0 +1,74 @@
+/ --- User sidenav (tall card, not fixed) ---
+.card.shadow-sm.bg-light.flex-shrink-0.user-sidenav-card
+  .card-body.d-flex.flex-column.pt-4.pb-4
+    .d-flex.align-items-end.gap-2
+      = render Usr::Shared::UserAvatarIconComponent.new(user: current_user, size: 60)
+      %h6.text-muted.fw-bold.mb-0
+        = current_user.full_name
+    %hr.mt-4.mb-3
+    %h6.text-muted.fw-bold.mb-3 Navigation
+    %ul.nav.flex-column.gap-1
+      %li.nav-item
+        = link_to usr_dashboards_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-house.me-2
+          Dashboard
+      %li.nav-item
+        = link_to usr_profile_path(current_profile), class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-person.me-2
+          My Profile
+      %li.nav-item
+        = link_to usr_profiles_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-people.me-2
+          People
+      %li.nav-tem
+        = link_to usr_jobs_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-briefcase.me-2
+          Jobs
+      - if @projects_navigation_path
+        %li.nav-item
+          = link_to @projects_navigation_path, class: "nav-link d-flex align-items-center text-dark" do
+            %i.bi.bi-folder2-open.me-2
+            Projects
+      %li.nav-item
+        = link_to usr_notifications_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-bell.me-2
+          Notifications
+          - if @unread_notification_count.positive?
+            %span.badge.rounded-pill.text-bg-primary.ms-auto= @unread_notification_count
+      %li.nav-item
+        = link_to usr_conversations_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-chat-left-text.me-2
+          Messages
+      %li.nav-item
+        = link_to usr_job_invitations_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-send.me-2
+          Invitations
+      %li.nav-item
+        = link_to usr_companies_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-buildings.me-2
+          Companies
+      %li.nav-item
+        %a.nav-link.d-flex.align-items-center.text-dark{ href: "#" }
+          %i.bi.bi-gear.me-2
+          Settings
+    %hr.mt-4.mb-3
+    %h6.text-muted.fw-bold.mb-3 Companies
+    %ul.nav.flex-column.gap-1.mb-3
+      - if @sidenav_companies.any?
+        - @sidenav_companies.each do |company|
+          %li.nav-item
+            = link_to usr_company_path(company), class: "nav-link d-flex align-items-center text-dark" do
+              %i.bi.bi-building.me-2
+              = company.name
+      - else
+        %li.nav-item
+          %p.text-muted.mb-0.ps-3 No companies yet.
+      %li.nav-item
+        = link_to new_usr_company_path, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-plus-circle.me-2
+          Create Company
+    %ul.nav.flex-column
+      %li.nav-item
+        = link_to destroy_user_session_path, data: { turbo_method: :delete }, class: "nav-link d-flex align-items-center text-dark" do
+          %i.bi.bi-box-arrow-right.me-2
+          Sign Out

@@ -1,0 +1,44 @@
+%div{ id: "company_plan_selection", class: ("d-none" if visible_form != "company_plan_selection") }
+  .row
+    .col-sm-12.text-center
+      %h3.fw-bold.mb-0 Select a Company Plan
+      %p.text-muted.mb-4 Please choose a plan that best fits your company's needs.
+  .row.g-3.mt-3.justify-content-center
+    - plans.each do |plan|
+      - presentation = tier_presentation(plan)
+      .col-12.col-md-6.col-xl-4
+        .card.border-0.shadow-sm.h-100.company-plan-card{ class: ["company-plan-card--#{tier_key(plan)}", ("company-plan-card--featured" if presentation[:badge])] }
+          - if presentation[:badge]
+            .company-plan-card__badge= presentation[:badge]
+          .company-plan-card__accent{ aria: { hidden: true } }
+          .card-body.d-flex.flex-column.p-4
+            .company-plan-card__icon.mx-auto.mb-3{ aria: { hidden: true } }
+              %i.bi{ class: presentation[:icon] }
+            %h3.text-center.fw-bold.mb-2= plan.name
+            %p.text-center.company-plan-card__price.mb-2
+              %span.fw-bold= plan.monthly_price
+              %span.text-muted /mo
+              %span.text-muted.mx-1 ·
+              %span.fw-semibold= plan.annual_price
+              %span.text-muted /yr
+            %p.card-text.text-muted.text-center.company-plan-card__description.mb-3= plan.description
+            .mt-auto
+              .company-plan-card__capacities.mt-3
+                - plan.capacity_items.each do |capacity|
+                  .company-plan-card__capacity.d-flex.align-items-center.gap-2
+                    %span.company-plan-card__capacity-icon{ aria: { hidden: true } }
+                      %i.bi{ class: capacity[:icon] }
+                    %span.fw-semibold= capacity[:label]
+              %ul.list-unstyled.company-plan-card__features.mb-3.mt-3
+                - plan.feature_matrix.each do |feature|
+                  %li.company-plan-card__feature.d-flex.align-items-start.gap-2.mb-2{ class: (feature[:included] ? "company-plan-card__feature--included" : "company-plan-card__feature--locked") }
+                    %span.company-plan-card__feature-status{ aria: { hidden: true } }
+                      - if feature[:included]
+                        %i.bi.bi-check-lg.text-success
+                      - else
+                        %i.bi.bi-x-lg.text-secondary
+                    %span.company-plan-card__feature-icon{ aria: { hidden: true } }
+                      %i.bi{ class: feature[:icon] }
+                    %span= feature[:label]
+              = link_to next_form_usr_companies_path(current_page: "company_plan_selection", plan_id: plan.id), class: "btn #{presentation[:button]} w-100 mt-3 company-plan-card__button" do
+                = "Select #{plan.name}"

@@ -1,0 +1,254 @@
+%main.marketing-home{ data: { marketing_homepage: true, controller: "marketing-motion" } }
+  %nav.marketing-nav{ aria: { label: "Primary navigation" } }
+    .marketing-container.marketing-nav__inner
+      = link_to root_path, class: "marketing-brand", aria: { label: "Crewbase home" } do
+        = brand
+      .marketing-nav__links
+        = link_to "How it works", "#how-it-works", class: "marketing-nav__anchor"
+        = link_to "For crew", "#for-crew", class: "marketing-nav__anchor"
+        = link_to "For companies", "#for-companies", class: "marketing-nav__anchor"
+        = link_to "Pricing", "#pricing", class: "marketing-nav__anchor"
+        = link_to "Meet the Team", meet_the_team_path, class: "marketing-nav__anchor"
+        = link_to "What’s new", change_log_entries_path, class: "marketing-nav__anchor"
+      .marketing-nav__actions
+        - if show_auth_links
+          = link_to "Sign in", new_user_session_path, class: "btn btn-quiet"
+        = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary"
+
+  %section.marketing-hero
+    .marketing-container.marketing-hero__grid
+      .marketing-hero__copy{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
+        .marketing-eyebrow
+          %span.marketing-eyebrow__dot
+          Built for the people behind live events
+        %h1 Build the right crew. Run a better show.
+        %p.marketing-hero__lede
+          Crewbase brings live event professionals, production companies, and real staffing workflows into one trusted network—without the group-thread chaos.
+        .marketing-hero__actions
+          = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary btn-lg"
+          = link_to "See how it works", "#how-it-works", class: "btn btn-outline-primary btn-lg"
+        .marketing-proof{ aria: { label: "Crewbase benefits" } }
+          %span
+            %i.bi.bi-check-circle-fill
+            Profiles built for event work
+          %span
+            %i.bi.bi-check-circle-fill
+            Clear, explainable matches
+          %span
+            %i.bi.bi-check-circle-fill
+            Staffing through show day
+
+      .marketing-product-preview{ aria: { label: "Crewbase staffing dashboard preview" }, data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
+        .marketing-product-preview__topbar
+          .marketing-window-dots{ aria: { hidden: true } }
+            %span
+            %span
+            %span
+          %span Crew recommendations
+          %span.marketing-live-pill Live
+        .marketing-product-preview__body
+          .marketing-preview-heading
+            %div
+              %span.marketing-preview-label Available this weekend
+              %strong Chicago, IL
+            %span.marketing-count 18 crew
+          .marketing-preview-list
+            .marketing-crew-row
+              .marketing-avatar AB
+              .marketing-crew-row__copy
+                %strong Avery Brooks
+                %span A1 Audio Engineer
+              %span.marketing-crew-reason Role + skills
+            .marketing-crew-row
+              .marketing-avatar.marketing-avatar--sky MK
+              .marketing-crew-row__copy
+                %strong Morgan Kim
+                %span Lighting Programmer
+              %span.marketing-crew-reason Skills + equipment
+            .marketing-crew-row
+              .marketing-avatar.marketing-avatar--navy JT
+              .marketing-crew-row__copy
+                %strong Jordan Torres
+                %span Video Engineer
+              %span.marketing-crew-reason Role + location
+          .marketing-preview-note
+            %i.bi.bi-stars
+            Matched by role, skills, equipment, location, and availability.
+
+  %section.marketing-trust-strip
+    .marketing-container{ data: { marketing_motion_target: "reveal" } }
+      %p One practical workspace for every part of building a live event team.
+      .marketing-trust-strip__items
+        %span Concerts
+        %span Festivals
+        %span Corporate events
+        %span Touring
+        %span Broadcast
+        %span Production
+
+  %section.marketing-section#how-it-works
+    .marketing-container
+      .marketing-section-heading{ data: { marketing_motion_target: "reveal" } }
+        %span.marketing-kicker From search to show day
+        %h2 Staffing should feel organized from the start.
+        %p Crewbase replaces scattered posts, texts, and spreadsheets with a workflow everyone can understand.
+      .marketing-steps
+        %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
+          %span.marketing-step__number 01
+          %i.bi.bi-person-vcard
+          %h3 Show what you do
+          %p Build a useful professional profile or company presence with roles, skills, equipment, verified Crewbase Credits, experience, and availability.
+        %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
+          %span.marketing-step__number 02
+          %i.bi.bi-search-heart
+          %h3 Find the right fit
+          %p Search people and jobs, see relevant recommendations, and understand exactly why each opportunity or crew member matches.
+        %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
+          %span.marketing-step__number 03
+          %i.bi.bi-kanban
+          %h3 Keep work moving
+          %p Invite, apply, shortlist, assign, message, and track the details that turn an open role into a dependable crew.
+
+  %section.marketing-section.marketing-section--tinted#for-crew
+    .marketing-container
+      .marketing-audience-heading{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
+        .marketing-audience-icon
+          %i.bi.bi-headset
+        %div
+          %span.marketing-kicker For crew members
+          %h2 Show what you can do. Find work that fits.
+          %p Make it easy for the right production teams to understand your experience and know when you can work.
+      .marketing-bento
+        %article.marketing-feature.marketing-feature--wide{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
+          .marketing-feature__icon
+            %i.bi.bi-person-badge
+          %h3 Skills & equipment, with proof of work
+          %p Go beyond a generic résumé with occupations, specialties, equipment fluency, significant experience, verified Crewbase Credits earned from completed jobs, and reviews visible only to company owners.
+          .marketing-tag-row
+            %span A1 Audio
+            %span GrandMA3
+            %span ETCP
+            %span Touring
+        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
+          .marketing-feature__icon
+            %i.bi.bi-calendar2-check
+          %h3 Availability without back-and-forth
+          %p Share explicit availability, block conflicts, and connect an iCal feed so teams can plan with better information.
+        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
+          .marketing-feature__icon
+            %i.bi.bi-briefcase
+          %h3 Jobs worth seeing
+          %p Browse structured postings, save roles, apply once, and receive recommendations grounded in your actual profile.
+
+  %section.marketing-section#for-companies
+    .marketing-container
+      .marketing-audience-heading{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "right" } }
+        .marketing-audience-icon.marketing-audience-icon--navy
+          %i.bi.bi-buildings
+        %div
+          %span.marketing-kicker For production companies
+          %h2 Build trusted crews with less friction.
+          %p Move quickly without sacrificing context, consistency, or control over your staffing process.
+      .marketing-bento
+        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
+          .marketing-feature__icon
+            %i.bi.bi-people
+          %h3 Find qualified people
+          %p Search the crew network by job title and profile, then use recommendations and match explanations to focus your outreach.
+        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
+          .marketing-feature__icon
+            %i.bi.bi-ui-checks-grid
+          %h3 Structured job postings
+          %p Post a single role or organize a multi-position gig, with clear requirements, dates, location, compensation, and application questions.
+        %article.marketing-feature.marketing-feature--wide{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
+          .marketing-feature__icon
+            %i.bi.bi-diagram-3
+          %h3 One hiring workflow, end to end
+          %p Invite candidates, review applications, build shortlists, organize crew positions and assignments, and keep conversations connected to the work.
+          .marketing-flow
+            %span Post
+            %i.bi.bi-arrow-right
+            %span Match
+            %i.bi.bi-arrow-right
+            %span Review
+            %i.bi.bi-arrow-right
+            %span Crew
+
+  %section.marketing-section.marketing-section--tinted#pricing
+    .marketing-container
+      .marketing-section-heading{ data: { marketing_motion_target: "reveal" } }
+        %span.marketing-kicker Simple beta pricing
+        %h2 Free forever for crew. Straightforward plans for companies.
+        %p Every professional can build a profile, apply, message, and manage their work for free. Company billing begins after the beta, with advance notice and no surprise charges.
+      .marketing-price-grid
+        - pricing_plans.each_with_index do |(name, monthly, annual, limits, description), index|
+          %article.marketing-price-card{ class: ("marketing-price-card--featured" if index == 1), data: { marketing_motion_target: "reveal", marketing_motion_stagger: index } }
+            - if index == 1
+              %span.marketing-price-card__badge Recommended
+            %h3= name
+            %p.marketing-price-card__price
+              %strong= monthly
+              %span / month
+            %p.marketing-price-card__annual #{annual}/year — two months free
+            %p.fw-semibold= limits
+            %p= description
+      .marketing-founder-offer{ data: { marketing_motion_target: "reveal" } }
+        %i.bi.bi-stars
+        %div
+          %span.marketing-kicker Founding Company offer
+          %h3 Help shape Crewbase and keep a lasting advantage.
+          %p.mb-0 The first 100 paying companies receive 50% off their first year, then 25% off while continuously subscribed, 24-month price protection, a Founding Company profile badge, concierge onboarding, priority feature voting, and early access. Beta access is free for 60 days with no card required.
+
+  %section.marketing-section.marketing-platform#platform
+    .marketing-container.marketing-platform__grid
+      .marketing-platform__copy{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
+        %span.marketing-kicker Built around real operations
+        %h2 The network gets you connected. The tools keep you there.
+        %p Crewbase stays useful after a match is made, keeping the context for each company, opportunity, and working relationship close at hand.
+        %ul.marketing-check-list
+          %li
+            %i.bi.bi-check2
+            %span
+              %strong Private project workspaces
+              for company owners to organize related postings.
+          %li
+            %i.bi.bi-check2
+            %span
+              %strong Contextual messaging and notifications
+              around applications and invitations.
+          %li
+            %i.bi.bi-check2
+            %span
+              %strong Saved jobs, crew shortlists, and private reviews
+              that make repeat work easier.
+      .marketing-principle-card{ data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
+        %i.bi.bi-stars
+        %span.marketing-kicker Matching without the mystery
+        %h3 Recommendations you can understand.
+        %p Crewbase bases recommendations on clear, job-relevant details like occupation, skills, equipment, location, requirements, and known availability—not an unexplained black box.
+        .marketing-signal-list
+          %span Occupation
+          %span Skills
+          %span Equipment
+          %span Location
+          %span Availability
+
+  %section.marketing-cta
+    .marketing-container
+      .marketing-cta__inner{ data: { marketing_motion_target: "reveal" } }
+        %span.marketing-kicker Your next crew starts here
+        %h2 Spend less time chasing replies. Build with confidence.
+        %p Join the shared workspace designed for the people who make live events happen.
+        .marketing-cta__actions
+          = link_to primary_cta_label, primary_cta_path, class: "btn btn-light btn-lg"
+          - if show_auth_links
+            = link_to "Already have an account? Sign in", new_user_session_path, class: "marketing-cta__signin"
+
+  %footer.marketing-footer
+    .marketing-container.marketing-footer__inner
+      .marketing-footer__brand
+        = brand
+        %span Live event teams, connected.
+      = link_to "What’s new", change_log_entries_path
+      = link_to "Meet the Team", meet_the_team_path
+      %p © #{Time.current.year} Crewbase

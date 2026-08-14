@@ -1,0 +1,28 @@
+%h4.fw-semibold.mb-4 What occupation(s) best describe you?
+.row.g-3
+  .col-md-12
+    .d-flex.flex-wrap.gap-2
+      - occupations.sort_by(&:name).each do |occupation|
+        - if profile_occupations.include?(occupation)
+          = link_to toggle_occupation_selection_usr_profile_path(profile, occupation_id: occupation.id, source: source), method: :post, class: "btn btn-secondary rounded-pill px-3 py-2 fw-normal", id: "occupation_button_id_#{occupation.id}", data: { occupation_id: occupation.id } do
+            = occupation.name
+        - else
+          = link_to toggle_occupation_selection_usr_profile_path(profile, occupation_id: occupation.id, source: source), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal", id: "occupation_button_id_#{occupation.id}", data: { occupation_id: occupation.id } do
+            = occupation.name
+    - if profile_occupations.any?
+      %p.fw-semibold.mt-3.mb-0 Your selected occupation(s):
+      .w-100
+      .d-flex.flex-wrap.gap-2.mt-2
+        - profile_occupations.sort_by(&:name).each do |po|
+          %span.selected-occupation-pill
+            = po.name
+    - if show_navigation
+      .row.mt-3
+        .col-md-6
+          = link_to previous_page_usr_profile_path(profile, current_page: "occupation_form"), class: "btn btn-quiet" do
+            %i.bi.bi-arrow-left-circle
+            Location
+        .col-md-6.d-flex.justify-content-end.align-items-end
+          = link_to next_page_usr_profile_path(profile, current_page: "occupation_form"), class: "btn btn-primary" do
+            %i.bi.bi-arrow-right-circle
+            Skills & Services

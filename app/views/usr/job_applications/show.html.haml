@@ -1,0 +1,137 @@
+.row.g-4
+  .col-12.col-lg-8
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4.p-lg-5
+        .d-flex.flex-column.flex-md-row.align-items-start.justify-content-between.gap-3.mb-4
+          .d-flex.align-items-start.gap-3.flex-grow-1{ style: "min-width: 0;" }
+            .flex-shrink-0
+              - if @job.company.present?
+                = render Usr::Shared::CompanyIconComponent.new(company: @job.company, size: 72)
+              - else
+                .rounded-circle.bg-secondary.text-white.d-inline-flex.align-items-center.justify-content-center{ style: "width: 72px; height: 72px; font-size: 1.75rem;" } J
+            %div{ style: "min-width: 0;" }
+              %h1.fw-bold.mb-1= @job.title
+              %p.text-muted.mb-0
+                - if @job.company.present?
+                  = link_to @job.company.name, usr_company_path(@job.company), class: "text-muted text-decoration-none"
+                - else
+                  Unassigned Company
+          .d-flex.flex-wrap.gap-2
+            .btn-group
+              - if @company_owner_view
+                = link_to "View Applicant Profile", usr_profile_path(@job_application.profile), class: "btn btn-quiet"
+              = link_to "View Job", usr_job_path(@job), class: "btn btn-quiet"
+
+        .row.g-3
+          - if @company_owner_view
+            .col-sm-6
+              %div.text-muted.small Applicant
+              %div.fw-semibold= @job_application.profile.user.full_name
+          .col-sm-6
+            %div.text-muted.small Status
+            %div.fw-semibold= @job_application.status.humanize.titleize
+          .col-sm-6
+            %div.text-muted.small Submitted
+            %div.fw-semibold= l((@job_application.submitted_at || @job_application.created_at).to_date, format: :long)
+          - if @job_application.reviewed_at.present?
+            .col-sm-6
+              %div.text-muted.small Reviewed
+              %div.fw-semibold= l(@job_application.reviewed_at.to_date, format: :long)
+          - if @job_application.decision_at.present?
+            .col-sm-6
+              %div.text-muted.small Decision
+              %div.fw-semibold= l(@job_application.decision_at.to_date, format: :long)
+
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h4.fw-semibold.mb-3 Screening Answers
+        - if @job_application.question_answers.present?
+          .d-flex.flex-column.gap-4
+            - @job_application.question_answers.each do |question, answer|
+              %div
+                %div.fw-semibold.mb-1= question
+                %div.text-muted= simple_format(answer.presence || "No answer provided.")
+        - else
+          %p.text-muted.mb-0 No screening questions were answered.
+
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h4.fw-semibold.mb-3 Additional Information
+        - if @job_application.additional_information.present?
+          = @job_application.additional_information
+        - else
+          %p.text-muted.mb-0 No additional information provided.
+
+    .card.border-0.shadow-sm.mt-4
+      .card-body.p-4
+        %h4.fw-semibold.mb-3 Conversation
+        - if @conversation.present?
+          = link_to "Open conversation", usr_conversation_path(@conversation), class: "btn btn-primary"
+        - else
+          = form_with url: usr_job_application_contextual_messages_path(@job_application), scope: :contextual_message do |form|
+            .mb-3
+              = form.label :body, "Message about this application", class: "form-label"
+              = form.text_area :body, class: "form-control", rows: 3, required: true, maxlength: 5000
+            = form.submit "Start conversation", class: "btn btn-primary"
+
+    - if @existing_credit.present?
+      .card.border-0.shadow-sm.mt-4
+        .card-body.p-4
+          .d-flex.align-items-center.gap-2.mb-2
+            = crewbase_credit_badge(variant: :blue, compact: true)
+            %h4.fw-semibold.mb-0 Crewbase Credit earned
+          %p.text-muted.mb-3 This job was verified and added automatically when the company marked it completed.
+          = link_to "View Crewbase Credit", usr_profile_path(@job_application.profile, anchor: "profile-credits"), class: "btn btn-outline-primary"
+
+  .col-12.col-lg-4
+    - if @company_owner_view
+      .card.border-0.shadow-sm.mb-4
+        .card-body.p-4
+          %h5.fw-semibold.mb-0 Review Application
+          %p.text-muted.mt-0="Current status: #{@job_application.status.humanize.titleize}"
+          .d-grid.gap-2
+            - JobApplication.review_statuses.each do |status|
+              - next if @job_application.status == status
+              - if status == "accepted" && @job.multi_position?
+                - if @available_crew_positions.any?
+                  = form_with url: update_status_usr_job_application_path(@job_application), method: :patch, class: "d-grid gap-2" do |form|
+                    = form.hidden_field :status, value: "accepted"
+                    = form.label :crew_position_id, "Position", class: "form-label mb-0"
+                    = form.select :crew_position_id, options_from_collection_for_select(@available_crew_positions, :id, :title), { prompt: "Select a position" }, class: "form-select", required: true
+                    = form.submit "Accept for Position", class: "btn btn-primary"
+                - else
+                  %p.text-muted.small.mb-0 All positions for this gig are already staffed.
+              - else
+                = link_to status.humanize.titleize, update_status_usr_job_application_path(@job_application, status: status), class: "btn btn-primary", data: { turbo_method: :patch, turbo_confirm: "Set this application to #{status.humanize.titleize}?" }
+
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h5.fw-semibold.mb-3 Application Files
+        .d-flex.flex-column.gap-3
+          %div
+            %div.text-muted.small Resume
+            - if @job_application.resume.attached?
+              = link_to @job_application.resume.filename.to_s, rails_blob_path(@job_application.resume, disposition: "attachment"), class: "fw-semibold text-decoration-none"
+            - else
+              %div.fw-semibold Not provided
+          %div
+            %div.text-muted.small Cover Letter
+            - if @job_application.cover_letter_file.attached?
+              = link_to @job_application.cover_letter_file.filename.to_s, rails_blob_path(@job_application.cover_letter_file, disposition: "attachment"), class: "fw-semibold text-decoration-none"
+            - else
+              %div.fw-semibold Not provided
+          %div
+            %div.text-muted.small Additional Attachments
+            - if @job_application.attachments.attached?
+              .d-flex.flex-column.gap-2.mt-2
+                - @job_application.attachments.each do |attachment|
+                  = link_to attachment.filename.to_s, rails_blob_path(attachment, disposition: "attachment"), class: "fw-semibold text-decoration-none"
+            - else
+              %div.fw-semibold None uploaded
+
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        - if @company_owner_view && @job.company.present?
+          = link_to "Back to Company", usr_company_path(@job.company), class: "btn btn-quiet w-100"
+        - else
+          = link_to "Back to My Applications", usr_job_applications_path, class: "btn btn-quiet w-100"

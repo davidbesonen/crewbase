@@ -1,0 +1,31 @@
+occupation_one:
+  industry: one
+  assignable: one (Occupation)
+
+occupation_two:
+  industry: two
+  assignable: two (Occupation)
+
+skill_one:
+  industry: one
+  assignable: one (Skill)
+
+skill_two:
+  industry: two
+  assignable: two (Skill)
+
+company_one:
+  industry: one
+  assignable: one (Company)
+
+company_two:
+  industry: two
+  assignable: two (Company)
+
+equipment_one:
+  industry: one
+  assignable: one (Equipment)
+
+equipment_two:
+  industry: two
+  assignable: two (Equipment)

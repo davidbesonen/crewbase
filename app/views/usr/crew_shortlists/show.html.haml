@@ -1,0 +1,23 @@
+.d-flex.justify-content-between.align-items-start.flex-wrap.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1= @crew_shortlist.name
+    %p.text-muted.mb-0= @crew_shortlist.company.name
+  .d-flex.gap-2
+    = link_to "Find Crew", usr_profiles_path, class: "btn btn-outline-primary"
+    = button_to "Delete List", usr_crew_shortlist_path(@crew_shortlist), method: :delete, class: "btn btn-outline-danger"
+
+- if @crew_shortlist.profiles.any?
+  .row.g-3
+    - @crew_shortlist.profiles.each do |profile|
+      .col-12
+        .card.border-0.shadow-sm
+          .card-body.d-flex.justify-content-between.align-items-center.gap-3
+            %div
+              %h5.mb-1= link_to profile.user.full_name, usr_profile_path(profile), class: "text-dark text-decoration-none"
+              %div.text-muted= profile.formatted_headline
+            = button_to "Remove", usr_crew_shortlist_membership_path(@crew_shortlist, profile), method: :delete, class: "btn btn-outline-danger btn-sm"
+- else
+  .card.border-0.shadow-sm
+    .card-body
+      %h5 This List Is Empty
+      %p.text-muted.mb-0 Add people from their profile pages.

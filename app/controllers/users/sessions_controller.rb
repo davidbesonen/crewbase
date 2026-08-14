@@ -7,6 +7,7 @@ class Users::SessionsController < Devise::SessionsController
 
   def after_login
     Visit.create(user_id: current_user.id, sign_in_ip: request.remote_ip)
+    session[:current_profile_id] ||= current_user.profiles.first&.id
 
     # if current_user.disabled?
     #   sign_out current_user

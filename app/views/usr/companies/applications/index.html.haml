@@ -1,0 +1,3 @@
+.row
+  .col-12
+    = render Usr::Company::ApplicationPipelineComponent.new(company: @company, applications: @applications, recommendations: @recommendations, jobs: @jobs, filters: @filters, stage_counts: @stage_counts, total_count: @total_count, return_context: @return_context)

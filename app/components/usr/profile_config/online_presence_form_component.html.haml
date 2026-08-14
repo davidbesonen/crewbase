@@ -1,0 +1,21 @@
+%h4.fw-semibold.mb-3 Let us know where to find you online
+.row.g-3
+  .col-md-6
+    = f.input :website_url, label: "Website URL", input_html: { class: "form-control form-control-muted", placeholder: "https://yourdomain.com" }
+  .col-md-6
+    = f.input :linkedin_url, label: "LinkedIn URL", input_html: { class: "form-control form-control-muted", placeholder: "https://linkedin.com/in/you" }
+  .col-md-6
+    = f.input :twitter_handle, label: "Twitter/X Handle", input_html: { class: "form-control form-control-muted", placeholder: "@handle" }
+  .col-md-6
+    = f.input :instagram_handle, label: "Instagram Handle", input_html: { class: "form-control form-control-muted", placeholder: "@handle" }
+  .col-md-6
+    = f.input :spotify_profile_url, label: "Spotify Profile URL", input_html: { class: "form-control form-control-muted", placeholder: "https://open.spotify.com/user/..." }
+.row.mt-3
+  - if show_navigation
+    .col-md-6
+      = link_to edit_calendar_usr_profile_path(profile), class: "btn btn-quiet" do
+        %i.bi.bi-arrow-left-circle
+        Availability
+  .col-md-6.d-flex.justify-content-end.align-items-end{ class: ("ms-auto" unless show_navigation) }
+    %button.btn.btn-primary.btn-lg{ type: "submit", name: "current_page", value: "online_presence_form" }
+      Save Profile

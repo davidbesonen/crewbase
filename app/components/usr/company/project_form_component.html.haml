@@ -1,0 +1,18 @@
+= simple_form_for project, url: form_url do |f|
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      = f.error_notification
+      .row.g-3
+        .col-12
+          = f.input :name, label: "Project Name", input_html: { autofocus: true }
+        .col-12
+          = f.input :description, as: :text, input_html: { rows: 5 }, hint: "A short overview of the work, scope, or production."
+        .col-md-4
+          = f.input :status, collection: Project.statuses.keys.map { |status| [status.humanize, status] }, include_blank: false
+        .col-md-4
+          = f.input :starts_on, as: :string, input_html: { type: "date" }
+        .col-md-4
+          = f.input :ends_on, as: :string, input_html: { type: "date" }
+      .btn-group-responsive.justify-content-between.mt-4
+        = link_to "Cancel", project.persisted? ? usr_project_path(project) : usr_company_projects_path(company), class: "btn btn-quiet"
+        = f.submit class: "btn btn-primary"

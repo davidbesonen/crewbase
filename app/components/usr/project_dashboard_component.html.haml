@@ -1,0 +1,79 @@
+%div{ data: { project_dashboard: true } }
+  .d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-start.gap-3.mb-4.app-hero.app-hero-cyan
+    %div
+      .d-flex.flex-wrap.align-items-center.gap-2.mb-1
+        %h1.fw-bold.mb-0= project.name
+        - if project.archived?
+          %span.status-badge.status-draft Archived
+        - else
+          %span{ class: project_status_badge_class(project.status) }= project.status.humanize
+      %p.text-muted.mb-0
+        = project.company.name
+        - if project.starts_on.present? || project.ends_on.present?
+          %span.mx-1 •
+          = [project.starts_on&.to_fs(:long), project.ends_on&.to_fs(:long)].compact.join(" – ")
+    .d-flex.flex-wrap.gap-2
+      = link_to "Edit Project", edit_usr_project_path(project), class: "btn btn-outline-primary"
+      - if project.archived?
+        = button_to "Restore Project", restore_usr_project_path(project), method: :patch, class: "btn btn-outline-primary"
+      - else
+        = button_to "Archive Project", archive_usr_project_path(project), method: :patch, class: "btn btn-quiet", form: { data: { turbo_confirm: "Archive this project? Existing jobs will remain unchanged." } }
+      - if jobs.any? && !project.archived?
+        = link_to "Add Job Posting", add_job_path, class: "btn btn-primary"
+
+  .row.g-3.mb-4
+    .col-12.col-md-4
+      .card.h-100.border-0.shadow-sm.card-accent.card-accent-cyan{ data: { project_metric: "postings" } }
+        .card-body
+          .text-muted.small Job Postings
+          .fs-3.fw-bold= posting_count
+    .col-12.col-md-4
+      .card.h-100.border-0.shadow-sm.card-accent.card-accent-cyan{ data: { project_metric: "open-postings" } }
+        .card-body
+          .text-muted.small Open Postings
+          .fs-3.fw-bold= open_posting_count
+    .col-12.col-md-4
+      .card.h-100.border-0.shadow-sm.card-accent.card-accent-navy{ data: { project_metric: "applications" } }
+        .card-body
+          .text-muted.small Applications
+          .fs-3.fw-bold= link_to application_count, usr_company_applications_path(project.company, project_id: project.id), class: "text-dark text-decoration-none"
+
+  .card.border-0.shadow-sm.mb-4.card-accent.card-accent-cyan
+    .card-body.p-4
+      %h2.h5.fw-bold.mb-2 Overview
+      %p.mb-0= project.description.presence || "Add a description to give your team context about this project."
+
+  .card.border-0.shadow-sm.card-accent.card-accent-sky{ data: { project_jobs: true } }
+    .card-body.p-4
+      .d-flex.justify-content-between.align-items-center.mb-3
+        %div
+          %h2.h5.fw-bold.mb-1 Job Postings
+          %p.text-muted.small.mb-0 Create roles, review applicants, and keep each posting moving.
+
+      - if jobs.any?
+        .d-flex.flex-column.gap-3
+          - jobs.each do |job|
+            .border.rounded-3.p-3{ data: { project_job: job.id } }
+              .d-flex.flex-column.flex-lg-row.justify-content-between.gap-3
+                %div
+                  .d-flex.flex-wrap.align-items-center.gap-2.mb-1
+                    %h3.h6.fw-semibold.mb-0= job.title
+                    %span{ class: job_status_class(job) }= job.status.humanize
+                  .text-muted.small
+                    = job.employment_type.humanize
+                    %span.mx-1 •
+                    = job.formatted_location
+                  .text-muted.small.mt-1
+                    = link_to pluralize(job.job_applications.size, "applicant"), usr_company_applications_path(project.company, job_id: job.id), class: "text-muted"
+                .d-flex.flex-wrap.align-items-start.gap-2
+                  = link_to "View Posting", usr_job_path(job), class: "btn btn-quiet btn-sm"
+                  = link_to "Edit", edit_usr_company_job_path(project.company, job), class: "btn btn-outline-primary btn-sm"
+                  = link_to "Review Applicants", usr_company_applications_path(project.company, job_id: job.id), class: "btn btn-primary btn-sm"
+      - else
+        .text-center.py-5.empty-state.empty-state-sky{ data: { project_empty_state: true } }
+          %span.icon-orb.icon-orb-sky
+            %i.bi.bi-briefcase{ aria: { hidden: true } }
+          %h3.h5.fw-semibold.mt-3 Create the first job posting
+          %p.text-muted.mx-auto No job postings yet. Add a role to start recruiting and tracking applicants for this project.
+          - unless project.archived?
+            = link_to "Add Job Posting", add_job_path, class: "btn btn-primary"

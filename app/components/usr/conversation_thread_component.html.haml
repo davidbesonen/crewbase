@@ -1,0 +1,11 @@
+.card.border-0.shadow-sm
+  .card-body.p-4
+    .d-flex.flex-column.gap-3.mb-4{ id: dom_id(conversation, :messages) }
+      - message_bubbles.each do |message_bubble|
+        = message_bubble
+
+    = form_with url: usr_conversation_contextual_messages_path(conversation), scope: :contextual_message, data: { controller: "message-form", action: "turbo:submit-end->message-form#reset" } do |form|
+      .mb-3
+        = form.label :body, "Message", class: "form-label"
+        = form.text_area :body, class: "form-control", rows: 3, required: true, maxlength: 5000
+      = form.submit "Send message", class: "btn btn-primary"

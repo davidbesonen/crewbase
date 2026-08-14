@@ -1,0 +1,6 @@
+.row.mb-4
+  .col-12
+    %h1.fw-bold.mb-1 Edit Credit
+    %p.text-muted.mb-0 Update this profile credit.
+
+= render Usr::ProfileConfig::CreditEditorComponent.new(profile: @profile, credit: @credit, companies: @companies)

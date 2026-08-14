@@ -1,0 +1,59 @@
+- positions.each do |position|
+  - if open_position?(position) && available_candidates(position).any?
+    .modal.fade{ id: assignment_modal_id(position), tabindex: "-1", role: "dialog", aria: { labelledby: "#{assignment_modal_id(position)}-title", hidden: "true" } }
+      .modal-dialog.modal-xl.modal-dialog-scrollable
+        .modal-content
+          .modal-header
+            %h2.modal-title.fs-5{ id: "#{assignment_modal_id(position)}-title" } Assign #{position.title}
+            %button.btn-close{ type: "button", data: { bs_dismiss: "modal" }, aria: { label: "Close" } }
+          .modal-body
+            %p.text-muted Choose a person based on how they are connected to this job.
+            .table-responsive
+              %table.table.table-hover.align-middle.mb-0
+                %thead
+                  %tr
+                    %th{ scope: "col" } Crew member
+                    %th{ scope: "col" } Reasoning
+                    %th{ scope: "col" } Profile
+                    %th.text-end{ scope: "col" }
+                %tbody
+                  - available_candidates(position).each do |candidate|
+                    %tr
+                      %td.fw-semibold
+                        = link_to candidate.profile.user.full_name, usr_profile_path(candidate.profile), target: "_blank", rel: "noopener"
+                      %td= candidate.reasons.to_sentence
+                      %td.text-muted= candidate.profile.formatted_headline
+                      %td.text-end
+                        = form_with model: CrewAssignment.new, url: usr_crew_position_crew_assignments_path(position) do |form|
+                          = form.hidden_field :profile_id, value: candidate.profile.id
+                          = form.submit "Assign", class: "btn btn-sm btn-primary", aria: { label: "Assign #{candidate.profile.user.full_name} to #{position.title}" }
+
+  - position.crew_assignments.each do |assignment|
+    - if replacement_candidates(assignment).any?
+      .modal.fade{ id: replacement_modal_id(assignment), tabindex: "-1", role: "dialog", aria: { labelledby: "#{replacement_modal_id(assignment)}-title", hidden: "true" } }
+        .modal-dialog.modal-xl.modal-dialog-scrollable
+          .modal-content
+            .modal-header
+              %h2.modal-title.fs-5{ id: "#{replacement_modal_id(assignment)}-title" } Replace #{assignment.profile.user.full_name}
+              %button.btn-close{ type: "button", data: { bs_dismiss: "modal" }, aria: { label: "Close" } }
+            .modal-body
+              %p.text-muted Select a replacement for #{position.title}.
+              .table-responsive
+                %table.table.table-hover.align-middle.mb-0
+                  %thead
+                    %tr
+                      %th{ scope: "col" } Crew member
+                      %th{ scope: "col" } Reasoning
+                      %th{ scope: "col" } Profile
+                      %th.text-end{ scope: "col" }
+                  %tbody
+                    - replacement_candidates(assignment).each do |candidate|
+                      %tr
+                        %td.fw-semibold
+                          = link_to candidate.profile.user.full_name, usr_profile_path(candidate.profile), target: "_blank", rel: "noopener"
+                        %td= candidate.reasons.to_sentence
+                        %td.text-muted= candidate.profile.formatted_headline
+                        %td.text-end
+                          = form_with model: assignment, url: usr_crew_assignment_path(assignment), method: :patch do |form|
+                            = form.hidden_field :profile_id, value: candidate.profile.id
+                            = form.submit "Replace", class: "btn btn-sm btn-outline-primary", aria: { label: "Replace with #{candidate.profile.user.full_name}" }

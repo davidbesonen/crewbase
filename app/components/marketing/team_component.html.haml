@@ -1,0 +1,61 @@
+%main.marketing-home.marketing-team{ data: { marketing_team_page: true } }
+  %nav.marketing-nav{ aria: { label: "Primary navigation" } }
+    .marketing-container.marketing-nav__inner
+      = link_to root_path, class: "marketing-brand", aria: { label: "Crewbase home" } do
+        = brand
+      .marketing-nav__links
+        = link_to "How it works", root_path(anchor: "how-it-works"), class: "marketing-nav__anchor"
+        = link_to "For crew", root_path(anchor: "for-crew"), class: "marketing-nav__anchor"
+        = link_to "For companies", root_path(anchor: "for-companies"), class: "marketing-nav__anchor"
+        = link_to "Meet the Team", meet_the_team_path, class: "marketing-nav__anchor", aria: { current: "page" }
+        = link_to "What’s new", change_log_entries_path, class: "marketing-nav__anchor"
+      .marketing-nav__actions
+        - if show_auth_links
+          = link_to "Sign in", new_user_session_path, class: "btn btn-quiet"
+        = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary"
+
+  %header.marketing-team__hero
+    .marketing-container
+      %span.marketing-kicker Built by people who know the work
+      %h1 Meet the Team
+      %p Crewbase brings software engineering and firsthand touring experience together to build better tools for the people behind live entertainment.
+
+  %section.marketing-section
+    .marketing-container
+      .marketing-team__grid
+        %article.marketing-team-member{ data: { team_member: "david-besonen" } }
+          .marketing-team-member__media
+            = image_tag "david-besonen-team.jpg", alt: "David Besonen playing saxophone on tour", class: "marketing-team-member__photo"
+          .marketing-team-member__body
+            %span.marketing-kicker Co-Founder, Lead Software Engineer and Touring Musician
+            %h2 David Besonen
+            %p David earned both his Bachelor’s and Master’s degrees in Computer Science and brings several years of experience from the software engineering industry to Crewbase.
+            %p He is also a professional touring musician who plays saxophone and piano and has performed in some of the most famous venues and arenas across the country. That combination of technical expertise and life on the road shapes how Crewbase is built for real working crews.
+
+        %article.marketing-team-member{ data: { team_member: "dayne-dehaven" } }
+          .marketing-team-member__media.marketing-team-member__placeholder{ data: { team_placeholder: true }, role: "img", aria: { label: "Photo of Dayne deHaven coming soon" } }
+            %span DD
+            %small Photo coming soon
+          .marketing-team-member__body
+            %span.marketing-kicker Co-Founder, Lighting Designer and Production Company Owner
+            %h2 Dayne deHaven
+            %p Dayne came up with the idea for Crewbase after seeing the need for a better way to connect live entertainment professionals with genuine work opportunities and help companies build trusted crews.
+            %p As a lighting designer and production company owner, Dayne has worked with major acts including Twenty One Pilots and Jon Bellion. As co-founder, he helps keep Crewbase focused on the people, relationships, and practical challenges at the heart of the gig economy.
+
+  %section.marketing-cta
+    .marketing-container
+      .marketing-cta__inner
+        %span.marketing-kicker Built for the people behind the show
+        %h2 Join the Crewbase community.
+        %p Find your next opportunity, build a trusted crew, and keep every part of the work connected.
+        = link_to primary_cta_label, primary_cta_path, class: "btn btn-light btn-lg"
+
+  %footer.marketing-footer
+    .marketing-container.marketing-footer__inner
+      .marketing-footer__brand
+        = brand
+        %span Live event teams, connected.
+      .d-flex.gap-3
+        = link_to "Home", root_path
+        = link_to "What’s new", change_log_entries_path
+      %p © #{Time.current.year} Crewbase

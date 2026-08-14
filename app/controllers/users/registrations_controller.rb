@@ -10,9 +10,24 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  # def create
-  #   super
-  # end
+  def create
+    super do |resource|
+      next unless resource.persisted?
+
+      # Assign default "user" role
+      user_role = Role.find_by(name: "user")
+      resource.assignments.find_or_create_by(role: user_role)
+
+      # Create associated user profile
+      resource.profiles.find_or_create_by(profile_type: "user")
+    end
+  end
+
+  protected
+
+  def after_sign_up_path_for(resource)
+    session.delete(:return_to_after_auth).presence || super
+  end
 
   # GET /resource/edit
   # def edit

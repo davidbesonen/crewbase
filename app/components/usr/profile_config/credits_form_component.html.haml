@@ -1,0 +1,32 @@
+.d-flex.justify-content-between.align-items-start.flex-wrap.gap-3.mb-3
+  %div
+    .d-flex.align-items-center.gap-2
+      = helpers.crewbase_credit_badge(variant: :neutral, compact: true)
+      %h4.fw-semibold.mb-1 Crewbase Credits
+    %p.text-muted.mb-0 Credits are earned automatically when companies confirm your completed Crewbase jobs. Verification details cannot be edited.
+
+.form-check.form-switch.mb-4
+  = f.check_box :show_credits, class: "form-check-input", role: "switch"
+  = f.label :show_credits, "Display credits on my profile", class: "form-check-label"
+
+- if credits.any?
+  .d-flex.flex-column.gap-3
+    - credits.each do |credit|
+      .border.rounded-3.p-3
+        .d-flex.flex-column.flex-md-row.justify-content-between.gap-3
+          %div
+            .fw-semibold= "#{credit.role} — #{credit.project_name}"
+            - if credit.display_company.present?
+              .text-muted.small= credit.display_company
+            .text-muted.small= credit.display_dates
+          .d-flex.align-items-center.gap-2
+            = helpers.crewbase_credit_badge(variant: :neutral, compact: true)
+            - if applications_by_job_id[credit.job_id]
+              = link_to "Request correction", usr_job_application_path(applications_by_job_id.fetch(credit.job_id)), class: "btn btn-outline-primary btn-sm"
+            = button_to credit.visible? ? "Hide" : "Show",
+              usr_profile_credit_path(profile, credit),
+              method: :patch,
+              params: { credit: { visible: !credit.visible? } },
+              class: "btn btn-outline-secondary btn-sm"
+- else
+  %p.text-muted.mb-0 Complete a job through Crewbase to earn your first verified credit.

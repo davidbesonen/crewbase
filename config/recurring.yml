@@ -9,7 +9,17 @@
 #     priority: 2
 #     schedule: at 5am every day
 
-production:
+development: &calendar_sync
+  sync_ical_feeds:
+    class: SyncIcalFeedsJob
+    schedule: every 6 hours
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+  prune_read_notifications:
+    class: PruneReadNotificationsJob
+    queue: maintenance
+    schedule: every day at 3:15am
+
+production:
+  <<: *calendar_sync

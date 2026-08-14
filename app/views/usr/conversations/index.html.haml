@@ -1,0 +1,19 @@
+%h1.fw-bold.mb-4 Messages
+
+- if @conversations.any?
+  .list-group.shadow-sm
+    - @conversations.each do |conversation|
+      - membership = conversation.memberships.detect { |item| item.user_id == current_user.id }
+      = link_to usr_conversation_path(conversation), class: "list-group-item list-group-item-action p-3" do
+        .d-flex.justify-content-between.align-items-start.gap-3
+          %div
+            %div.fw-semibold= conversation.title
+            %div.text-muted.small= conversation.context_label
+            - if conversation.messages.last
+              %div.mt-1= truncate(conversation.messages.last.body, length: 100)
+          - if membership&.unread?
+            %span.badge.text-bg-primary Unread
+- else
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      %p.text-muted.mb-0 Your job-related conversations will appear here.

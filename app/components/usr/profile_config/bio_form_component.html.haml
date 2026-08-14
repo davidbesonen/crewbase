@@ -1,0 +1,6 @@
+%h4.fw-semibold.mb-3 About You
+%p.text-muted.mb-4 Add a short bio to describe your background, specialties, and the kind of projects you want to work on.
+
+.row.g-3
+  .col-12
+    = f.input :bio, as: :text, label: "Bio", input_html: { class: "form-control form-control-muted", rows: 6, placeholder: "Tell people about your background, specialties, and the kind of work you do best." }

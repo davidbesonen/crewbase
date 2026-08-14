@@ -1,2 +1,6 @@
 #!/usr/bin/env ruby
+
+ENV["SOLID_QUEUE_IN_PUMA"] ||= "1"
+exit(false) unless system("./bin/rails", "db:prepare")
+
 exec "./bin/rails", "server", *ARGV

@@ -1,0 +1,4 @@
+<%= @invitation.invited_by.full_name %> invited you to apply for <%= @job.title %> at <%= @job.company.name %>.
+
+View the posting and respond:
+<%= public_job_invitation_url(@invitation.token) %>

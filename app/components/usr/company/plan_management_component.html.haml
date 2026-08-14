@@ -1,0 +1,61 @@
+.container-fluid.py-4
+  .mb-4
+    %p.text-uppercase.text-primary.fw-semibold.small.mb-1 Billing and access
+    %h1.mb-1 Manage Plan
+    %p.text-muted.mb-0 Upgrade #{company.name} to increase capacity and unlock additional staffing tools.
+
+  .card.border-0.shadow-sm.mb-4{ data: { current_plan: true } }
+    .card-body.d-flex.flex-wrap.align-items-center.gap-3
+      .plan-feature-icon
+        %i.bi.bi-check-circle-fill
+      %div
+        %p.text-muted.small.text-uppercase.fw-semibold.mb-1 Current plan
+        %h2.h4.mb-1= current_plan&.name || "No active plan"
+        - if current_plan
+          %p.text-muted.mb-0= "#{current_plan.monthly_price}/month · #{current_plan.annual_price}/year"
+      %span.badge.text-bg-success.ms-lg-auto Active
+      - if company.stripe_customer_id.present?
+        = button_to "Manage payment method and invoices", usr_company_billing_portal_path(company), method: :post, class: "btn btn-outline-primary"
+
+  - if upgrade_plans.any?
+    .row.g-4
+      - upgrade_plans.each do |plan|
+        .col-12.col-xl-6
+          .card.border-0.shadow-sm.h-100.company-plan-card{ class: "company-plan-card--#{plan.key}" }
+            .company-plan-card__accent
+            .card-body.p-4.d-flex.flex-column
+              %h2.h3.fw-bold= plan.name
+              %p.text-muted= plan.description
+              %p.h4.fw-bold.mb-3
+                = plan.monthly_price
+                %span.fs-6.fw-normal.text-muted /month
+              %ul.list-unstyled.vstack.gap-2.mb-4
+                - plan.capacity_items.each do |item|
+                  %li.d-flex.gap-2
+                    %i.bi.text-primary{ class: item.fetch(:icon) }
+                    = item.fetch(:label)
+                - included_features(plan).each do |feature|
+                  %li.d-flex.gap-2
+                    %i.bi.bi-check-lg.text-success
+                    = feature.fetch(:label)
+              = form_with url: usr_company_billing_checkout_path(company), method: :post, class: "mt-auto", data: { turbo: false } do |form|
+                = form.hidden_field :plan_id, value: plan.id
+                %fieldset.mb-3
+                  %legend.visually-hidden Billing interval
+                  .form-check
+                    = form.radio_button :billing_interval, "monthly", checked: true, class: "form-check-input", id: "plan_#{plan.id}_monthly"
+                    = form.label :billing_interval_monthly, "#{plan.monthly_price}/month", class: "form-check-label", for: "plan_#{plan.id}_monthly"
+                  .form-check
+                    = form.radio_button :billing_interval, "annual", class: "form-check-input", id: "plan_#{plan.id}_annual"
+                    = form.label :billing_interval_annual, "#{plan.annual_price}/year", class: "form-check-label", for: "plan_#{plan.id}_annual"
+                = form.submit "Continue to secure checkout", class: "btn btn-primary w-100"
+  - else
+    .card.border-0.shadow-sm
+      .card-body.p-4.text-center
+        %i.bi.bi-stars.fs-1.text-primary
+        %h2.h4.mt-3 You are on the highest plan
+        %p.text-muted.mb-0 Your company has access to every currently available Crewbase company feature.
+
+  .alert.alert-info.mt-4.mb-0
+    %i.bi.bi-shield-lock.me-2
+    Payment details are collected securely by Stripe. Your new plan activates only after Stripe confirms the subscription.

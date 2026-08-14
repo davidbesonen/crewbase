@@ -1,0 +1,35 @@
+.d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-center.gap-3.mb-4.app-hero.app-hero-cyan
+  %div
+    %h1.fw-bold.mb-1 Projects
+    %p.text-muted.mb-0= "Projects for #{@company.name}."
+  = link_to "Start a Project", new_usr_company_project_path(@company), class: "btn btn-primary"
+
+- if @projects.any?
+  .row.g-3{ data: { active_projects: true } }
+    - @projects.each do |project|
+      .col-12.col-lg-6
+        .card.border-0.shadow-sm.h-100.card-accent.card-accent-cyan
+          .card-body.p-4
+            .d-flex.justify-content-between.gap-3
+              %div
+                %h4.fw-semibold.mb-1= link_to project.name, usr_project_path(project), class: "text-dark text-decoration-none"
+                %p.text-muted.mb-2= project.description.presence || "No description added."
+              %span.align-self-start{ class: project_status_badge_class(project.status) }= project.status.humanize
+            %p.small.text-muted.mb-0= pluralize(project.jobs.size, "job posting")
+- else
+  .card.border-0.shadow-sm
+    .card-body.p-4.empty-state.empty-state-cyan
+      %h5.fw-semibold No Projects Yet
+      %p.text-muted.mb-0 Start a project to group related job postings.
+
+- if @archived_projects.any?
+  .mt-5{ data: { archived_projects: true } }
+    %h2.h5.fw-bold.mb-3 Archived Projects
+    .card.border-0.shadow-sm
+      .list-group.list-group-flush
+        - @archived_projects.each do |project|
+          .list-group-item.d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-center.gap-3.p-3
+            %div
+              = link_to project.name, usr_project_path(project), class: "fw-semibold text-dark text-decoration-none"
+              %div.text-muted.small= pluralize(project.jobs.size, "job posting")
+            = button_to "Restore", restore_usr_project_path(project), method: :patch, class: "btn btn-outline-primary btn-sm"

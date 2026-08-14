@@ -1,0 +1,13 @@
+.row
+  .col-lg-8.mx-auto
+    .text-center.mb-4
+      %h1.fw-bold.mb-2 Which company?
+      %p.text-muted.mb-0 Choose the company that is posting this job.
+
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        .d-grid.gap-3
+          - @companies.each do |company|
+            = link_to new_usr_company_job_path(company), class: "btn btn-outline-primary btn-lg" do
+              %i.bi.bi-building.me-2{ aria: { hidden: true } }
+              = company.name

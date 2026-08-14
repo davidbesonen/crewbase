@@ -1,0 +1,12 @@
+.row.mb-4
+  .col-12
+    %h1.fw-bold.mb-1 Choose a Company
+    %p.text-muted.mb-0 Select the company that owns this project.
+
+.row.g-3
+  - @companies.each do |company|
+    .col-12.col-md-6
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-4
+          %h4.fw-semibold= company.name
+          = link_to "Start Project", new_usr_company_project_path(company), class: "btn btn-primary"

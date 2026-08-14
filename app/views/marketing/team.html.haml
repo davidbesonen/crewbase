@@ -1,0 +1,4 @@
+- content_for :hide_default_footer, "true"
+= render Marketing::TeamComponent.new(primary_cta_label: @primary_cta_label, primary_cta_path: @primary_cta_path, show_auth_links: current_user.blank?) do |team|
+  - team.with_brand do
+    = render Shared::CrewbaseLogoTextComponent.new

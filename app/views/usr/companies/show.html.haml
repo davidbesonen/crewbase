@@ -1,0 +1,84 @@
+- if @company.is_owner?(current_user)
+  = render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :profile, entitlement: @entitlement)
+
+.row
+  .col-sm-12
+    .card.border-0.shadow-sm.app-hero.app-hero-cyan
+      .card-body
+        .row.px-4
+          .col-sm-12.mt-4
+            = render Usr::Shared::CompanyIconComponent.new(company: @company, size: 250)
+        .row.mt-4.px-4
+          .col-sm-8
+            .d-flex.flex-wrap.align-items-center.gap-2
+              %h1.fw-bold.mb-0= @company.name
+              = render Usr::Shared::CompanyVisibilityBadgeComponent.new(plan: @company_plan)
+          .col-sm-4.d-flex.align-items-center.justify-content-end
+            - if current_user != @company.owner
+              = link_to new_usr_company_review_path(@company), class: "btn btn-outline-primary me-3", data: { turbo_frame: "remote_modal" } do
+                Write a Review
+        .row.px-4
+          .col-sm-12
+            %p.d-flex.flex-wrap.align-items-center.gap-2.text-muted.mt-1.mb-0{ style: "font-size: 1.3rem;" }
+              %span
+                %strong
+                  %i.bi.bi-buildings.me-1
+              %span= @company.industry_names_text.presence || "Industry not listed"
+              - if @company.formatted_location.present?
+                %span •
+              %span= @company.formatted_location
+              - if @company.is_owner?(current_user)
+                %span.badge.bg-secondary{ style: "font-size: 0.75rem;" }
+                  Owner
+            .d-flex.flex-wrap.gap-3.mt-2.mb-3
+              - if @company.website_url.present?
+                = link_to @company.website_url, target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-globe{ title: "Website" }
+              - if @company.linkedin_url.present?
+                = link_to @company.linkedin_url, target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-linkedin{ title: "LinkedIn" }
+              - if @company.twitter_handle.present?
+                = link_to "https://twitter.com/#{@company.twitter_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-twitter-x{ title: "X (Twitter)" }
+              - if @company.instagram_handle.present?
+                = link_to "https://instagram.com/#{@company.instagram_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-instagram{ title: "Instagram" }
+              - if @company.facebook_url.present?
+                = link_to @company.facebook_url, target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-facebook{ title: "Facebook" }
+              - if @company.youtube_url.present?
+                = link_to @company.youtube_url, target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-youtube{ title: "YouTube" }
+              - if @company.tiktok_handle.present?
+                = link_to "https://www.tiktok.com/@#{@company.tiktok_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted" do
+                  %i.bi.bi-tiktok{ title: "TikTok" }
+
+.row.mt-3
+  .col-sm-12
+    .card.border-0.shadow-sm.card-accent.card-accent-cyan
+      .card-body
+        .row.g-3
+          %h3.fw-bold.mb-0 Company Details
+          -# %p.text-muted.mt-1.mb-3 Update your company's information to keep your profile accurate and up-to-date.
+
+          %ul.nav.nav-tabs{ role: "tablist" }
+            %li.fw-semibold.text-muted{ role: "presentation" }
+              %button.nav-link.text-reset.active{ id: "company-home-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-home" }, aria: { controls: "company-home", selected: "true" } } Home
+            %li.fw-semibold.text-muted{ role: "presentation" }
+              %button.nav-link.text-reset{ id: "company-jobs-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-jobs" }, aria: { controls: "company-jobs", selected: "false" } } Open Jobs
+            - if @company.is_owner?(current_user)
+              %li.fw-semibold.text-muted{ role: "presentation" }
+                %button.nav-link.text-reset{ id: "company-applications-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-applications" }, aria: { controls: "company-applications", selected: "false" } }
+                  Applications
+            %li.fw-semibold.text-muted{ role: "presentation" }
+              %button.nav-link.text-reset{ id: "company-employees-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-employees" }, aria: { controls: "company-employees", selected: "false" } } Employees
+            %li.fw-semibold.text-muted{ role: "presentation" }
+              %button.nav-link.text-reset{ id: "company-ratings-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-ratings" }, aria: { controls: "company-ratings", selected: "false" } } Ratings
+
+          .tab-content.mt-3
+            = render Usr::Company::HomeTabComponent.new(company: @company)
+            = render Usr::Company::JobsTabComponent.new(company: @company, jobs: @jobs)
+            - if @company.is_owner?(current_user)
+              = render Usr::Company::ApplicationsTabComponent.new(company: @company, job_applications: @job_applications, pipeline_available: @entitlement.allowed?(:shortlists_pipeline))
+            = render Usr::Company::EmployeesTabComponent.new(company: @company)
+            = render Usr::Company::RatingsTabComponent.new(company: @company, ratings: @ratings)

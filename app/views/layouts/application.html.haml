@@ -8,14 +8,16 @@
     %meta{:content => "yes", :name => "apple-mobile-web-app-capable"}/
     %meta{:content => "yes", :name => "mobile-web-app-capable"}/
     %meta{property: "og:title", content: "Crewbase"}
-    %meta{property: "og:description", content: "Compete with friends in college football pick'em. Make your picks, join leagues, and climb the leaderboard!"}
+    %meta{name: "description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
+    %meta{property: "og:description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
     -# %meta{property: "og:image", content: image_url('campus_clash_logo.png')}
     %meta{property: "og:url", content: request.original_url}
     %meta{name: "twitter:card", content: "summary_large_image"}
     %meta{name: "twitter:title", content: "Crewbase"}
-    %meta{name: "twitter:description", content: "Compete with friends in college football pick'em. Make your picks, join leagues, and climb the leaderboard!"}
+    %meta{name: "twitter:description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
     -# %meta{name: "twitter:image", content: image_url('campus_clash_logo.png')}
     %link{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" }
+    %link{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" }
     -# %link{ rel: "apple-touch-icon", sizes: "180x180", href: asset_path('campus_clash_logo.png') }
     -# %link{ rel: "icon", type: "image/png", sizes: "192x192", href: asset_path('campus_clash_logo.png') }
     = csrf_meta_tags
@@ -24,18 +26,41 @@
     = javascript_importmap_tags
     -# = favicon_link_tag asset_path('campus_clash_text_logo.png')
 
-  %body.vh-100#page-top{ "data-turbo-prefetch" => "false" }
-    - if current_user && current_user.has_role?(:admin)
+  %body#page-top{ "data-turbo-prefetch" => "false" }
+    - if @marketing_page
+      = render "layouts/flash"
+      = yield
+    - elsif current_user&.has_role?(:admin)
       = render "layouts/admin_navbar"
-    - elsif current_user && current_user.has_role?(:user)
-      = render "layouts/user_navbar"
-    .app-content
-      .container-fluid
-        #wrapper.h-100.container-fluid.p-5
+      .app-content
+        .container-fluid.p-4
+          = render "layouts/flash"
           = yield
+    - elsif current_user&.has_role?(:user)
+      = render "layouts/user_navbar"
+      - if current_user.has_completed_user_profile?
+        .offcanvas.offcanvas-start{ id: "userSidenav", tabindex: "-1", aria: { labelledby: "userSidenavLabel" } }
+          .offcanvas-header
+            -# %h5.offcanvas-title#userSidenavLabel Menu
+            %button.btn-close{ type: "button", data: { bs_dismiss: "offcanvas" }, aria: { label: "Close" } }
+          .offcanvas-body.p-0
+            = render "layouts/user_sidenav"
+      .app-content
+        .container-fluid
+          .user-layout.d-flex.align-items-start.gap-4.mt-4
+            - if current_user.has_completed_user_profile?
+              .d-none.d-lg-block.app-sticky-sidenav
+                = render "layouts/user_sidenav"
+            .user-main.flex-grow-1
+              .container-fluid.p-4
+                = render "layouts/flash"
+                = yield
+    - else
+      .app-content
+        = render "layouts/flash"
+        = yield
     
-    = turbo_frame_tag "remote_modal", target: "_top"
-    -# = render "flash"
-
-    %footer.text-center.mt-5.mb-3.text-muted
-      © #{Time.current.year} Crewbase
+    = turbo_frame_tag "remote_modal", target: "_top", data: { controller: "remote-modal", action: "turbo:before-render@document->remote-modal#hideBeforeRender turbo:submit-end->remote-modal#closeOnSuccess turbo:frame-load->remote-modal#showModal" }
+    - unless content_for?(:hide_default_footer)
+      %footer.text-center.mt-5.mb-3.text-muted
+        © #{Time.current.year} Crewbase

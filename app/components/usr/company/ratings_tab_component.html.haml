@@ -1,0 +1,24 @@
+.tab-pane.fade#company-ratings{ role: "tabpanel", aria: { labelledby: "company-ratings-tab" } }
+  %h5.fw-semibold Ratings
+  - average_rating = company.ratings["overall_rating"]
+  %p.text-muted
+    = average_rating ? "#{average_rating.round(1)} out of 5 • #{company.reviews.count} reviews" : "No reviews yet."
+  .row.g-3
+    .col-sm-6
+      %div.text-muted.small Communication/Clarity
+      %div.fw-semibold= ratings["communication_clarity"] ? "#{ratings["communication_clarity"].round(1)} / 5" : "N/A"
+    .col-sm-6
+      %div.text-muted.small Payment Timeliness
+      %div.fw-semibold= ratings["payment_timeliness"] ? "#{ratings["payment_timeliness"].round(1)} / 5" : "N/A"
+    .col-sm-6
+      %div.text-muted.small Working Conditions/Safety
+      %div.fw-semibold= ratings["working_conditions_safety"] ? "#{ratings["working_conditions_safety"].round(1)} / 5" : "N/A"
+    .col-sm-6
+      %div.text-muted.small Professionalism/Respect
+      %div.fw-semibold= ratings["professionalism_respect"] ? "#{ratings["professionalism_respect"].round(1)} / 5" : "N/A"
+    .col-sm-6
+      %div.text-muted.small Accuracy of Call/Scope
+      %div.fw-semibold= ratings["accuracy_of_call_scope"] ? "#{ratings["accuracy_of_call_scope"].round(1)} / 5" : "N/A"
+    .col-sm-6
+      %div.text-muted.small Overall
+      %div.fw-semibold= ratings["overall_rating"] ? "#{ratings["overall_rating"].round(1)} / 5" : "N/A"

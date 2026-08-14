@@ -1,0 +1,9 @@
+.modal.fade#remote_modal_dialog(tabindex="-1" data-bs-focus="false")
+  .modal-dialog.modal-xl
+    .modal-content
+      .modal-header.d-flex.align-items-center
+        - if title.present?
+          %h5.modal-title.mx-3= title
+        %button.btn-close{ type: "button", data: { bs_dismiss: "modal" }, aria: { label: "Close" } }
+      .modal-body#remote_modal_body
+        = yield

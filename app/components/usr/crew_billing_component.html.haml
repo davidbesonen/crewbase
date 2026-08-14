@@ -1,0 +1,49 @@
+.card.border-0.shadow-sm.card-accent.card-accent-cyan.mb-4
+  .card-body.p-4
+    .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3
+      %div
+        %h2.h4.fw-bold.mb-1 Crew membership
+        %p.text-muted.mb-0 Core Crewbase remains free for working professionals.
+      - if subscription
+        .text-end
+          %span.badge.text-bg-success= subscription_status
+          %p.small.text-muted.mb-0.mt-1= "#{subscription.user_plan.name} · #{subscription.billing_interval&.humanize || 'Billing managed by Stripe'}"
+
+    %p.mt-3.mb-0 Profiles, applications, messages, invitations, saved jobs, and availability remain free. Crew Pro is an optional way to support Crewbase during beta; it does not improve hiring rank or imply professional verification.
+
+- if subscription
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      %h2.h5.fw-bold Manage subscription
+      %p.text-muted Change your payment method, billing interval, or cancellation settings securely in Stripe.
+      = button_to "Manage billing in Stripe", helpers.portal_usr_settings_billing_path, class: "btn btn-primary", data: { turbo: false }
+- else
+  .row.g-4.mb-4
+    - plans.each do |plan|
+      .col-12.col-xl-8{ data: { user_plan: plan.slug } }
+        .card.border-0.shadow-sm.h-100
+          .card-body.p-4
+            .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+              %div
+                %span.badge.text-bg-info.mb-2 Founding beta
+                %h2.h3.fw-bold.mb-1= plan.name
+                %p.text-muted.mb-0 Optional support for the people building their careers on Crewbase.
+              .text-end
+                %p.h4.fw-bold.mb-0= "#{money(plan.monthly_price_cents)} / month"
+                %p.text-muted.mb-0= "or #{money(plan.annual_price_cents)} / year"
+
+            %h3.h6.fw-bold Included now
+            %ul.mb-4
+              - plan.data.to_h.fetch("included", []).each do |feature|
+                %li.mb-2= feature
+
+            .border.rounded-3.bg-light.p-3.mb-4
+              %span.badge.text-bg-secondary.mb-2 Roadmap — not yet available
+              %p.small.text-muted.mb-2 These ideas are being explored and are not part of the paid product today.
+              %ul.small.mb-0
+                - plan.data.to_h.fetch("roadmap", []).each do |feature|
+                  %li.mb-1= feature
+
+            .d-flex.flex-wrap.gap-2
+              = button_to "Choose monthly", helpers.subscription_checkout_usr_settings_billing_path, params: { user_plan_id: plan.id, billing_interval: "monthly" }, class: "btn btn-outline-primary", data: { turbo: false }
+              = button_to "Choose annual", helpers.subscription_checkout_usr_settings_billing_path, params: { user_plan_id: plan.id, billing_interval: "annual" }, class: "btn btn-primary", data: { turbo: false }

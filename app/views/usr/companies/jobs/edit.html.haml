@@ -1,0 +1,8 @@
+.row.mb-4
+  .col-sm-12
+    %h1.fw-bold.mb-1 Edit Job
+    %p.text-muted.mb-0 Update this role for #{@company.name}.
+
+.row.mt-4
+  .col-sm-12
+    = render Usr::Company::JobFormComponent.new(company: @company, job: @job, projects: @projects, occupations: @occupations, skills: @skills, equipment: @equipment, requirement_selections: @requirement_selections, entitlement: @entitlement)

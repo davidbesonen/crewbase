@@ -1,0 +1,9 @@
+.card.h-100.card-accent.card-accent-cyan{ data: { helpful_tools: true } }
+  .card-body
+    %h2.h5.card-title.fw-semibold.mb-3 Helpful Tools
+    %nav.d-flex.flex-wrap.justify-content-between.w-100.gap-3{ aria: { label: "Helpful tools" } }
+      - tools.each do |tool|
+        = link_to tool.path, class: "d-flex flex-column align-items-center gap-1 text-decoration-none text-center" do
+          %span.icon-orb{ class: "icon-orb-#{tool.color}" }
+            %i.bi{ class: "bi-#{tool.icon}", aria: { hidden: true } }
+          %span.small.text-muted= tool.label

@@ -1,0 +1,8 @@
+.row.mb-4
+  .col-12
+    %h1.fw-bold.mb-1 Apply for #{@job.title}
+    %p.text-muted.mb-0 Complete the form below to submit your application.
+
+.row.mt-4
+  .col-12
+    = render Usr::JobApplication::FormComponent.new(job: @job, job_application: @job_application)

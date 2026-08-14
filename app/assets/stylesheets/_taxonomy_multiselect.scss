@@ -1,0 +1,93 @@
+.taxonomy-multiselect {
+  position: relative;
+}
+
+.taxonomy-multiselect-control {
+  position: relative;
+}
+
+.taxonomy-multiselect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.taxonomy-multiselect-chips:empty {
+  display: none;
+}
+
+.taxonomy-multiselect-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.3rem 0.625rem;
+  border: 1px solid color-mix(in srgb, var(--crewbase-primary, #1b4965) 20%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--crewbase-primary, #1b4965) 8%, transparent);
+  color: var(--crewbase-primary, #1b4965);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.taxonomy-multiselect-chip:hover {
+  background: color-mix(in srgb, var(--crewbase-primary, #1b4965) 14%, transparent);
+}
+
+.taxonomy-multiselect-chip:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--crewbase-primary, #1b4965) 20%, transparent);
+}
+
+.taxonomy-multiselect-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taxonomy-multiselect-options {
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.taxonomy-multiselect .taxonomy-multiselect-options {
+  position: absolute;
+  z-index: 1050;
+  top: calc(100% + 0.25rem);
+  width: 100%;
+  max-height: 18rem;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: var(--bs-body-bg);
+  box-shadow: var(--bs-box-shadow);
+}
+
+.taxonomy-multiselect .taxonomy-multiselect-options [role="option"] {
+  border-right: 0;
+  border-left: 0;
+}
+
+.taxonomy-multiselect .taxonomy-multiselect-options [role="option"]:first-child {
+  border-top: 0;
+}
+
+.taxonomy-multiselect .taxonomy-multiselect-options [role="option"]:last-child {
+  border-bottom: 0;
+}
+
+.taxonomy-multiselect-check {
+  color: var(--crewbase-primary, #1b4965);
+  opacity: 0;
+}
+
+.taxonomy-multiselect .taxonomy-multiselect-options [aria-selected="true"] {
+  background: color-mix(in srgb, var(--crewbase-primary, #1b4965) 8%, transparent);
+  color: var(--crewbase-primary, #1b4965);
+  font-weight: 600;
+}
+
+.taxonomy-multiselect .taxonomy-multiselect-options [aria-selected="true"] .taxonomy-multiselect-check {
+  opacity: 1;
+}

@@ -1,0 +1,30 @@
+.container-fluid.py-4
+  .d-flex.justify-content-between.align-items-start.mb-4
+    %div
+      %h1.mb-1 Admin Dashboard
+      %p.text-muted.mb-0 Product activity from the last 30 days. Sign-ins represent authenticated sessions, not anonymous page views.
+  .row.g-3.mb-4
+    - dashboard[:totals].slice(:users, :companies, :jobs, :applications).each do |metric, value|
+      .col-6.col-xl-3
+        .card.h-100{ data: { metric: metric } }
+          .card-body
+            %div.text-muted.small.text-uppercase.fw-semibold= metric.to_s.humanize
+            %div.display-6.fw-bold= number_with_delimiter(value)
+  .row.g-4
+    .col-12.col-xl-8
+      .card.h-100
+        .card-body
+          %h2.h5 Sign-ins over time
+          %p.text-muted.small Daily authenticated sessions and account growth.
+          .admin-chart-container
+            %canvas{ data: { controller: "admin-chart", admin_chart_data_value: chart_data }, aria: { label: "Sign-ins and account growth over the last 30 days", role: "img" } }
+    .col-12.col-xl-4
+      .card.h-100
+        .card-body
+          %h2.h5 Job status mix
+          %table.table.table-sm.align-middle.mb-0
+            %tbody
+              - dashboard[:job_statuses].each do |status, count|
+                %tr
+                  %th= status
+                  %td.text-end= count

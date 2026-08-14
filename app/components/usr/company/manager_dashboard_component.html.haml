@@ -1,0 +1,84 @@
+.container-fluid.py-4
+  .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+    %div
+      -# %p.text-uppercase.text-primary.fw-semibold.small.mb-1 Company Workspace
+      %h1.mb-1= "#{company.name} Company Manager"
+      %p.text-muted.mb-0 Staffing performance and upcoming work for the last 30 days.
+
+  .row.g-3.mb-4
+    - self.class::METRICS.each do |key, (label, icon)|
+      .col-6.col-xl-2
+        .card.h-100.border-0.shadow-sm{ data: { company_manager_metric: key } }
+          .card-body
+            .d-flex.align-items-center.gap-2.text-muted.small.text-uppercase.fw-semibold.mb-2
+              %i.bi{ class: icon }
+              - if key == :pending_invitations
+                = link_to label, usr_job_invitations_path, class: "text-reset text-decoration-none"
+              - else
+                = label
+            .display-6.fw-bold= number_with_delimiter(dashboard[:summary].fetch(key))
+
+  .row.g-4.mb-4
+    .col-12.col-xl-8
+      .card.h-100.border-0.shadow-sm
+        .card-body
+          %h2.h5 Staffing activity
+          %p.text-muted.small Daily applications and invitations over the last 30 days.
+          .admin-chart-container
+            %canvas{ data: { controller: "admin-chart", admin_chart_data_value: chart_data }, aria: { label: "Applications and invitations over the last 30 days", role: "img" } }
+    .col-12.col-xl-4
+      .card.h-100.border-0.shadow-sm
+        .card-body
+          %h2.h5 Conversion health
+          .d-flex.justify-content-between.py-3.border-bottom
+            %span Application acceptance
+            %strong= percentage(dashboard[:rates][:application_acceptance])
+          .d-flex.justify-content-between.py-3
+            %span Invitation acceptance
+            %strong= percentage(dashboard[:rates][:invitation_acceptance])
+          %h3.h6.mt-4 Application pipeline
+          - dashboard[:pipeline_counts].each do |status, count|
+            .d-flex.justify-content-between.py-1
+              %span.text-muted= status.to_s.humanize
+              %strong= count
+
+  .row.g-4
+    .col-12.col-xl-7
+      .card.h-100.border-0.shadow-sm
+        .card-body
+          %h2.h5 Upcoming staffing needs
+          - if dashboard[:upcoming_jobs].any?
+            .list-group.list-group-flush
+              - dashboard[:upcoming_jobs].each do |job|
+                .list-group-item.px-0.d-flex.justify-content-between.align-items-center
+                  %div
+                    %strong= job.title
+                    .small.text-muted= job.starts_at&.strftime("%b %-d, %Y") || "Date not set"
+                  %span.badge.text-bg-light= job.posting_type.humanize
+          - else
+            %p.text-muted.mb-0 No upcoming published jobs yet.
+    .col-12.col-xl-5
+      .card.h-100.border-0.shadow-sm
+        .card-body
+          %h2.h5 Studio benefits
+          - if studio?
+            .vstack.gap-3
+              .d-flex.gap-3{ data: { studio_benefit: "priority-support" } }
+                %i.bi.bi-headset.fs-4.text-success
+                %div
+                  %strong Priority support and onboarding
+                  %p.text-muted.small.mb-1 Direct setup and workflow help from the Crewbase team.
+                  = mail_to "support@crewbase.com", "Contact priority support", subject: "Studio support for #{company.name}", class: "small fw-semibold"
+              .d-flex.gap-3{ data: { studio_benefit: "enhanced-visibility" } }
+                %i.bi.bi-megaphone.fs-4.text-success
+                %div
+                  %strong Enhanced company visibility
+                  %p.text-muted.small.mb-0 Your Studio badge appears with your company across the marketplace.
+              .d-flex.gap-3{ data: { studio_benefit: "integration-access" } }
+                %i.bi.bi-plug.fs-4.text-success
+                %div
+                  %strong Early integration access
+                  %p.text-muted.small.mb-1 Studio companies receive first access to integration previews.
+                  = mail_to "support@crewbase.com", "Request preview access", subject: "Integration preview for #{company.name}", class: "small fw-semibold"
+          - else
+            %p.text-muted.mb-2 Upgrade to Studio for priority onboarding, enhanced marketplace visibility, and integration previews.

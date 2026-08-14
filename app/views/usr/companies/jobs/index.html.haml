@@ -1,0 +1,32 @@
+.row.mb-4
+  .col-12.d-flex.flex-wrap.align-items-start.justify-content-between.gap-3
+    %div
+      %h1.fw-bold.mb-1= "Jobs for #{@company.name}"
+      %p.text-muted.mb-0 Create and manage this company's job listings.
+    = link_to new_usr_company_job_path(@company), class: "btn btn-primary" do
+      %i.bi.bi-plus-lg.me-1{ aria: { hidden: true } }
+      Add Job
+
+- if @jobs.any?
+  .row.g-3
+    - @jobs.each do |job|
+      .col-12
+        .card.border-0.shadow-sm
+          .card-body.p-4
+            .d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-start.gap-3
+              %div
+                %h4.fw-semibold.mb-2= job.title
+                .d-flex.flex-wrap.gap-2.text-muted.small
+                  %span= job.status.humanize
+                  %span •
+                  %span= job.employment_type.humanize
+                  %span •
+                  %span= job.workplace_type.humanize
+              .d-flex.flex-wrap.gap-2
+                = link_to "View", usr_job_path(job), class: "btn btn-quiet"
+                = link_to "Edit", edit_usr_company_job_path(@company, job), class: "btn btn-outline-primary"
+- else
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      %h5.fw-semibold.mb-2 No Jobs Yet
+      %p.text-muted.mb-0 Create the first job listing for this company.

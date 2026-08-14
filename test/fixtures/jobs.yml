@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  company_id: 1
+  title: MyString
+  workplace_type: on_site
+  employment_type: full_time
+  requires_travel: false
+  is_visa_sponsorship_available: false
+  pay_min: 1.5
+  pay_max: 2.5
+  pay_period: hourly
+  is_active: true
+  status: draft
+
+two:
+  company_id: 1
+  title: MyString
+  workplace_type: on_site
+  employment_type: full_time
+  requires_travel: false
+  is_visa_sponsorship_available: false
+  pay_min: 1.5
+  pay_max: 2.5
+  pay_period: hourly
+  is_active: true
+  status: draft

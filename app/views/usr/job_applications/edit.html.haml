@@ -1,0 +1,8 @@
+.row.mb-4
+  .col-12
+    %h1.fw-bold.mb-1 Edit Application
+    %p.text-muted.mb-0 Update your application for #{@job.title}.
+
+.row.mt-4
+  .col-12
+    = render Usr::JobApplication::FormComponent.new(job: @job, job_application: @job_application)

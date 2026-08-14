@@ -1,1 +1,258 @@
-Test
+.row.mb-4{ data: { dashboard_greeting: true } }
+  .col-12
+    %h1.fw-bold.mb-1= "👋 Hi, #{current_user.first_name}"
+    -# %p.text-muted.mb-0 Quick overview of your work, availability, and opportunities.
+
+.row.g-3.mb-4{ data: { dashboard_search_row: true } }
+  .col-12.col-lg-8
+    .card.h-100.card-accent.card-accent-cyan.dashboard-quick-search-card
+      .card-body
+        %h5.card-title.fw-semibold.mb-2 Quick Search
+        %p.card-text.text-muted.mb-3 Search people, jobs, and companies...
+        .dashboard-quick-search.position-relative{
+          data: {
+            controller: "quick-search",
+            quick_search_url_value: quick_search_usr_dashboards_path,
+            quick_search_min_length_value: 2,
+            quick_search_debounce_value: 250,
+            action: "click@window->quick-search#clickOutside"
+          }
+        }
+          .input-group
+            %span.input-group-text.bg-white
+              %i.bi.bi-search.text-muted
+            %input.form-control{
+              type: "search",
+              placeholder: "Search by name or job title...",
+              autocomplete: "off",
+              role: "combobox",
+              aria: {
+                autocomplete: "list",
+                expanded: "false",
+                controls: "dashboard-quick-search-results",
+                label: "Search people, jobs, and companies"
+              },
+              data: {
+                quick_search_target: "input",
+                action: "input->quick-search#search keydown->quick-search#navigate focus->quick-search#showResults"
+              }
+            }
+          #dashboard-quick-search-results.list-group.position-absolute.w-100.shadow-sm.d-none{
+            role: "listbox",
+            data: { quick_search_target: "results" }
+          }
+          %p.visually-hidden.mb-0{ role: "status", aria: { live: "polite" }, data: { quick_search_target: "status" } }
+  .col-12.col-lg-4
+    - if @owned_companies.any?
+      = render Usr::Dashboard::CompanyToolsComponent.new(post_job_path: @post_job_path, create_project_path: @start_project_path, job_postings_path: my_postings_usr_jobs_path, projects_path: @projects_navigation_path, companies_path: usr_companies_path)
+    - else
+      = render Usr::Dashboard::HelpfulToolsComponent.new(jobs_path: usr_jobs_path, people_path: usr_profiles_path, saved_jobs_path: usr_saved_jobs_path, availability_path: edit_calendar_usr_profile_path(@profile), profile_path: usr_profile_path(@profile))
+
+- if @owned_job_postings.any?
+  .row.g-3.mb-4
+    .col-12{ data: { owned_job_postings_card: true } }
+      .card.h-100.card-accent.card-accent-sky
+        .card-body
+          %h5.card-title.fw-semibold.mb-2 My Open Job Postings
+          .d-flex.flex-column.gap-3
+            - @owned_job_postings.each do |posting|
+              .pb-3.border-bottom{ data: { owned_job_posting_id: posting.job.id } }
+                .d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-start.gap-2
+                  %div
+                    = link_to posting.job.title, usr_job_path(posting.job), class: "fw-semibold text-dark text-decoration-none"
+                    .text-muted.small.mt-1= posting.job.company.name
+                    .text-muted.small
+                      = posting.job.employment_type.humanize
+                      •
+                      = posting.job.workplace_type.humanize
+                      •
+                      = posting.job.formatted_location
+                    .d-flex.flex-wrap.gap-3.text-muted.small.mt-1
+                      %span{ data: { applicant_count: true } }
+                        = link_to usr_company_applications_path(posting.job.company, job_id: posting.job.id), class: "text-muted" do
+                          %i.bi.bi-people.me-1{ aria: { hidden: true } }
+                          = pluralize(posting.applicant_count, "applicant")
+                      %span{ data: { recommended_applicant_count: true } }
+                        %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+                        = pluralize(posting.recommended_applicant_count, "recommended candidate")
+                  .text-muted.small.text-md-end
+                    %div{ data: { posted_at: true } }
+                      %i.bi.bi-clock.me-1{ aria: { hidden: true } }
+                      Posted
+                      = posting.job.relative_published_at
+                    - if posting.job.starts_at.present?
+                      %div
+                        Starts
+                        = l(posting.job.starts_at.to_date, format: :long)
+          .mt-3
+            = link_to "View My Job Postings", my_postings_usr_jobs_path, class: "text-muted text-decoration-none fw-semibold"
+
+.row.g-3.mb-4{ data: { dashboard_recommendations: true } }
+  .col-12{
+    class: ("col-lg-6" if @owned_companies.any?),
+    data: { open_jobs_card: true }
+  }
+    = render Usr::Dashboard::JobRecommendationsComponent.new(results: @job_recommendations, applied_job_ids: @applied_job_ids, jobs_path: usr_jobs_path)
+  - if @owned_companies.any?
+    .col-12.col-lg-6{ data: { people_crews_card: true } }
+      = render Usr::Dashboard::CrewRecommendationsComponent.new(results: @crew_recommendations, active_jobs: @crew_recommendations_active_jobs, profiles_path: usr_profiles_path(recommended: "1"), post_job_path: @post_job_path)
+
+.row.g-3.mb-4{ data: { dashboard_activity: true } }
+  .col-12.col-lg-4
+    .card.h-100.card-accent.card-accent-cyan
+      .card-body
+        %h5.card-title.fw-semibold.mb-2 Profile & Availability
+        .d-flex.align-items-center.gap-3.mb-4
+          .profile-completion-wheel{
+            style: "--profile-completion: #{@profile_completion}%;",
+            data: { profile_completion: @profile_completion },
+            role: "img",
+            aria: { label: "Profile #{@profile_completion}% complete" }
+          }
+            .profile-completion-wheel__center
+              - if @profile.complete?
+                %i.bi.bi-check-lg{ aria: { hidden: true } }
+                %span.visually-hidden Complete
+              - else
+                %span.fw-bold= "#{@profile_completion}%"
+          %div
+            %div.fw-semibold= @profile.complete? ? "Profile complete" : "Build your profile"
+            %div.text-muted.small
+              - if @profile.complete?
+                Your profile is ready to share.
+              - else
+                Complete profiles help crews and employers find you.
+        - if @profile_next_step
+          = link_to @profile_next_step.fetch(:label),
+            edit_usr_profile_path(@profile, source: "completed_profile", anchor: @profile_next_step.fetch(:anchor)),
+            class: "btn btn-outline-primary btn-sm mb-4",
+            data: { profile_next_step: true }
+        .border-top.pt-3{ data: { availability_overview: true } }
+          .d-flex.justify-content-between.align-items-start.gap-2
+            %div
+              .fw-semibold
+                %i.bi.bi-calendar-check.me-1.text-secondary{ aria: { hidden: true } }
+                Availability
+              .text-muted.small.mt-1
+                - if @availability_overview.fetch(:status) == "Calendar connected"
+                  %i.bi.bi-check-circle-fill.text-success.me-1{ aria: { hidden: true } }
+                = @availability_overview.fetch(:status)
+            - if @availability_overview.fetch(:blocked_days).positive?
+              .text-end
+                %span.badge.text-bg-light.border.rounded-pill
+                  = pluralize(@availability_overview.fetch(:blocked_days), "blocked day")
+                .small.text-muted.mt-1 in the next 30 days
+          - if @availability_overview.fetch(:next_blockout_date)
+            .text-muted.small.mt-2
+              Next unavailable:
+              = l(@availability_overview.fetch(:next_blockout_date), format: :long)
+          .border-top.pt-3.mt-3
+            = link_to "Manage Availability",
+              edit_calendar_usr_profile_path(@profile),
+              class: "text-muted text-decoration-none fw-semibold"
+  .col-12.col-lg-4
+    .card.h-100.card-accent.card-accent-cyan
+      .card-body
+        %h5.card-title.fw-semibold.mb-2 Upcoming Jobs
+        - if @upcoming_jobs.any?
+          .d-flex.flex-column.gap-3{ data: { upcoming_jobs: true } }
+            - @upcoming_jobs.each do |job|
+              .pb-3.border-bottom
+                = link_to job.title, usr_job_path(job), class: "fw-semibold text-dark text-decoration-none"
+                .text-muted.small.mt-1
+                  = job.company.name
+                .text-muted.small
+                  Starts
+                  = l(job.starts_at.to_date, format: :long)
+        - else
+          %p.card-text.text-muted You have no upcoming jobs right now.
+        .mt-3
+          = link_to "View my Jobs", usr_jobs_path, class: "text-muted text-decoration-none fw-semibold"
+  .col-12.col-lg-4
+    .card.h-100.card-accent.card-accent-navy{ data: { requests_and_applications: true } }
+      .card-body
+        .d-flex.align-items-center.gap-2.mb-2
+          %h5.card-title.fw-semibold.mb-0 Requests & Applications
+          - if @pending_job_invitations.any?
+            %span.badge.rounded-pill.text-bg-primary{ data: { pending_invitation_count: true } }
+              = @pending_job_invitations.size
+        - if @pending_job_invitations.any?
+          .d-flex.flex-column.gap-3.mb-3{ data: { pending_job_invitations: true } }
+            - @pending_job_invitations.each do |invitation|
+              .pb-3.border-bottom{ data: { pending_invitation: invitation.id } }
+                .d-flex.justify-content-between.align-items-start.gap-3
+                  %div
+                    .fw-semibold= link_to invitation.job.title, usr_job_path(invitation.job), class: "text-dark text-decoration-none"
+                    .text-muted.small= invitation.job.company.name
+                  %span.status-badge.status-warning Invited
+        - if @current_job_applications.any?
+          .d-flex.flex-column.gap-3{ data: { current_job_applications: true } }
+            - @current_job_applications.each do |job_application|
+              - job = job_application.job
+              .pb-3.border-bottom
+                .d-flex.justify-content-between.align-items-start.gap-3
+                  %div
+                    %div.fw-semibold= link_to job.title, usr_job_application_path(job_application), class: "text-dark text-decoration-none"
+                    %div.text-muted.small
+                      - if job.company.present?
+                        = link_to job.company.name, usr_company_path(job.company), class: "text-muted text-decoration-none"
+                      - else
+                        Unassigned Company
+                    %div.text-muted.small.mt-1
+                      = job.formatted_location
+                      •
+                      = job_application.status.humanize
+                  .text-end
+                    %div.text-muted.small Applied
+                    %div.fw-semibold.small= l((job_application.submitted_at || job_application.created_at).to_date, format: :long)
+        - elsif @pending_job_invitations.empty?
+          %p.card-text.text-muted You have no active job applications right now.
+        .mt-3
+          = link_to "View Applications & Invitations", usr_job_applications_path, class: "text-muted text-decoration-none fw-semibold"
+
+.row.g-3.mb-4{ data: { dashboard_secondary: true } }
+  .col-12.col-lg-6
+    .card.h-100.card-accent.card-accent-sky
+      .card-body
+        .d-flex.align-items-center.gap-2.mb-2
+          %span.icon-orb.icon-orb-sky
+            %i.bi.bi-bookmark{ aria: { hidden: true } }
+          %h5.card-title.fw-semibold.mb-0 Saved Lists / Shortlists
+        - if @saved_jobs.any? || @crew_shortlists.any?
+          - @saved_jobs.each do |saved_job|
+            .py-2.border-bottom
+              %div.fw-semibold= link_to saved_job.job.title, usr_job_path(saved_job.job), class: "text-dark text-decoration-none"
+              %div.text-muted.small Saved job
+          - @crew_shortlists.each do |shortlist|
+            .py-2.border-bottom
+              %div.fw-semibold= link_to shortlist.name, usr_crew_shortlist_path(shortlist), class: "text-dark text-decoration-none"
+              %div.text-muted.small= "#{shortlist.company.name} · #{pluralize(shortlist.crew_shortlist_memberships.size, 'person')}"
+          .d-flex.flex-wrap.gap-3.mt-3
+            = link_to "View Saved Jobs", usr_saved_jobs_path, class: "text-muted text-decoration-none fw-semibold"
+            - if @owned_companies.one?
+              = link_to "Manage Shortlists", usr_company_crew_shortlists_path(@owned_companies.first), class: "text-muted text-decoration-none fw-semibold"
+        - else
+          %p.card-text.text-muted.mb-2 Save jobs or create crew lists to organize future work.
+          .d-flex.flex-wrap.gap-3
+            = link_to "Browse Jobs", usr_jobs_path, class: "text-muted text-decoration-none fw-semibold"
+            - if @owned_companies.one?
+              = link_to "Create a Shortlist", usr_company_crew_shortlists_path(@owned_companies.first), class: "text-muted text-decoration-none fw-semibold"
+  .col-12.col-lg-6
+    .card.h-100.card-accent.card-accent-navy
+      .card-body
+        .d-flex.align-items-center.gap-2.mb-2
+          %span.icon-orb.icon-orb-navy
+            %i.bi.bi-chat-dots{ aria: { hidden: true } }
+          %h5.card-title.fw-semibold.mb-0 Messages & Updates
+        - if @recent_notifications.any?
+          .d-flex.flex-column.gap-3
+            - @recent_notifications.each do |notification|
+              .pb-3.border-bottom
+                - if notification.kind == "crewbase_credit_earned"
+                  = crewbase_credit_badge(variant: :neutral, compact: true)
+                %p.mb-1= notification.message
+                %p.text-muted.small.mb-0= l(notification.created_at.to_date, format: :long)
+          .mt-3
+            = link_to "View all notifications", usr_notifications_path, class: "text-muted text-decoration-none fw-semibold"
+        - else
+          %p.card-text.text-muted You have no recent updates.

@@ -1,0 +1,20 @@
+.card.border-0.shadow-sm.card-accent.card-accent-navy{ data: { profile_availability: true } }
+  .card-body
+    .d-flex.flex-column.flex-md-row.justify-content-between.align-items-md-start.gap-3
+      .d-flex.align-items-start.gap-3
+        %span.icon-orb.icon-orb-navy
+          %i.bi.bi-calendar-check{ aria: { hidden: true } }
+        %div
+          %h2.h5.card-section-title.fw-bold.mb-1 Availability
+          %p.text-muted.mb-2= overview.fetch(:status)
+          - if overview.fetch(:blocked_days).positive?
+            .d-flex.flex-wrap.gap-3.small
+              %span
+                %strong= helpers.pluralize(overview.fetch(:blocked_days), "blocked day")
+              - if overview.fetch(:next_blockout_date)
+                %span.text-muted
+                  Next unavailable:
+                  = helpers.l(overview.fetch(:next_blockout_date), format: :long)
+          - else
+            %p.text-muted.small.mb-0 Add blockout dates or connect a calendar to keep your availability current.
+      = link_to "Manage Availability", availability_path, class: "btn btn-primary flex-shrink-0"

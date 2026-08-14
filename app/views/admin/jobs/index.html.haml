@@ -1,0 +1,29 @@
+.container-fluid.py-4
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+    %h1.mb-0 Jobs
+    = form_with url: admin_jobs_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex gap-2" do |form|
+      = form.search_field :q, value: params[:q], class: "form-control", placeholder: "Search jobs", aria: { label: "Search jobs" }
+      = form.select :status, Job.statuses.keys.map { |status| [status.humanize, status] }, { include_blank: "All statuses", selected: params[:status] }, class: "form-select"
+      = form.submit "Filter", class: "btn btn-primary"
+  .card
+    .table-responsive
+      %table.table.table-hover.align-middle.mb-0
+        %thead
+          %tr
+            %th Job
+            %th Company
+            %th Status
+            %th Type
+            %th Applications
+            %th Created
+        %tbody
+          - @jobs.each do |job|
+            %tr
+              %td.fw-semibold= job.title
+              %td= job.company&.name || "Unassigned"
+              %td= job.status.humanize
+              %td= job.posting_type_label
+              %td= job.job_applications.length
+              %td= l(job.created_at.to_date, format: :long)
+  - if @pagy.pages > 1
+    .mt-4.d-flex.justify-content-end= bootstrap_pagy_nav(@pagy)

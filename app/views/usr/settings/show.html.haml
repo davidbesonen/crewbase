@@ -1,0 +1,15 @@
+.row
+  .col-12
+    .card.border-0.shadow-sm.app-hero.app-hero-cyan.mb-4
+      .card-body.p-4
+        .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+          %div
+            %h1.fw-bold.mb-1 Settings
+            %p.text-muted.mb-0 Manage your account details and the notifications you receive.
+          = link_to usr_settings_billing_path, class: "btn btn-outline-primary" do
+            %i.bi.bi-credit-card.me-2
+            Billing & plans
+
+.row
+  .col-12
+    = render Usr::SettingsFormComponent.new(user: current_user)

@@ -29,3 +29,6 @@
 
 en:
   hello: "Hello world"
+  time:
+    formats:
+      notification: "%B %-d, %Y at %-I:%M %p"

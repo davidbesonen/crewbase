@@ -1,0 +1,54 @@
+.card.h-100
+  .card-body
+    %h5.card-title.fw-semibold.mb-3
+      %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+      People / Crews You May Need
+    - if results.any?
+      .d-flex.flex-column.gap-3
+        - results.each do |result|
+          .d-flex.gap-3.pb-3.border-bottom{ data: { crew_recommendation: true, recommendation_tier: result.tier } }
+            = link_to profile_path(result.profile), class: "text-decoration-none flex-shrink-0" do
+              .avatar-toggle{ style: "width: 52px; height: 52px; font-size: 21px;" }
+                = avatar_initial(result.profile)
+            .flex-grow-1.position-relative.crew-recommendation-content
+              .crew-recommendation-location.position-absolute.top-0.end-0.text-muted.small
+                %i.bi.bi-geo-alt.me-1{ aria: { hidden: true } }
+                = result.profile.formatted_location
+              .crew-recommendation-copy
+                .fw-semibold
+                  = link_to result.profile.user.full_name,
+                    profile_path(result.profile),
+                    class: "text-dark text-decoration-none"
+                .text-muted.small= result.profile.formatted_headline
+                - if result.tier == :near
+                  .small.fw-semibold.text-warning
+                    %i.bi.bi-exclamation-circle.me-1{ aria: { hidden: true } }
+                    Near match
+                - if result.rating.present?
+                  .small{ class: recommendation_rating_text_class(result.rating), data: { crew_recommendation_rating: true } }
+                    %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                    = "#{result.rating} / 5 rating#{',' if availability_follows_rating?(result)}"
+                    - if availability_follows_rating?(result)
+                      %span.text-success.ms-2
+                        = result.availability_label
+              .small.mt-2
+                %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+                = "#{match_reason_for(result)} for"
+                = link_to result.job.title, job_path(result.job), class: "text-dark fw-semibold"
+              - if result.gap_reasons.any?
+                - result.gap_reasons.each do |reason|
+                  .small.text-warning.mt-1
+                    %i.bi.bi-exclamation-circle.me-1{ aria: { hidden: true } }
+                    = reason
+              - unless availability_follows_rating?(result) || result.gap_reasons.any?
+                .small.text-success.mt-1
+                  %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                  = result.availability_label
+      .mt-3
+        = link_to "View more people", profiles_path, class: "text-muted text-decoration-none fw-semibold"
+    - elsif active_jobs
+      %p.card-text.text-muted No matching crew recommendations are available right now.
+      = link_to "View more people", profiles_path, class: "text-muted text-decoration-none fw-semibold"
+    - else
+      %p.card-text.text-muted Post a job to receive tailored crew recommendations.
+      = link_to "Post a Job", post_job_path, class: "text-muted text-decoration-none fw-semibold"

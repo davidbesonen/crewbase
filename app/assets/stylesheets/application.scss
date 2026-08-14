@@ -1,20 +1,34 @@
 @import "bootstrap";
 @import "colors";
+@import "color_accents";
+@import "actiontext";
+@import "taxonomy_multiselect";
+@import "marketing";
 
-/* ---------- Global layout & overflow clamps ---------- */
-html, body {
+:root {
+  --app-shell-padding-x: clamp(1.25rem, 6vw, 5rem);
+  --app-top-nav-height: 4rem;
+}
+
+/* ---------- Global Base ---------- */
+html {
   height: 100%;
+}
+
+html,
+body {
   max-width: 100%;
-  overflow-x: hidden; /* prevent page-wide side scroll */
+  overflow-x: clip;
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--bs-tertiary-bg);
 }
 
-.container { /* main page containers grow, footer sticks */
+.container {
   flex: 1 0 auto;
 }
 
@@ -22,24 +36,130 @@ body {
   flex-shrink: 0;
 }
 
-/* Long words / unbroken strings (IDs, URLs, etc.) */
-.text-break, .break-all {
+/* ---------- Text Utilities ---------- */
+.text-break,
+.break-all {
   word-wrap: break-word;
   word-break: break-word;
 }
 
-/* Tables should scroll internally rather than the page */
+/* ---------- Form Labels ---------- */
+.form-label {
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+}
+
+/* ---------- Table Responsiveness ---------- */
 .table-responsive {
   overflow-x: auto;
 }
 
-/* ---------- Small utilities ---------- */
+/* ---------- Utility Layout Helpers ---------- */
 .header-btns {
   display: flex;
   justify-content: end;
   align-items: center;
 }
 
+/* ---------- Cards ---------- */
+.card {
+  box-shadow: $box-shadow !important;
+}
+
+.card-title,
+.card-section-title,
+.card-body > h3:first-child,
+.card-body > h4:first-child,
+.card-body > h5:first-child {
+  font-size: 1.3rem;
+  line-height: 1.35;
+  margin-bottom: 1rem !important;
+  padding: 0.125rem;
+}
+
+/* ---------- Availability Calendar ---------- */
+.availability-calendar .flatpickr-calendar.inline {
+  width: 100%;
+  max-width: 100%;
+  box-shadow: none;
+}
+
+.availability-calendar .flatpickr-innerContainer {
+  overflow-x: auto;
+}
+
+.availability-calendar .flatpickr-rContainer {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.availability-calendar .flatpickr-month {
+  min-width: 240px;
+}
+
+.occupation-pill,
+.industry-pill {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: $text-dark;
+}
+
+.industry-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background-color: #f1f1f1;
+  color: $text-dark;
+}
+
+.selected-occupation-pill {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: $white;
+  background-color: $primary;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background-color: $primary;
+}
+
+.selection-pill {
+  width: 100px;
+  justify-content: center;
+}
+
+.availability-date-pill {
+  width: 75px;
+  justify-content: center;
+}
+
+.availability-table thead th:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+.availability-table thead th:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+/* ---------- Review Ratings ---------- */
+.review-rating-group .btn-check:checked + .review-rating-btn {
+  background-color: $secondary;
+  border-color: $secondary;
+  color: #fff;
+}
+
+.review-rating-group .btn-check:checked + .review-rating-btn:hover,
+.review-rating-group .btn-check:checked + .review-rating-btn:focus {
+  background-color: darken($secondary, 10%);
+  border-color: darken($secondary, 10%);
+  color: #fff;
+}
+
+/* ---------- Avatar & User Menu ---------- */
 .team-fallback-avatar {
   display: inline-flex;
   align-items: center;
@@ -54,8 +174,6 @@ body {
 }
 
 .avatar-toggle {
-  width: 40px;
-  height: 40px;
   border-radius: 50%;
   background-color: $logo;
   color: #fff;
@@ -76,84 +194,144 @@ body {
   box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.3);
 }
 
+.user-nav-dropdown {
+  min-width: 240px;
+  padding: 0.65rem 0;
+}
+
+/* ---------- Progress & Turbo Helpers ---------- */
 .progress { padding: 0 !important; border: none !important; }
 .progress-bar { margin-left: 0 !important; }
 .turbo-progress-bar { visibility: hidden; }
 
-.auth-card { width: 100%; }
+.profile-completion-wheel {
+  --profile-completion: 0%;
+  width: 5.25rem;
+  height: 5.25rem;
+  flex: 0 0 5.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--bs-primary) var(--profile-completion),
+    var(--bs-gray-200) 0
+  );
+}
 
-/* ---------- App shell (sidenav + content) ---------- */
-/* Flex layout on desktop, offcanvas for mobile */
+.profile-completion-wheel__center {
+  width: 4rem;
+  height: 4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bs-body-bg);
+  color: var(--bs-primary);
+  font-size: 1.1rem;
+}
+
+.profile-completion-wheel__center .bi-check-lg {
+  font-size: 2rem;
+}
+
+.crew-recommendation-content {
+  min-width: 0;
+}
+
+.crew-recommendation-copy {
+  min-width: 0;
+  padding-right: 42%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.crew-recommendation-location {
+  max-width: 40%;
+  text-align: right;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* ---------- Auth Cards ---------- */
+.auth-card {
+  width: 100%;
+}
+
+/* ---------- App Shell Layout ---------- */
 .app-shell {
   display: flex;
-  min-height: 100vh; /* full height; if you want to subtract a fixed navbar, change to calc(100vh - <nav-height>) */
+  min-height: 100vh;
 }
 
-/* Desktop sidenav width */
+/* ---------- Sidebar Widths ---------- */
 .sidenav-wrapper {
-  flex: 0 0 280px;  /* keep in sync with .aside if you set inline width */
-  min-width: 0;     /* allow shrink without x-scroll */
+  flex: 0 0 280px;
+  min-width: 0;
 }
 
-/* Collapsed sidenav width (Stimulus adds .sidenav-collapsed on <body>) */
 .sidenav-collapsed .sidenav-wrapper {
   flex-basis: 64px;
 }
 
-/* Sidebar containers */
+/* ---------- Sidebar Containers ---------- */
 .aside,
 .sidenav {
   width: 100%;
   transition: width 150ms ease;
-  overflow-x: hidden; /* never scroll horizontally in the sidebar */
+  overflow-x: hidden;
 }
 
-/* Keep aside scrollable and full height */
 .aside {
   min-height: 100vh;
   overflow-y: auto;
 }
 
-/* Content area */
 .app-content {
   flex: 1 1 auto;
-  overflow-x: hidden; /* clamps rogue wide children */
-  padding-bottom: 2rem;
+  overflow-x: clip;
+  padding: 0 var(--app-shell-padding-x) 2rem;
 }
 
-/* Mobile: hide desktop sidebar, rely on offcanvas */
+.app-shell-gutter {
+  padding-left: var(--app-shell-padding-x);
+  padding-right: var(--app-shell-padding-x);
+}
+
+.app-top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  min-height: var(--app-top-nav-height);
+}
+
+/* ---------- Responsive Sidebar Behavior ---------- */
 @media (max-width: 991.98px) {
   .sidenav-wrapper {
     display: none !important;
   }
 }
 
-/* ---------- Sidenav header & toggle ---------- */
+/* ---------- Sidenav Header & Toggle ---------- */
 .sidenav-header {
-  min-height: 75px; /* stable centering for logo/toggle */
+  min-height: 75px;
   position: relative;
 }
 
 .sidenav-toggle {
-  z-index: 2; /* keep clickable if overlapping logo */
+  z-index: 2;
   flex-shrink: 0;
 }
 
-/* Hide big centered logo when collapsed */
+/* ---------- Collapsed State Helpers ---------- */
 .sidenav-collapsed .sidenav-logo { display: none; }
-
-/* Optional: hide title text when collapsed */
 .sidenav-collapsed .sidenav-title { display: none !important; }
 
-/* ---------- Sidenav overflow hardening ---------- */
-/* Kill negative margins/gutters from Bootstrap rows inside the sidenav */
+/* ---------- Sidenav Overflow Hardening ---------- */
 .sidenav .row {
   --bs-gutter-x: 0;
   margin-left: 0;
   margin-right: 0;
 }
 
-/* Zero column padding so content doesn't push width */
 .sidenav .col,
 .sidenav [class^="col-"],
 .sidenav [class*=" col-"] {
@@ -161,7 +339,6 @@ body {
   padding-right: 0;
 }
 
-/* Ensure images/logos never exceed the sidebar width */
 .sidenav img,
 .sidenav .img-fluid {
   max-width: 100%;
@@ -169,14 +346,13 @@ body {
   display: block;
 }
 
-/* Truncate ultra-long labels instead of expanding the sidebar */
 .sidenav .nav-link {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ---------- Sidenav links & icons ---------- */
+/* ---------- Sidenav Links & Icons ---------- */
 .sidenav .nav-link {
   color: #fff !important;
   font-weight: 700;
@@ -212,7 +388,7 @@ body {
   opacity: 1;
 }
 
-/* Hide/show label text when collapsed */
+/* ---------- Collapsed Label Behavior ---------- */
 .nav-text {
   transition: opacity 120ms ease;
 }
@@ -224,37 +400,433 @@ body {
   display: inline-block;
 }
 
+/* ---------- Logo Square ---------- */
 .logo-square {
-  width: 40px;            /* uniform square size */
+  width: 40px;
   height: 40px;
-  background-color: #434548; /* neutral background */
-  border-radius: 8px;     /* rounded corners */
+  background-color: #434548;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;       /* clip to rounded shape */
+  overflow: hidden;
 }
 
-/* Target the table-responsive with custom scrollbar */
+/* ---------- Custom Scrollbars ---------- */
 .table-responsive::-webkit-scrollbar {
-  width: 8px; /* thickness of vertical scrollbar */
+  width: 8px;
 }
 
 .table-responsive::-webkit-scrollbar-track {
-  background: #1e1e1e; /* dark track */
+  background: #1e1e1e;
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-  background-color: #555; /* scrollbar handle */
+  background-color: #555;
   border-radius: 4px;
 }
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
-  background-color: #777; /* lighter on hover */
+  background-color: #777;
 }
 
-/* Firefox scrollbar styling */
 .table-responsive {
   scrollbar-width: thin;
-  scrollbar-color: #555 #1e1e1e; /* thumb, track */
+  scrollbar-color: #555 #1e1e1e;
+}
+/* User sidenav responsiveness */
+.user-sidenav-card {
+  width: 250px;
+  border-radius: 0.75rem;
+}
+
+@media (min-width: 992px) {
+  .app-sticky-sidenav {
+    flex: 0 0 250px;
+    width: 250px;
+    position: sticky;
+    top: calc(var(--app-top-nav-height) + 1.5rem);
+    max-height: calc(100vh - var(--app-top-nav-height) - 3rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app-sticky-filter {
+    position: sticky;
+    top: calc(var(--app-top-nav-height) + 1.5rem);
+    max-height: calc(100vh - var(--app-top-nav-height) - 3rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .user-sidenav-card {
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+.job-description-editor {
+  min-height: 18rem;
+  resize: vertical;
+}
+
+.experience-summary-editor {
+  min-height: 10rem;
+}
+
+.experience-summary-content {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  .trix-content > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.experience-summary-content.is-expanded {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.experience-summary-toggle {
+  font-size: inherit;
+  text-decoration: none;
+}
+
+/* ---------- Dashboard Quick Search ---------- */
+.dashboard-quick-search-card {
+  overflow: visible;
+}
+
+.dashboard-quick-search .list-group {
+  top: calc(100% + 0.35rem);
+  z-index: 1020;
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.quick-search-result-icon {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bs-light);
+  color: var(--bs-secondary-color);
+}
+
+.quick-search-result-icon-company {
+  color: var(--bs-primary);
+}
+
+.quick-search-result-icon-job {
+  color: var(--bs-success);
+}
+
+.quick-search-result-icon-person {
+  color: var(--bs-info-text-emphasis);
+}
+
+.crewbase-credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+
+  img {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.profile-credits-heading {
+  align-items: center;
+  min-height: 1.5rem;
+  line-height: 1;
+
+  .card-section-title {
+    margin: 0 !important;
+    padding: 0;
+    line-height: 1.25;
+  }
+
+  &__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    line-height: 0;
+  }
+
+  .crewbase-credit-badge {
+    display: flex;
+  }
+}
+
+.crewbase-credit-badge-blue {
+  color: var(--bs-primary);
+}
+
+.crewbase-credit-badge-neutral {
+  color: var(--bs-secondary-color);
+}
+
+.recommended-applicant-badge {
+  font-size: 0.68rem;
+}
+
+/* ---------- Dashboard company tools ---------- */
+.company-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &__item {
+    min-width: 0;
+
+    .small {
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+/* ---------- Notifications ---------- */
+.notification-card {
+  border-radius: 0.85rem;
+
+  &--read {
+    background-color: var(--bs-gray-200);
+    box-shadow: none !important;
+    opacity: 0.78;
+  }
+
+  &__content {
+    min-width: 0;
+  }
+
+  &__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1rem;
+  }
+
+  &__message {
+    line-height: 1.45;
+  }
+}
+
+.notifications-divider hr {
+  border-color: var(--bs-gray-400);
+  opacity: 0.65;
+}
+
+.notification-action-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--bs-body-color);
+    text-decoration: underline;
+  }
+
+  &--button {
+    flex: 0 0 auto;
+  }
+}
+
+.message-bubble {
+  max-width: 75%;
+  overflow-wrap: anywhere;
+}
+
+.admin-chart-container {
+  min-height: 22rem;
+  position: relative;
+}
+
+/* ---------- Company Plan Selection ---------- */
+.company-plan-card {
+  --plan-accent: var(--bs-primary);
+  --plan-accent-rgb: var(--bs-primary-rgb);
+  --plan-soft: rgba(var(--plan-accent-rgb), 0.1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(var(--plan-accent-rgb), 0.18) !important;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.company-plan-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--plan-accent-rgb), 0.45) !important;
+  box-shadow: 0 1rem 2.25rem rgba(var(--plan-accent-rgb), 0.16) !important;
+}
+
+.company-plan-card--starter {
+  --plan-accent: #4ea8d8;
+  --plan-accent-rgb: 78, 168, 216;
+}
+
+.company-plan-card--team {
+  --plan-accent: var(--bs-primary);
+  --plan-accent-rgb: var(--bs-primary-rgb);
+  background: linear-gradient(180deg, rgba(var(--bs-primary-rgb), 0.07), #fff 34%);
+}
+
+.company-plan-card--studio {
+  --plan-accent: #17365f;
+  --plan-accent-rgb: 23, 54, 95;
+  background: linear-gradient(180deg, rgba(23, 54, 95, 0.1), #fff 38%);
+}
+
+.company-visibility-badge {
+  border: 1px solid rgba(23, 54, 95, 0.18);
+  background: linear-gradient(135deg, #17365f, #315f92);
+  box-shadow: 0 0.25rem 0.75rem rgba(23, 54, 95, 0.18);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.65rem;
+}
+
+.company-plan-card--featured {
+  border-width: 2px !important;
+  border-color: var(--plan-accent) !important;
+  box-shadow: 0 1.1rem 2.5rem rgba(var(--plan-accent-rgb), 0.2) !important;
+}
+
+.company-plan-card__accent {
+  height: 0.35rem;
+  background: linear-gradient(90deg, var(--plan-accent), rgba(var(--plan-accent-rgb), 0.55));
+}
+
+.company-plan-card__badge {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 1;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--plan-accent);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.company-plan-card__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1rem;
+  background: var(--plan-soft);
+  color: var(--plan-accent);
+  font-size: 1.45rem;
+}
+
+.company-plan-card__price > .fw-bold {
+  color: var(--plan-accent);
+  font-size: 1.25rem;
+}
+
+.company-plan-card__description {
+  min-height: 3rem;
+}
+
+.company-plan-card__features {
+  border-top: 1px solid rgba(var(--plan-accent-rgb), 0.14);
+  padding-top: 1rem;
+}
+
+.company-plan-card__capacities {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--plan-soft);
+}
+
+.company-plan-card__capacity-icon {
+  width: 1.75rem;
+  color: var(--plan-accent);
+  text-align: center;
+}
+
+.company-plan-card__feature {
+  min-height: 1.7rem;
+  transition: color 120ms ease, opacity 120ms ease;
+}
+
+.company-plan-card__feature-status {
+  width: 1.2rem;
+  flex: 0 0 1.2rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.company-plan-card__feature--included .company-plan-card__feature-icon {
+  background: rgba(var(--bs-success-rgb), 0.1);
+  color: var(--bs-success);
+}
+
+.company-plan-card__feature--locked {
+  color: var(--bs-secondary-color);
+  opacity: 0.58;
+}
+
+.company-plan-card__feature--locked .company-plan-card__feature-icon {
+  background: var(--bs-gray-100);
+  color: var(--bs-gray-500);
+}
+
+.company-plan-card__feature-icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  flex: 0 0 1.7rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.5rem;
+  background: var(--plan-soft);
+  color: var(--plan-accent);
+  font-size: 0.82rem;
+}
+
+.company-plan-card__button {
+  font-weight: 700;
+}
+
+.company-plan-card--team .company-plan-card__button {
+  box-shadow: 0 0.4rem 1rem rgba(var(--bs-primary-rgb), 0.2);
 }

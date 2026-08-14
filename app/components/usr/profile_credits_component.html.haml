@@ -1,0 +1,37 @@
+.card.border-0.shadow-sm{ id: "profile-credits" }
+  .card-body
+    .d-flex.justify-content-between.align-items-start.flex-wrap.gap-2
+      %div
+        .profile-credits-heading.d-flex.align-items-center.gap-2
+          .profile-credits-heading__icon
+            = helpers.crewbase_credit_badge(variant: :blue, compact: true)
+          %h5.card-section-title.fw-bold.mb-0 Crewbase Credits
+          %span.badge.rounded-pill.text-bg-light.border{ data: { profile_credit_count: true } }
+            = "#{helpers.pluralize(credits.size, "credit")} earned"
+        %p.text-muted.mb-0 Verified gigs completed through Crewbase.
+      - if owner_view && !visible
+        %span.badge.text-bg-light.border Hidden from others
+    - if credits.any?
+      .d-flex.flex-column.mt-3
+        - credits.each_with_index do |credit, index|
+          .py-3{ class: ("border-top" if index.positive?) }
+            .d-flex.flex-column.flex-md-row.justify-content-between.gap-2
+              %div{ class: ("opacity-50" if owner_view && !credit.visible?) }
+                %h5.fw-semibold.mb-1= credit.role
+                %p.mb-1= credit.project_name
+                - if credit.display_company.present?
+                  %p.text-muted.small.mb-1= credit.display_company
+                - if credit.location.present?
+                  %p.text-muted.small.mb-0
+                    %i.bi.bi-geo-alt.me-1
+                    = credit.location
+              .text-md-end
+                %span.badge.text-bg-light.border.rounded-pill= credit.display_dates
+                - if credit.verified?
+                  .mt-2= helpers.crewbase_credit_badge(variant: :blue)
+                - if owner_view && !credit.visible?
+                  .small.text-muted.mt-2 Hidden from others
+            - if credit.description.present?
+              %p.text-muted.mt-2.mb-0= credit.description
+    - else
+      %p.text-muted.mt-3.mb-0 Complete jobs through Crewbase to earn verified credits.

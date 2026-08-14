@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Wireless Microphone
+  brand_id: 1
+
+two:
+  name: Stage Console
+  brand_id: 1

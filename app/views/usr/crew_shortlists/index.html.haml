@@ -1,0 +1,24 @@
+.d-flex.justify-content-between.align-items-start.flex-wrap.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Crew Shortlists
+    %p.text-muted.mb-0= @company.name
+  = form_with model: [ :usr, @company, @crew_shortlist ], class: "d-flex gap-2" do |form|
+    = form.text_field :name, class: "form-control", placeholder: "New shortlist name", required: true, aria: { label: "Shortlist name" }
+    = form.submit "Create List", class: "btn btn-primary text-nowrap"
+
+- if @crew_shortlist.errors.any?
+  .alert.alert-danger= @crew_shortlist.errors.full_messages.to_sentence
+
+- if @crew_shortlists.any?
+  .row.g-3
+    - @crew_shortlists.each do |shortlist|
+      .col-12.col-md-6
+        .card.border-0.shadow-sm.h-100
+          .card-body
+            %h5= link_to shortlist.name, usr_crew_shortlist_path(shortlist), class: "text-dark text-decoration-none"
+            %p.text-muted.mb-0= pluralize(shortlist.profiles.size, "person")
+- else
+  .card.border-0.shadow-sm
+    .card-body
+      %h5 No Crew Shortlists Yet
+      %p.text-muted.mb-0 Create a named list to organize people for an upcoming production.

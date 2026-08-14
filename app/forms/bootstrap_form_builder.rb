@@ -1,5 +1,4 @@
 class BootstrapFormBuilder < ActionView::Helpers::FormBuilder
-  # NOT CURRENTLY USED
   #
   # Generates a styled form field for each of the following field helpers:
   #   * text_field
@@ -72,11 +71,9 @@ class BootstrapFormBuilder < ActionView::Helpers::FormBuilder
   end
 
   def collection_select(method, collection, value_method, text_method, options = {}, html_options = {})
-    style = "form-select"
-    html_options[:class] ||= ""
-    html_options[:class].prepend style + " "
+    html_options[:class] = [ "form-select", *html_options[:class].to_s.split ].uniq.join(" ")
 
-    label = options[:label] == false ? "" : styled_label(method, options)
+    label = options[:label] == false ? "".html_safe : styled_label(method, options)
     field = super
 
     label + field

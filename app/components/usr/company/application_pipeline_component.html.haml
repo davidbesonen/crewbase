@@ -1,0 +1,74 @@
+.card.border-0.shadow-sm.card-accent.card-accent-navy
+  .card-body.p-4
+    .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4.app-hero.app-hero-navy
+      %div
+        %h1.h3.fw-bold.mb-1 Application Pipeline
+        %p.text-muted.mb-0
+          = "#{total_count} total #{'application'.pluralize(total_count)} for #{company.name}"
+      - if return_context
+        = link_to return_context.fetch(:label), return_context.fetch(:path), class: "btn btn-quiet"
+      - else
+        = link_to "Back to Company", usr_company_path(company), class: "btn btn-quiet"
+
+    .row.g-2.mb-4
+      - pipeline_statuses.each do |status|
+        .col-6.col-md
+          = link_to usr_company_applications_path(company, filters.merge(status: status)), class: "card h-100 text-decoration-none text-dark card-accent card-accent-cyan", data: { pipeline_stage: status } do
+            .card-body.p-3
+              .small.text-muted= status.humanize.titleize
+              .fs-4.fw-bold= stage_counts.fetch(status, 0)
+
+    = form_with url: usr_company_applications_path(company), method: :get, class: "row g-2 align-items-end mb-4" do |form|
+      - if filters[:project_id]
+        = form.hidden_field :project_id, value: filters[:project_id]
+      - if return_context
+        = form.hidden_field :return_to, value: filters[:return_to]
+      .col-md-4
+        = form.label :query, "Applicant", class: "form-label"
+        = form.search_field :query, value: filters[:query], class: "form-control", placeholder: "Search by name", styled: true
+      .col-md-3
+        = form.label :job_id, "Job", class: "form-label"
+        = form.select :job_id, options_from_collection_for_select(jobs, :id, :title, filters[:job_id]), { include_blank: "All jobs" }, class: "form-select"
+      .col-md-3
+        = form.label :status, "Stage", class: "form-label"
+        = form.select :status, options_for_select(pipeline_statuses.map { |status| [ status.humanize.titleize, status ] }, filters[:status]), { include_blank: "All stages" }, class: "form-select"
+      .col-md-2.d-flex.gap-2
+        = form.submit "Filter", class: "btn btn-primary"
+        = link_to "Clear", usr_company_applications_path(company, clear_filters), class: "btn btn-quiet"
+
+    - if applications.any?
+      .d-flex.flex-column.gap-3
+        - applications.each do |application|
+          %article{ class: application_card_classes(application), data: { pipeline_application: application.id } }
+            .card-body
+              .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3
+                %div
+                  %h2.h5.fw-semibold.mb-1.d-flex.flex-wrap.align-items-center.gap-2{ data: recommendation_heading_data(application) }
+                    = link_to application.profile.user.full_name, usr_profile_path(application.profile), class: "text-dark text-decoration-none"
+                    - if recommendation_for(application)
+                      %span.badge.text-bg-success.recommended-applicant-badge
+                        %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                        Recommended Applicant
+                  - if recommendation_for(application)
+                    .small.text-success.mb-2{ data: { recommendation_reason: true } }
+                      %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                      = recommendation_summary(application)
+                  %p.text-muted.mb-2
+                    = link_to application.job.title, usr_job_path(application.job), class: "text-muted"
+                    %span.mx-1 •
+                    = l((application.submitted_at || application.created_at).to_date, format: :long)
+                  %span{ class: job_application_status_badge_class(application.status) }
+                    = application.status.humanize.titleize
+                .d-flex.flex-wrap.justify-content-end.gap-2
+                  = link_to "View Application", usr_job_application_path(application), class: "btn btn-quiet btn-sm"
+                  .d-flex.flex-wrap.gap-2{ data: { pipeline_actions: true } }
+                    - pipeline_action_statuses.each do |status|
+                      - if current_status?(application, status)
+                        %button.btn.btn-secondary.btn-sm{ type: "button", disabled: true, aria: { disabled: "true" } }
+                          = transition_label(status)
+                      - else
+                        = link_to transition_label(status), update_status_usr_job_application_path(application, status: status), class: "btn btn-outline-primary btn-sm", data: { turbo_method: :patch, turbo_confirm: "Move this application to #{status.humanize.titleize}?" }
+    - else
+      .text-center.py-5.empty-state.empty-state-navy
+        %h2.h5 No applications found
+        %p.text-muted.mb-0 Adjust the filters or check back after candidates apply.

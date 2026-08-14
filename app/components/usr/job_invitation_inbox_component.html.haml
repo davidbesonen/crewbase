@@ -1,0 +1,50 @@
+.row.mb-4.app-hero.app-hero-sky
+  .col-12
+    %h1.fw-bold.mb-1 Invitations
+    %p.text-muted.mb-0 Review invitations you have received and track invitations you have sent.
+
+.row.g-4
+  .col-12.col-xl-6
+    %section.card.border-0.shadow-sm.h-100
+      .card-body.p-4
+        .d-flex.align-items-center.gap-2.mb-3
+          %i.bi.bi-inbox.fs-4.text-primary
+          %h2.h4.fw-semibold.mb-0 Received
+          %span.badge.text-bg-light.ms-auto= received.size
+        - if received.any?
+          .list-group.list-group-flush
+            - received.each do |invitation|
+              .list-group-item.px-0.py-3{ data: { received_invitation: invitation.id } }
+                .d-flex.justify-content-between.align-items-start.gap-3
+                  %div
+                    %h3.h6.fw-semibold.mb-1= link_to invitation.job.title, usr_job_path(invitation.job), class: "text-dark text-decoration-none"
+                    %p.text-muted.small.mb-1= invitation.job.company.name
+                    %span.badge{ class: status_class(invitation) }= invitation.status.humanize
+                  - if invitation.pending?
+                    .d-flex.flex-wrap.justify-content-end.gap-2
+                      = link_to "Apply", accept_usr_job_invitation_path(invitation), class: "btn btn-sm btn-primary", data: { turbo_method: :patch }
+                      = link_to "Decline", decline_usr_job_invitation_path(invitation), class: "btn btn-sm btn-outline-danger", data: { turbo_method: :patch, turbo_confirm: "Decline this invitation?" }
+                %p.text-muted.small.mb-0.mt-2
+                  Sent by #{invitation.invited_by.full_name} on #{l(invitation.created_at.to_date, format: :long)}
+        - else
+          %p.text-muted.mb-0 You have not received any invitations.
+
+  .col-12.col-xl-6
+    %section.card.border-0.shadow-sm.h-100
+      .card-body.p-4
+        .d-flex.align-items-center.gap-2.mb-3
+          %i.bi.bi-send.fs-4.text-primary
+          %h2.h4.fw-semibold.mb-0 Sent
+          %span.badge.text-bg-light.ms-auto= sent.size
+        - if sent.any?
+          .list-group.list-group-flush
+            - sent.each do |invitation|
+              .list-group-item.px-0.py-3{ data: { sent_invitation: invitation.id } }
+                .d-flex.justify-content-between.align-items-start.gap-3
+                  %div
+                    %h3.h6.fw-semibold.mb-1= link_to invitation.job.title, usr_job_path(invitation.job), class: "text-dark text-decoration-none"
+                    %p.text-muted.small.mb-1= recipient_name(invitation)
+                    %span.badge{ class: status_class(invitation) }= invitation.status.humanize
+                  %span.text-muted.small= l(invitation.created_at.to_date, format: :long)
+        - else
+          %p.text-muted.mb-0 You have not sent any invitations.

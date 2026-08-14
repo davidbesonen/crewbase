@@ -1,0 +1,23 @@
+%h4.fw-semibold.mb-4 Where are you located?
+.row.g-3
+  .col-md-12
+    = f.simple_fields_for :locations, (f.object.locations.first || f.object.locations.build) do |location_fields|
+      .row.g-3
+        = location_fields.input :id, as: :hidden
+        -# .col-md-12
+        -#   = location_fields.input :address_line_1, label: "Address Line 1", required: false, input_html: { class: "form-control form-control-muted" }
+        -# .col-md-12
+        -#   = location_fields.input :address_line_2, label: "Address Line 2", required: false, input_html: { class: "form-control form-control-muted" }
+        .col-md-4
+          = location_fields.input :city, required: false, input_html: { class: "form-control form-control-muted" }
+        .col-md-4
+          = location_fields.input :state, as: :select, collection: Location::STATES, include_blank: true, required: false, input_html: { class: "form-control form-control-muted" }
+        -# .col-md-3
+        -#   = location_fields.input :zip_code, required: false, input_html: { class: "form-control form-control-muted" }
+        .col-md-4
+          = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false, input_html: { class: "form-control form-control-muted" }
+        - if show_navigation
+          .col-md-12.d-flex.justify-content-end.align-items-end
+            %button.btn.btn-primary{ type: "submit", name: "current_page", value: "location_form" }
+              %i.bi.bi-arrow-right-circle.me-1{ aria: { hidden: true } }
+              Industry & Occupation

@@ -1,0 +1,130 @@
+.mt-4{ data: { controller: "nested-experience-fields" } }
+  .d-flex.justify-content-between.align-items-center.flex-wrap.gap-3.mb-3
+    %div
+      %h4.fw-semibold.mb-1 Experience Timeline
+      %p.text-muted.mb-0 Add significant, longer-term roles. Completed Crewbase gigs are added automatically as verified Credits.
+    %button.btn.btn-outline-primary{ type: "button", data: { action: "nested-experience-fields#add" } }
+      %i.bi.bi-plus-lg.me-1
+      Add Experience
+  %template{ data: { nested_experience_fields_target: "template" } }
+    = f.simple_fields_for :experiences, Experience.new, child_index: "NEW_RECORD" do |experience_fields|
+      .border.rounded-3.p-3.mb-3{ data: { experience_fields_wrapper: true, new_record: experience_fields.object.new_record?.to_s } }
+        = experience_fields.input :id, as: :hidden
+        = experience_fields.input :_destroy, as: :hidden, input_html: { value: "0" }
+        .row.g-3
+          .col-md-5
+            = experience_fields.input :title, label: "Role", input_html: { class: "form-control form-control-muted", placeholder: "Lead Audio Engineer" }
+          .col-md-5.position-relative{ data: { controller: "company-combobox", company_combobox_url_value: Rails.application.routes.url_helpers.search_usr_companies_path } }
+            - company_results_id = "#{experience_fields.object_name}_company_results".parameterize(separator: "_")
+            = experience_fields.label :company_name, "Company", class: "form-label"
+            .input-group.mb-3
+              %span.input-group-text.bg-white{ data: { company_combobox_target: "avatar" } }
+                - if experience_fields.object.company.present?
+                  - if company_icon_url(experience_fields.object).present?
+                    = image_tag company_icon_url(experience_fields.object), alt: experience_fields.object.company.name, class: "rounded-circle", style: "width: 24px; height: 24px; object-fit: cover;"
+                  - else
+                    .avatar-toggle{ style: "width: 24px; height: 24px; flex: 0 0 24px; font-size: 10px;" }
+                      = company_initial(experience_fields.object)
+                - else
+                  %i.bi.bi-search.text-muted{ aria: { hidden: true } }
+              = experience_fields.search_field :company_name,
+                class: "form-control form-control-muted",
+                placeholder: "Search companies or enter a name...",
+                autocomplete: "off",
+                role: "combobox",
+                aria: { autocomplete: "list", expanded: "false", controls: company_results_id },
+                data: { company_combobox_target: "input", action: "input->company-combobox#search keydown->company-combobox#navigate focus->company-combobox#showResults blur->company-combobox#hide" }
+            = experience_fields.hidden_field :company_id, data: { company_combobox_target: "hidden" }
+            .list-group.position-absolute.w-100.shadow-sm.z-3.d-none{
+              id: company_results_id,
+              role: "listbox",
+              data: { company_combobox_target: "results" },
+              style: "top: 100%;"
+            }
+          .col-md-2.d-flex.align-items-end.justify-content-end
+            %button.btn.btn-outline-danger.mb-3.w-100{ type: "button", data: { action: "nested-experience-fields#remove" } }
+              %i.bi.bi-trash.me-1
+              Remove
+          .col-md-3
+            = experience_fields.input :start_month, label: "Start Month", as: :select, collection: month_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .col-md-3
+            = experience_fields.input :start_year, label: "Start Year", as: :select, collection: year_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .col-md-3{ class: ("d-none" if experience_fields.object.currently_active?), data: { current_role_end_date: true } }
+            = experience_fields.input :end_month, label: "End Month", as: :select, collection: month_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .col-md-3{ class: ("d-none" if experience_fields.object.currently_active?), data: { current_role_end_date: true } }
+            = experience_fields.input :end_year, label: "End Year", as: :select, collection: year_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .w-100{ data: { current_role_row_break: true } }
+          .col-md-6.d-flex.align-items-end
+            .form-check.mb-3
+              = experience_fields.check_box :currently_active, class: "form-check-input", data: { action: "change->nested-experience-fields#toggleCurrentRole" }
+              = experience_fields.label :currently_active, "Current Role", class: "form-check-label"
+          .col-12
+            = experience_fields.label :summary, "Summary", class: "form-label"
+            = experience_fields.rich_text_area :summary, class: "experience-summary-editor", placeholder: "Briefly describe the scope of work, clients, tools, or results."
+          .col-12.d-flex.justify-content-end
+            %button.btn.btn-primary{ type: "submit" }
+              %i.bi.bi-check-lg.me-1
+              Save
+  %div{ data: { nested_experience_fields_target: "container" } }
+    = f.simple_fields_for :experiences, editable_experiences do |experience_fields|
+      .border.rounded-3.p-3.mb-3{ data: { experience_fields_wrapper: true, new_record: experience_fields.object.new_record?.to_s } }
+        - if overlapping_credits(experience_fields.object).any?
+          .alert.alert-warning.py-2{ role: "status" }
+            This role overlaps a verified Crewbase Credit from the same company and year. Keep it only if it represents a distinct, significant engagement.
+            = link_to "Review credits", "#credits_form", class: "alert-link ms-1"
+        = experience_fields.input :id, as: :hidden
+        = experience_fields.input :_destroy, as: :hidden, input_html: { value: "0" }
+        .row.g-3
+          .col-md-5
+            = experience_fields.input :title, label: "Role", input_html: { class: "form-control form-control-muted", placeholder: "Lead Audio Engineer" }
+          .col-md-5.position-relative{ data: { controller: "company-combobox", company_combobox_url_value: Rails.application.routes.url_helpers.search_usr_companies_path } }
+            - company_results_id = "#{experience_fields.object_name}_company_results".parameterize(separator: "_")
+            = experience_fields.label :company_name, "Company", class: "form-label"
+            .input-group.mb-3
+              %span.input-group-text.bg-white{ data: { company_combobox_target: "avatar" } }
+                - if experience_fields.object.company.present?
+                  - if company_icon_url(experience_fields.object).present?
+                    = image_tag company_icon_url(experience_fields.object), alt: experience_fields.object.company.name, class: "rounded-circle", style: "width: 24px; height: 24px; object-fit: cover;"
+                  - else
+                    .avatar-toggle{ style: "width: 24px; height: 24px; flex: 0 0 24px; font-size: 10px;" }
+                      = company_initial(experience_fields.object)
+                - else
+                  %i.bi.bi-search.text-muted{ aria: { hidden: true } }
+              = experience_fields.search_field :company_name,
+                class: "form-control form-control-muted",
+                placeholder: "Search companies or enter a name...",
+                autocomplete: "off",
+                role: "combobox",
+                aria: { autocomplete: "list", expanded: "false", controls: company_results_id },
+                data: { company_combobox_target: "input", action: "input->company-combobox#search keydown->company-combobox#navigate focus->company-combobox#showResults blur->company-combobox#hide" }
+            = experience_fields.hidden_field :company_id, data: { company_combobox_target: "hidden" }
+            .list-group.position-absolute.w-100.shadow-sm.z-3.d-none{
+              id: company_results_id,
+              role: "listbox",
+              data: { company_combobox_target: "results" },
+              style: "top: 100%;"
+            }
+          .col-md-2.d-flex.align-items-end.justify-content-end
+            %button.btn.btn-outline-danger.mb-3.w-100{ type: "button", data: { action: "nested-experience-fields#remove" } }
+              %i.bi.bi-trash.me-1
+              Remove
+          .col-md-3
+            = experience_fields.input :start_month, label: "Start Month", as: :select, collection: month_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .col-md-3
+            = experience_fields.input :start_year, label: "Start Year", as: :select, collection: year_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .col-md-3{ class: ("d-none" if experience_fields.object.currently_active?), data: { current_role_end_date: true } }
+            = experience_fields.input :end_month, label: "End Month", as: :select, collection: month_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .col-md-3{ class: ("d-none" if experience_fields.object.currently_active?), data: { current_role_end_date: true } }
+            = experience_fields.input :end_year, label: "End Year", as: :select, collection: year_options, include_blank: true, input_html: { class: "form-control form-control-muted" }
+          .w-100{ data: { current_role_row_break: true } }
+          .col-md-6.d-flex.align-items-end
+            .form-check.mb-3
+              = experience_fields.check_box :currently_active, class: "form-check-input", data: { action: "change->nested-experience-fields#toggleCurrentRole" }
+              = experience_fields.label :currently_active, "Current Role", class: "form-check-label"
+          .col-12
+            = experience_fields.label :summary, "Summary", class: "form-label"
+            = experience_fields.rich_text_area :summary, class: "experience-summary-editor", placeholder: "Briefly describe the scope of work, clients, tools, or results."
+          .col-12.d-flex.justify-content-end
+            %button.btn.btn-primary{ type: "submit" }
+              %i.bi.bi-check-lg.me-1
+              Save

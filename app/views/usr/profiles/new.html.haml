@@ -1,0 +1,60 @@
+-# 11/19/25: Not currently used. Retained for potential future use.
+-# .row
+-#   .col-lg-10.mx-auto
+-#     %h1.fw-bold.text-center.mb-1="Welcome #{current_user.first_name} 👋"
+-#     %h4.fw-semibold.text-center.mb-5 Tell us about yourself...
+
+-#     .row
+-#       .col-sm-12
+-#         = simple_form_for [:usr, current_user, @profile] do |f|
+-#           = f.error_notification
+-#           .card.shadow-sm.mb-4
+-#             .card-body
+-#               %h4.fw-semibold.mb-4 Where are you located?
+-#               .row.g-3
+-#                 .col-md-12
+-#                   = f.simple_fields_for :locations do |location_fields|
+-#                     .row.g-3
+-#                       .col-md-12
+-#                         = location_fields.input :address_line_1, label: "Address Line 1", required: false, input_html: { class: "form-control form-control-muted" }
+-#                       .col-md-12
+-#                         = location_fields.input :address_line_2, label: "Address Line 2", required: false, input_html: { class: "form-control form-control-muted" }
+-#                       .col-md-3
+-#                         = location_fields.input :city, required: false, input_html: { class: "form-control form-control-muted" }
+-#                       .col-md-3
+-#                         = location_fields.input :state, required: false, input_html: { class: "form-control form-control-muted" }
+-#                       .col-md-3
+-#                         = location_fields.input :zip_code, required: false, input_html: { class: "form-control form-control-muted" }
+-#                       .col-md-3
+-#                         = location_fields.input :country, as: :string, required: false, input_html: { class: "form-control form-control-muted" }
+-#                       .col-md-3.justify-self-end
+-#                         = link_to next_page_usr_profile_path(profile_id: @profile.id, page: "location"), class: "btn btn-secondary mt-2" do
+-#                           %i.bi.bi-arrow-right-circle.me-2
+-#                           Industry & Occupation
+
+-#           .card.shadow-sm.mb-4
+-#             .card-body
+-#               %h4.fw-semibold.mb-3 Contact Information
+-#               .row.g-3
+-#                 .col-md-6
+-#                   = f.input :contact_email, input_html: { class: "form-control form-control-muted", placeholder: "you@example.com" }
+-#                 .col-md-6
+-#                   = f.input :contact_phone_number, input_html: { class: "form-control form-control-muted", placeholder: "(555) 555-5555" }
+
+-#           .card.shadow-sm
+-#             .card-body
+-#               %h4.fw-semibold.mb-3 Online Presence
+-#               .row.g-3
+-#                 .col-md-6
+-#                   = f.input :website_url, input_html: { class: "form-control form-control-muted", placeholder: "https://yourdomain.com" }
+-#                 .col-md-6
+-#                   = f.input :linkedin_url, label: "LinkedIn URL", input_html: { class: "form-control form-control-muted", placeholder: "https://linkedin.com/in/you" }
+-#                 .col-md-6
+-#                   = f.input :twitter_handle, label: "Twitter Handle", input_html: { class: "form-control form-control-muted", placeholder: "@handle" }
+-#                 .col-md-6
+-#                   = f.input :instagram_handle, label: "Instagram Handle", input_html: { class: "form-control form-control-muted", placeholder: "@handle" }
+-#                 .col-md-6
+-#                   = f.input :spotify_profile_url, label: "Spotify Profile URL", input_html: { class: "form-control form-control-muted", placeholder: "https://open.spotify.com/user/..." }
+
+-#           .d-flex.justify-content-end.mt-4
+-#             = f.submit "Save Profile", class: "btn btn-primary btn-lg"

@@ -1,0 +1,28 @@
+.container-fluid.py-4
+  .d-flex.justify-content-between.align-items-center.mb-4
+    %h1.mb-0 Companies
+    = form_with url: admin_companies_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex gap-2" do |form|
+      = form.search_field :q, value: params[:q], class: "form-control", placeholder: "Search companies", aria: { label: "Search companies" }
+      = form.submit "Search", class: "btn btn-primary"
+  .card
+    .table-responsive
+      %table.table.table-hover.align-middle.mb-0
+        %thead
+          %tr
+            %th Company
+            %th Contact
+            %th Team
+            %th Jobs
+            %th Plan
+            %th Joined
+        %tbody
+          - @companies.each do |company|
+            %tr
+              %td.fw-semibold= company.name
+              %td= company.contact_email
+              %td= company.users.length
+              %td= company.jobs.length
+              %td= company.company_plans.max_by(&:created_at)&.plan&.name || "Beta access"
+              %td= l(company.created_at.to_date, format: :long)
+  - if @pagy.pages > 1
+    .mt-4.d-flex.justify-content-end= bootstrap_pagy_nav(@pagy)

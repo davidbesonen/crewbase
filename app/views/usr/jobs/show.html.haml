@@ -1,0 +1,185 @@
+.row.g-4
+  .col-12.col-lg-8
+    .card.border-0.shadow-sm.mb-4.app-hero.app-hero-sky
+      .card-body.p-4.p-lg-5
+        .d-flex.flex-column.flex-md-row.align-items-start.gap-3.mb-4
+          - if @job.company.present?
+            = render Usr::Shared::CompanyIconComponent.new(company: @job.company, size: 72)
+          - else
+            .rounded-circle.bg-secondary.text-white.d-inline-flex.align-items-center.justify-content-center{ style: "width: 72px; height: 72px; font-size: 1.75rem;" } J
+          .flex-grow-1
+            .d-flex.flex-wrap.align-items-start.justify-content-between.gap-3.mb-2
+              %div.d-flex.flex-wrap.align-items-center.gap-2
+                %h1.fw-bold.mb-0= @job.title
+                %span{ class: job_status_badge_class(@job.status) }= @job.status&.humanize || "Draft"
+              - if @job.company.present? && @job.editable_by?(current_user)
+                .d-flex.align-items-center.gap-2{ data: { job_heading_controls: true } }
+                  = link_to edit_usr_company_job_path(@job.company, @job), class: "text-muted" do
+                    %i.bi.bi-pencil.fs-4{ title: "Edit Job" }
+            %p.text-muted.mb-2
+              - if @job.company.present?
+                = link_to @job.company.name, usr_company_path(@job.company), class: "text-muted text-decoration-none fw-semibold"
+                = render Usr::Shared::CompanyVisibilityBadgeComponent.new(plan: @company_plan)
+              - else
+                Unassigned Company
+            .d-flex.flex-wrap.align-items-center.gap-2.text-muted
+              %span
+                %i.bi.bi-geo-alt.me-1
+                = @job.formatted_location
+              %span •
+              %span
+                %i.bi.bi-building.me-1
+                = @job.workplace_type&.humanize || "Workplace type not listed"
+              %span •
+              %span
+                %i.bi.bi-briefcase.me-1
+                = @job.employment_type&.humanize || "Employment type not listed"
+              - if @job.requires_travel?
+                %span •
+                %span
+                  %i.bi.bi-sign-turn-right.me-1
+                  Travel required
+            .d-flex.flex-wrap.align-items-center.gap-2.mt-3
+              - if @job.compensation_range.present?
+                %span.badge.rounded-pill.text-bg-light.border.px-3.py-2
+                  = @job.compensation_range
+                  - if @job.pay_period.present?
+                    = "/ #{@job.pay_period.humanize}"
+              - if @job.application_deadline.present?
+                %span.badge.rounded-pill.text-bg-light.border.px-3.py-2
+                  Apply by
+                  = l(@job.application_deadline.to_date, format: :long)
+              %span.badge.rounded-pill.text-bg-light.border.px-3.py-2
+                - if @job.editable_by?(current_user)
+                  = link_to pluralize(@job.job_applications.count, "application"), usr_company_applications_path(@job.company, job_id: @job.id), class: "text-dark"
+                - else
+                  = pluralize(@job.job_applications.count, "application")
+              %span.badge.rounded-pill.text-bg-light.border.px-3.py-2= @job.posting_type_label
+            .mt-2
+              .d-flex.flex-wrap.gap-2{ data: { job_primary_actions: true } }
+                - if @job_application.present?
+                  %button.btn.btn-success{ type: "button", disabled: true }
+                    %i.bi.bi-check-lg.me-1
+                    Applied
+                  = link_to "View My Application", usr_job_application_path(@job_application), class: "btn btn-quiet"
+                - elsif !@job.editable_by?(current_user)
+                  = link_to "Apply", new_usr_job_job_application_path(@job), class: "btn btn-primary"
+                - if @saved_job.present?
+                  = button_to usr_job_saved_job_path(@job), method: :delete, class: "btn btn-quiet" do
+                    %i.bi.bi-bookmark-fill.me-1
+                    Saved
+                - else
+                  = button_to usr_job_saved_job_path(@job), method: :post, class: "btn btn-outline-primary" do
+                    %i.bi.bi-bookmark.me-1
+                    Save Job
+                - if @job.multi_position? && @job.editable_by?(current_user)
+                  = link_to "Staff This Gig", usr_job_crew_path(@job), class: "btn btn-primary"
+
+        .border-top.pt-4
+          %h4.fw-semibold.mb-3 About This Job
+          - if @job.description.present?
+            .text-muted.mb-0= @job.description
+          - else
+            %p.text-muted.mb-0 No description has been added for this role yet.
+
+    .card.border-0.shadow-sm.card-accent.card-accent-cyan
+      .card-body.p-4
+        %h4.fw-semibold.mb-3 Job Details
+        .row.g-3
+          .col-sm-6
+            %div.text-muted.small Employment Type
+            %div.fw-semibold= @job.employment_type&.humanize || "N/A"
+          .col-sm-6
+            %div.text-muted.small Workplace Type
+            %div.fw-semibold= @job.workplace_type&.humanize || "N/A"
+          .col-sm-6
+            %div.text-muted.small Compensation
+            %div.fw-semibold= @job.compensation_range || "N/A"
+          .col-sm-6
+            %div.text-muted.small Pay Period
+            %div.fw-semibold= @job.pay_period&.humanize || "N/A"
+          .col-sm-6
+            %div.text-muted.small Starts
+            %div.fw-semibold= @job.starts_at ? l(@job.starts_at.to_date, format: :long) : "Flexible / Not listed"
+          .col-sm-6
+            %div.text-muted.small Ends
+            %div.fw-semibold= @job.ends_at ? l(@job.ends_at.to_date, format: :long) : "Flexible / Not listed"
+          - if @job.work_dates.any?
+            .col-12{ data: { job_work_dates: true } }
+              %div.text-muted.small Specific Work Dates
+              .d-flex.flex-wrap.gap-2.mt-1
+                - @job.work_dates.each do |work_date|
+                  %span.badge.rounded-pill.text-bg-light.border= l(work_date, format: :long)
+          .col-sm-6
+            %div.text-muted.small Visa Sponsorship
+            %div.fw-semibold= @job.is_visa_sponsorship_available? ? "Available" : "Not listed"
+          .col-sm-6
+            %div.text-muted.small Travel
+            %div.fw-semibold= @job.requires_travel? ? "Required" : "Not required"
+
+  .col-12.col-lg-4
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h5.fw-semibold.mb-3 Job Insights
+        .d-flex.flex-column.gap-3
+          %div
+            %div.text-muted.small Published
+            %div.fw-semibold= @job.relative_published_at
+          %div
+            %div.text-muted.small Current Status
+            %div.fw-semibold= @job.status&.humanize || "Draft"
+          - if @job.primary_status_timestamp.present?
+            %div
+              %div.text-muted.small Status Updated
+              %div.fw-semibold= l(@job.primary_status_timestamp.to_date, format: :long)
+          %div
+            %div.text-muted.small Active Listing
+            %div.fw-semibold= @job.is_active? ? "Yes" : "No"
+          %div
+            %div.text-muted.small Applications
+            %div.fw-semibold
+              - if @job.editable_by?(current_user)
+                = link_to pluralize(@job.job_applications.count, "application"), usr_company_applications_path(@job.company, job_id: @job.id), class: "text-dark"
+              - else
+                = pluralize(@job.job_applications.count, "application")
+
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h5.fw-semibold.mb-3 About The Company
+        - if @job.company.present?
+          .d-flex.align-items-center.gap-3.mb-3
+            = render Usr::Shared::CompanyIconComponent.new(company: @job.company, size: 56)
+            %div
+              .d-flex.flex-wrap.align-items-center.gap-2
+                %div.fw-semibold= link_to @job.company.name, usr_company_path(@job.company), class: "text-dark text-decoration-none"
+                = render Usr::Shared::CompanyVisibilityBadgeComponent.new(plan: @company_plan)
+              %div.text-muted.small= @job.company.industry_names_text.presence || "Industry not listed"
+          %p.text-muted.mb-3= truncate(@job.company.description.presence || "This company has not added a profile summary yet.", length: 180)
+          .d-flex.flex-column.gap-3
+            %div
+              %div.text-muted.small Headquarters
+              %div.fw-semibold= @job.company.formatted_location.presence || "Not listed"
+            %div
+              %div.text-muted.small Company Size
+              %div.fw-semibold= "#{@job.company.employee_range} employees"
+            - if @job.company.website_url.present?
+              %div
+                = link_to @job.company.normalized_website_url, target: "_blank", rel: "noopener", class: "btn btn-quiet w-100" do
+                  Visit Website
+        - else
+          %p.text-muted.mb-0 This job is not currently attached to a company profile.
+
+    - if @job.editable_by?(current_user) && @job.is_active? && @job.published?
+      .card.border-0.shadow-sm.mt-4.card-accent.card-accent-cyan{ data: { job_invitation_tools: true } }
+        .card-body.p-4
+          %h5.fw-semibold.mb-2 Invite someone
+          %p.text-muted.small Send a personal invitation by email, or copy the public posting link and share it anywhere.
+          = form_with url: usr_job_job_invitations_path(@job), scope: :job_invitation, class: "mb-3" do |form|
+            .input-group
+              = form.email_field :email, class: "form-control", required: true, placeholder: "person@example.com", aria: { label: "Email address" }, styled: true
+              = form.submit "Send invitation", class: "btn btn-primary"
+          .input-group{ data: { controller: "clipboard" } }
+            = text_field_tag :public_job_posting_url, public_job_posting_url(@job), class: "form-control", readonly: true, data: { clipboard_target: "source" }, aria: { label: "Public posting link" }
+            %button.btn.btn-outline-primary{ type: "button", data: { action: "clipboard#copy", clipboard_target: "button" } } Copy link
+
+= render Usr::JobCrewRecommendationsComponent.new(results: @crew_recommendations, profiles_path: @crew_recommendations_path)

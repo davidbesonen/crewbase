@@ -26,6 +26,8 @@ module Crewbase
     config.time_zone = "Central Time (US & Canada)"
 
     config.autoload_paths += Dir[Rails.root.join("app", "models", "{*/}")]
+    config.autoload_paths << Rails.root.join("app", "forms")
+    config.eager_load_paths << Rails.root.join("app", "forms")
     config.eager_load_paths += %W[ #{config.root}/app/services #{config.root}/app/models/concerns/ ]
     config.importmap.paths += Dir[Rails.root.join("config", "importmaps", "{*.rb}")]
     Dir[File.join(Rails.root, "lib", "core_ext", "*.rb")].each { |l| require l }
@@ -34,6 +36,7 @@ module Crewbase
     config.generators do |g|
       g.view_component base_class: "ApplicationComponent"
     end
+
 
     config.importmap.paths += Dir[Rails.root.join("config", "importmaps", "{*.rb}")]
 

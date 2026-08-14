@@ -20,14 +20,18 @@ $background-alt: #FAEBC8;
 
 // Text Colors
 $text-primary: #1D3557;
-$text-secondary: #457B9D;
+$text-secondary: #62B6CB;
 $text-disabled: #A29F9F;
+$text-dark: #242424;
 
 // UI Element Colors
 $danger: #E63946;
-$success: #BEE9E8;
+$success: #94cfad;
 $info: #A8DADC;
 $neutral: #CAE9FF;
+$button-neutral: #5F6B76;
+$button-neutral-border: #ADB5BD;
+$button-neutral-background: #FFFFFF;
 
 // Optional Dark Mode Colors
 $dark-bg-primary: #1D3557;
@@ -40,33 +44,57 @@ $dark-text-primary: #F1F1F1;
 
 .btn {
   font-weight: 600;
-  padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  border: none;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  box-shadow: none;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.24);
+    outline: 0;
+  }
+
+  &:disabled,
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+    transform: none;
+  }
 
   &-primary {
     background-color: $primary;
+    border-color: $primary;
     color: #fff;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background-color: darken($primary, 10%);
+      border-color: darken($primary, 10%);
+      color: #fff;
     }
   }
 
   &-secondary {
     background-color: $secondary;
+    border-color: $secondary;
     color: #fff;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background-color: darken($secondary, 10%);
+      border-color: darken($secondary, 10%);
+      color: #fff;
     }
   }
 
   &-logo {
     background-color: $logo;
+    border-color: $logo;
     color: #fff;
 
     &:hover {
@@ -76,6 +104,7 @@ $dark-text-primary: #F1F1F1;
 
   &-neutral {
     background-color: $neutral;
+    border-color: $neutral;
     color: $text-primary;
 
     &:hover {
@@ -85,6 +114,7 @@ $dark-text-primary: #F1F1F1;
 
   &-danger {
     background-color: $danger;
+    border-color: $danger;
     color: #fff;
 
     &:hover {
@@ -94,6 +124,7 @@ $dark-text-primary: #F1F1F1;
 
   &-info {
     background-color: $info;
+    border-color: $info;
     color: $primary;
 
     &:hover {
@@ -103,10 +134,141 @@ $dark-text-primary: #F1F1F1;
 
   &-success {
     background-color: $success;
+    border-color: $success;
     color: #fff;
 
     &:hover {
       background-color: darken($success, 10%);
+    }
+  }
+
+  &-outline-primary {
+    border-color: $primary;
+    color: $primary;
+    background-color: transparent;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $primary;
+      border-color: $primary;
+      color: #fff;
+    }
+  }
+
+  &-outline-secondary {
+    border-color: $secondary;
+    color: $secondary;
+    background-color: transparent;
+
+    &:hover {
+      background-color: rgba($secondary, 0.08);
+      color: $secondary;
+    }
+
+    &:focus-visible {
+      background-color: transparent;
+      color: $secondary;
+      box-shadow: 0 0 0 0.2rem rgba($secondary, 0.25);
+    }
+
+    &:active,
+    &.active {
+      background-color: $secondary;
+      color: #fff;
+    }
+  }
+
+  &-quiet {
+    background-color: $button-neutral-background;
+    border-color: $button-neutral-border;
+    color: $button-neutral;
+
+    &:hover {
+      background-color: darken($button-neutral-background, 4%);
+      border-color: darken($button-neutral-border, 12%);
+      color: darken($button-neutral, 10%);
+    }
+
+    &:focus-visible {
+      background-color: $button-neutral-background;
+      border-color: $primary;
+      color: $button-neutral;
+    }
+
+    &:active,
+    &.active {
+      background-color: lighten($button-neutral-border, 18%);
+      border-color: $button-neutral;
+      color: darken($button-neutral, 12%);
+    }
+  }
+
+  &-outline-danger {
+    border-color: $danger;
+    color: $danger;
+    background-color: transparent;
+
+    &:hover {
+      background-color: rgba($danger, 0.08);
+      color: $danger;
+    }
+
+    &:focus-visible {
+      background-color: transparent;
+      color: $danger;
+      box-shadow: 0 0 0 0.2rem rgba($danger, 0.25);
+    }
+
+    &:active,
+    &.active {
+      background-color: $danger;
+      color: #fff;
+    }
+  }
+}
+
+.btn-sm {
+  border-radius: 0.4rem;
+}
+
+.btn-lg {
+  border-radius: 0.625rem;
+}
+
+.btn-icon {
+  align-items: center;
+  aspect-ratio: 1;
+  display: inline-flex;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+  width: 2.5rem;
+
+  &.btn-sm {
+    width: 2rem;
+  }
+
+  &.btn-lg {
+    width: 3rem;
+  }
+}
+
+.btn-group-responsive {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .btn-group-responsive {
+    align-items: stretch;
+    flex-direction: column;
+
+    > .btn,
+    > form,
+    > form > .btn {
+      width: 100%;
     }
   }
 }

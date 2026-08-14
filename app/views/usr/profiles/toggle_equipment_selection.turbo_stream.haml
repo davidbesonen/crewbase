@@ -1,0 +1,2 @@
+= turbo_stream.replace "skill_equipment_selection_content" do
+  = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, skills: @skills, equipment: @equipment, profile_occupations: @profile.occupations, profile_skills: @profile_skills, profile_equipment: @profile_equipment, show_navigation: false, source: params[:source])

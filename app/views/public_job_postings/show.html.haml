@@ -1,0 +1,27 @@
+.container.py-5
+  .mx-auto{ style: "max-width: 820px;" }
+    = link_to root_path, class: "d-inline-block mb-4" do
+      = render Shared::CrewbaseLogoTextComponent.new
+    .card.border-0.shadow-sm
+      .card-body.p-4.p-lg-5
+        %p.text-uppercase.text-muted.small.fw-semibold.mb-2 Open job posting
+        %h1.fw-bold= @job.title
+        %p.h5.text-muted= @job.company.name
+        .d-flex.flex-wrap.gap-2.my-4
+          %span.badge.text-bg-light.border= @job.posting_type_label
+          %span.badge.text-bg-light.border= @job.employment_type.humanize
+          %span.badge.text-bg-light.border= @job.workplace_type.humanize
+          %span.badge.text-bg-light.border= @job.formatted_location
+          - if @job.compensation_range.present?
+            %span.badge.text-bg-light.border= @job.compensation_range
+        %h2.h5 About this job
+        .text-muted.mb-4= @job.description
+        - if current_user && @job.editable_by?(current_user)
+          %p.mb-0.text-muted You manage this posting through Crewbase.
+        - elsif current_user
+          = link_to "Apply for this posting", new_usr_job_job_application_path(@job), class: "btn btn-primary"
+        - else
+          %p.mb-3 Create a free Crewbase account to apply, or sign in if you already have one.
+          .d-flex.flex-wrap.gap-2
+            = link_to "Create an account to apply", new_user_registration_path, class: "btn btn-primary"
+            = link_to "Sign in", new_user_session_path, class: "btn btn-outline-primary"

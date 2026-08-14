@@ -3,7 +3,7 @@
 one:
   first_name: MyString
   last_name: MyString
-  email: MyString
+  email: fixture-one@example.com
   dob: 2025-11-09 17:18:09
   middle_name: MyString
   phone: MyString
@@ -11,7 +11,7 @@ one:
 two:
   first_name: MyString
   last_name: MyString
-  email: MyString
+  email: fixture-two@example.com
   dob: 2025-11-09 17:18:09
   middle_name: MyString
   phone: MyString

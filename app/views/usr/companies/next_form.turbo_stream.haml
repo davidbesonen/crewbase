@@ -1,0 +1,18 @@
+- if @current_page.present?
+  = turbo_stream.action :hide, @current_page
+
+- if @next_page.present?
+  = turbo_stream.action :show, @next_page
+  = turbo_stream.replace "selected_plan_id_input" do
+    %div{ id: "selected_plan_id_input" }
+      = hidden_field_tag :plan_id, @selected_plan_id
+  = turbo_stream.replace "company_plan_display_card" do
+    %div{ id: "company_plan_display_card" } 
+      - if @plan.present?
+        .card.border-0.shadow-sm.mb-4
+          .card-body
+            %p.mb-0
+              %i.bi.bi-check-circle-fill
+              You have selected the
+              %span.fw-bold= @plan.name
+              plan.

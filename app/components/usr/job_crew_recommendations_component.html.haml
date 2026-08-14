@@ -1,0 +1,52 @@
+.card.border-0.shadow-sm.mt-4
+  .card-body.p-4
+    %h4.fw-semibold.mb-3
+      %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+      Recommended Crew
+    .row.g-3
+      - results.each do |result|
+        .col-12.col-lg-4
+          .border.rounded-3.p-3.h-100{ data: { job_crew_recommendation: true, recommendation_tier: result.tier } }
+            .d-flex.gap-3
+              = link_to profile_path(result.profile), class: "text-decoration-none flex-shrink-0" do
+                .avatar-toggle{ style: "width: 52px; height: 52px; font-size: 21px;" }
+                  = avatar_initial(result.profile)
+              .flex-grow-1
+                .fw-semibold
+                  = link_to result.profile.user.full_name,
+                    profile_path(result.profile),
+                    class: "text-dark text-decoration-none"
+                .text-muted.small= result.profile.formatted_headline
+                .text-muted.small
+                  %i.bi.bi-geo-alt.me-1{ aria: { hidden: true } }
+                  = result.profile.formatted_location
+                - if result.rating.present?
+                  .small.mt-1{ class: recommendation_rating_text_class(result.rating) }
+                    %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                    = "#{result.rating} / 5 rating"
+                - if result.tier == :near
+                  .small.fw-semibold.text-warning.mt-1
+                    %i.bi.bi-exclamation-circle.me-1{ aria: { hidden: true } }
+                    Near match
+            - if result.relevant_years.positive?
+              .small.fw-semibold.mt-3
+                %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+                = relevant_experience_label(result)
+            .small.mt-2
+              %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+              = result.match_reason
+            - if result.matched_skills_and_equipment.any?
+              .small.mt-2
+                %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+                = "Skills & equipment: #{result.matched_skills_and_equipment.to_sentence}"
+            - if result.gap_reasons.any?
+              - result.gap_reasons.each do |reason|
+                .small.text-warning.mt-2
+                  %i.bi.bi-exclamation-circle.me-1{ aria: { hidden: true } }
+                  = reason
+            - else
+              .small.text-success.mt-2
+                %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                = result.availability_label
+    .d-flex.justify-content-end.mt-3
+      = link_to "View All", profiles_path, class: "text-muted text-decoration-none fw-semibold"

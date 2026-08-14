@@ -1,0 +1,15 @@
+.row.mb-4
+  .col-sm-12
+    %h1.fw-bold.mb-1 Create a New Company
+    %p.text-muted.mb-0 Complete the following steps to set up your company profile.
+
+= simple_form_for [:usr, @company], data: { turbo_stream: true } do |f|
+  #selected_plan_id_input
+    = hidden_field_tag :plan_id, @selected_plan_id
+  .row.mt-5{ id: "company_configuration_page" }
+    .col-sm-12
+      = render Usr::Company::FormComponent.new do |form|
+        - form.with_plan_form do
+          = render Usr::Company::CompanyPlanFormComponent.new(plans: @plans, visible_form: @current_page)
+        - form.with_details_form do
+          = render Usr::Company::CompanyDetailsFormComponent.new(f: f, industries: @industries, selected_industry_ids: @selected_industry_ids, plan: @plan, visible_form: @current_page, can_fill_mock_data: @can_fill_mock_company_data)

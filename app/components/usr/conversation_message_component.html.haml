@@ -1,0 +1,5 @@
+.d-flex{ id: dom_id(message), class: (sent_by_current_user? ? "justify-content-end" : "justify-content-start"), data: { message_id: message.id } }
+  .rounded-3.p-3.message-bubble{ class: (sent_by_current_user? ? "bg-primary text-white" : "bg-light") }
+    %div.fw-semibold.small.mb-1= message.sender.full_name
+    %div= simple_format(message.body, {}, wrapper_tag: "div")
+    %div.small.mt-1{ class: (sent_by_current_user? ? "text-white-50" : "text-muted") }= l(message.created_at, format: :short)

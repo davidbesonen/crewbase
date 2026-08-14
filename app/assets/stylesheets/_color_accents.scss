@@ -1,0 +1,224 @@
+/*
+ * CrewBase accent system
+ *
+ * Accent colors belong on small details. Surface colors are deliberately pale
+ * enough for cards, headers, and empty states without competing with content.
+ */
+:root {
+  --app-accent-navy: #1b4965;
+  --app-accent-cyan: #62b6cb;
+  --app-accent-sky: #5fa8d3;
+
+  --app-surface-navy: #f0f5f8;
+  --app-surface-cyan: #eff9fb;
+  --app-surface-sky: #f2f8fc;
+
+  --app-ink-navy: #1b4965;
+  --app-ink-cyan: #17667b;
+  --app-ink-sky: #245f82;
+}
+
+/* Pale, semantic section surfaces */
+.surface-wash {
+  background-color: var(--app-accent-surface, var(--bs-tertiary-bg));
+  color: var(--app-accent-ink, var(--bs-body-color));
+}
+
+.surface-wash-cyan {
+  --app-accent-surface: var(--app-surface-cyan);
+  --app-accent-ink: var(--app-ink-cyan);
+}
+
+.surface-wash-navy {
+  --app-accent-surface: var(--app-surface-navy);
+  --app-accent-ink: var(--app-ink-navy);
+}
+
+.surface-wash-sky {
+  --app-accent-surface: var(--app-surface-sky);
+  --app-accent-ink: var(--app-ink-sky);
+}
+
+/* Restrained page and section introductions */
+.app-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px solid color-mix(in srgb, var(--app-accent-color) 18%, transparent);
+  border-radius: 1rem;
+  background-color: var(--bs-card-bg);
+  color: var(--bs-body-color);
+}
+
+.app-hero-cyan {
+  --app-accent-color: var(--app-accent-cyan);
+  --app-accent-surface: var(--app-surface-cyan);
+}
+
+.app-hero-navy {
+  --app-accent-color: var(--app-accent-navy);
+  --app-accent-surface: var(--app-surface-navy);
+}
+
+.app-hero-sky {
+  --app-accent-color: var(--app-accent-sky);
+  --app-accent-surface: var(--app-surface-sky);
+}
+
+/* White cards stay clean; a slim side rail carries the branded accent. */
+.card-accent {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bs-card-bg);
+}
+
+.card-accent::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background-color: var(--app-accent-color);
+  content: "";
+  pointer-events: none;
+}
+
+.card-accent.card-accent-side::before {
+  inset: 0 0 0 auto;
+}
+
+.card-accent-cyan {
+  --app-accent-color: var(--app-accent-cyan);
+}
+
+.card-accent-navy {
+  --app-accent-color: var(--app-accent-navy);
+}
+
+.card-accent-sky {
+  --app-accent-color: var(--app-accent-sky);
+}
+
+/* Small icon containers provide the most saturated color on a page. */
+.icon-orb {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--app-accent-surface);
+  color: var(--app-accent-ink);
+  font-size: 1.1rem;
+}
+
+.icon-orb-cyan {
+  --app-accent-surface: var(--app-surface-cyan);
+  --app-accent-ink: var(--app-ink-cyan);
+}
+
+.icon-orb-navy {
+  --app-accent-surface: var(--app-surface-navy);
+  --app-accent-ink: var(--app-ink-navy);
+}
+
+.icon-orb-sky {
+  --app-accent-surface: var(--app-surface-sky);
+  --app-accent-ink: var(--app-ink-sky);
+}
+
+/* Status color supplements a visible label; it never carries meaning alone. */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--app-status-ink) 16%, transparent);
+  border-radius: 999px;
+  background-color: var(--app-status-surface);
+  color: var(--app-status-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.status-open,
+.status-available {
+  --app-status-surface: var(--app-surface-cyan);
+  --app-status-ink: var(--app-ink-cyan);
+}
+
+.status-draft,
+.status-unknown {
+  --app-status-surface: var(--bs-gray-100);
+  --app-status-ink: #525a61;
+}
+
+.status-completed {
+  --app-status-surface: var(--app-surface-navy);
+  --app-status-ink: var(--app-ink-navy);
+}
+
+.status-unavailable {
+  --app-status-surface: #fff1f2;
+  --app-status-ink: #a5222d;
+}
+
+.status-warning {
+  --app-status-surface: var(--app-surface-sky);
+  --app-status-ink: var(--app-ink-sky);
+}
+
+.crew-schedule-availability {
+  align-self: flex-start;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+/* Friendly, low-density treatment for screens without content yet. */
+.empty-state {
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px dashed color-mix(in srgb, var(--app-accent-color) 32%, transparent);
+  border-radius: 1rem;
+  background-color: var(--app-accent-surface);
+  color: var(--bs-body-color);
+  text-align: center;
+}
+
+.empty-state-cyan {
+  --app-accent-color: var(--app-accent-cyan);
+  --app-accent-surface: var(--app-surface-cyan);
+}
+
+.empty-state-navy {
+  --app-accent-color: var(--app-accent-navy);
+  --app-accent-surface: var(--app-surface-navy);
+}
+
+.empty-state-sky {
+  --app-accent-color: var(--app-accent-sky);
+  --app-accent-surface: var(--app-surface-sky);
+}
+
+@media (max-width: 575.98px) {
+  .app-hero {
+    padding: 1.15rem;
+    border-radius: 0.75rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-hero,
+  .card-accent,
+  .icon-orb,
+  .status-badge,
+  .empty-state {
+    transition: none;
+  }
+}

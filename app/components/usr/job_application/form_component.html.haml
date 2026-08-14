@@ -1,0 +1,34 @@
+= simple_form_for form_scope, data: { turbo: false } do |f|
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      .row.g-4
+        .col-12
+          %h4.fw-semibold.mb-1= job.title
+          %p.text-muted.mb-0
+            - if job.company.present?
+              Applying to #{job.company.name}
+            - else
+              Submit your application for this role.
+
+        - if question_fields.any?
+          .col-12
+            %h5.fw-semibold.mb-2 Screening Questions
+            %p.text-muted.mb-0 Answer the questions provided by the employer.
+          - question_fields.each do |question|
+            .col-12
+              %label.form-label{ for: "job_application_question_answers_#{question.parameterize}" }= question
+              = text_area_tag "job_application[question_answers][#{question}]", answer_for(question), id: "job_application_question_answers_#{question.parameterize}", class: "form-control", rows: 4, placeholder: "Enter your answer"
+
+        .col-md-6
+          = f.input :resume, as: :file, input_html: { accept: ".pdf,.doc,.docx" }
+        .col-md-6
+          = f.input :cover_letter_file, as: :file, label: "Cover Letter", input_html: { accept: ".pdf,.doc,.docx" }
+        .col-12
+          = f.input :attachments, as: :file, input_html: { multiple: true }
+        .col-12
+          %p.form-label Additional Information
+          = f.rich_text_area :additional_information, placeholder: "Anything else you want the employer to know.", class: "job-application-editor"
+
+      .d-flex.justify-content-between.align-items-center.mt-4
+        = link_to "Back to Job", usr_job_path(job), class: "btn btn-quiet"
+        = f.submit submit_label, class: "btn btn-primary"

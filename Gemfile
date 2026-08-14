@@ -8,8 +8,6 @@ gem "propshaft"
 gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Bundle and transpile JavaScript [https://github.com/rails/jsbundling-rails]
-gem "jsbundling-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
@@ -33,24 +31,33 @@ gem "solid_cable"
 # Importmap for Rails
 gem "importmap-rails"
 
+# Calendar feeds
+gem "icalendar"
+gem "countries"
+
 # View
 gem "bootstrap", "~> 5.3", ">= 5.3.3"
 gem "sassc-rails"
-gem 'haml-rails'
+gem "haml-rails"
 gem "view_component"
 gem "dry-initializer"
-gem 'chart-js-rails'
+gem "chart-js-rails"
 
 # Ransack
-gem 'ransack'
+gem "ransack"
 gem "ransack_memory"
-gem 'pagy'
+gem "pagy"
 
 # Simpleform
-gem 'simple_form'
+gem "simple_form"
+
+# Files
+gem "shrine"
 
 # User authentication and management
 gem "devise"
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
@@ -62,7 +69,10 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 1.2"
+
+# Hosted checkout, subscription lifecycle webhooks, and the customer billing portal.
+gem "stripe", "~> 18.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -73,6 +83,7 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+  gem "pry"
 end
 
 group :development do

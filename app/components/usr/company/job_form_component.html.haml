@@ -1,0 +1,244 @@
+= simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields" } do |f|
+  - if job.errors[:base].any?
+    .alert.alert-warning{ data: { plan_limit_message: true } }= job.errors[:base].to_sentence
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      .row.g-4
+        .col-12
+          %fieldset{ data: { posting_type_choice: true } }
+            %legend.h5.fw-semibold.mb-2 What are you posting?
+            %p.text-muted.mb-3 Choose how people will apply and how you will staff this opportunity.
+            .row.g-3
+              .col-md-6
+                .border.rounded-3.p-3.h-100
+                  .form-check
+                    = f.radio_button :posting_type, :single_role,
+                      class: "form-check-input",
+                      required: true,
+                      data: { posting_type_fields_target: "choice", action: "posting-type-fields#change" }
+                    = f.label :posting_type_single_role, class: "form-check-label fw-semibold" do
+                      Single job posting
+                  %p.text-muted.small.mb-0.mt-2
+                    Hire one person for one role. Applicants apply directly to this job, and no crew-position workspace is created.
+              .col-md-6
+                .border.rounded-3.p-3.h-100
+                  .form-check
+                    = f.radio_button :posting_type, :multi_position,
+                      class: "form-check-input",
+                      required: true,
+                      disabled: !multi_position_available?,
+                      data: { posting_type_fields_target: "choice", action: "posting-type-fields#change" }
+                    = f.label :posting_type_multi_position, class: "form-check-label fw-semibold" do
+                      Multi-position gig
+                  %p.text-muted.small.mb-0.mt-2
+                    Staff a gig with several roles and headcounts. After publishing, use “Staff This Gig” to add positions and assign crew.
+                  - unless multi_position_available?
+                    %p.small.text-primary.fw-semibold.mb-0.mt-2{ data: { feature_upgrade: "multi-position-gigs" } }
+                      %i.bi.bi-lock-fill.me-1
+                      Available on Team and Studio plans
+            - if job.errors[:posting_type].any?
+              .text-danger.small.mt-2= job.errors.full_messages_for(:posting_type).to_sentence
+        - if job.new_record?
+          .col-12{
+            class: ("d-none" unless job.multi_position?),
+            data: { gig_positions: true, posting_type_fields_target: "positions" }
+          }
+            .border.rounded-3.p-3
+              %h5.fw-semibold.mb-2 Define the first position
+              %p.text-muted.mb-3
+                Every multi-position gig needs at least one crew position. You can add more positions later from “Staff This Gig.”
+              = f.simple_fields_for :crew_positions, initial_crew_position do |position_fields|
+                .row.g-3
+                  .col-md-8
+                    = position_fields.input :title,
+                      label: "Position title",
+                      placeholder: "e.g. Audio Engineer",
+                      required: true,
+                      input_html: { disabled: !job.multi_position?, data: { posting_type_fields_target: "positionField" } }
+                  .col-md-4
+                    = position_fields.input :headcount,
+                      label: "How many people?",
+                      required: true,
+                      input_html: { min: 1, step: 1, value: initial_crew_position.headcount || 1, disabled: !job.multi_position?, data: { posting_type_fields_target: "positionField" } }
+              - if crew_position_error_messages.present?
+                .text-danger.small.mt-2= crew_position_error_messages
+        .col-12
+          = f.input :title, label: "Posting or gig title", input_html: { autofocus: true }
+        - if projects.any?
+          .col-12
+            = f.input :project_id,
+              collection: projects.map { |project| [project.name, project.id] },
+              include_blank: "No project",
+              label: "Project"
+        .col-12
+          %p.form-label Description
+          = f.rich_text_area :description, placeholder: "Job description, years experience, primary responsibilities, etc.", class: "job-description-editor"
+        .col-12
+          %h5.fw-semibold.mb-2 Crew requirements
+          %p.text-muted.mb-3
+            Structured requirements power crew matching. Mark only genuine must-haves as required.
+          .row.g-3
+            - taxonomy_requirement_fields.each do |field|
+              .col-md-6
+                .taxonomy-multiselect{
+                  id: "#{field[:id]}_combobox",
+                  data: {
+                    controller: "taxonomy-multiselect",
+                    taxonomy_multiselect_kind_value: field[:noun],
+                    action: "click@window->taxonomy-multiselect#clickOutside"
+                  }
+                }
+                  = label_tag "#{field[:id]}_search", field[:label], class: "form-label"
+                  = hidden_field_tag "job[#{field[:attribute]}][]", ""
+                  = select_tag "job[#{field[:attribute]}][]",
+                    options_from_collection_for_select(field[:options], :id, :name, field[:selected_ids]),
+                    multiple: true,
+                    class: "visually-hidden",
+                    id: field[:id],
+                    tabindex: "-1",
+                    aria: { hidden: "true" },
+                    data: { taxonomy_multiselect_target: "select" }
+                  .taxonomy-multiselect-control
+                    = search_field_tag "#{field[:attribute]}_search",
+                      nil,
+                      id: "#{field[:id]}_search",
+                      class: "form-control taxonomy-multiselect-input",
+                      placeholder: "Search and select...",
+                      role: "combobox",
+                      autocomplete: "off",
+                      aria: { autocomplete: "list", controls: "#{field[:id]}_options", expanded: "false" },
+                      data: { taxonomy_multiselect_target: "input", action: "input->taxonomy-multiselect#search keydown->taxonomy-multiselect#navigate focus->taxonomy-multiselect#show" }
+                    .taxonomy-multiselect-options.list-group.d-none{
+                      id: "#{field[:id]}_options",
+                      role: "listbox",
+                      aria: { multiselectable: "true", label: field[:label] },
+                      data: { taxonomy_multiselect_target: "options" }
+                    }
+                      - field[:options].each do |option|
+                        %button.list-group-item.list-group-item-action.d-flex.justify-content-between.align-items-center{
+                          id: "#{field[:id]}_option_#{option.id}",
+                          type: "button",
+                          role: "option",
+                          tabindex: "-1",
+                          aria: { selected: field[:selected_ids].include?(option.id).to_s },
+                          data: {
+                            action: "taxonomy-multiselect#toggle",
+                            taxonomy_multiselect_target: "option",
+                            taxonomy_value: option.id,
+                            taxonomy_name: option.name,
+                            taxonomy_search_text: option.name.downcase
+                          }
+                        }
+                          %span= option.name
+                          %i.bi.bi-check-lg.taxonomy-multiselect-check{ aria: { hidden: "true" } }
+                    .visually-hidden{ role: "status", aria: { live: "polite" }, data: { taxonomy_multiselect_target: "status" } }
+                  .taxonomy-multiselect-chips{ data: { taxonomy_multiselect_target: "chips" } }
+                    - field[:options].select { |option| field[:selected_ids].include?(option.id) }.each do |option|
+                      %button.taxonomy-multiselect-chip{
+                        type: "button",
+                        aria: { label: "Remove #{option.name}" },
+                        data: {
+                          action: "taxonomy-multiselect#remove",
+                          taxonomy_multiselect_target: "chip",
+                          taxonomy_value: option.id,
+                          taxonomy_name: option.name
+                        }
+                      }
+                        %span= option.name
+                        %i.bi.bi-x-lg{ aria: { hidden: "true" } }
+        .col-12
+          %label.form-label Screening Questions
+          %p.text-muted.mb-2 Add custom screening questions for applicants. Use the plus button to add another question.
+          .d-flex.flex-column.gap-2{ data: { controller: "question-fields" } }
+            .d-flex.flex-column.gap-2{ data: { question_fields_target: "container" } }
+              - question_fields.each do |question|
+                .input-group
+                  %span.input-group-text
+                    %i.bi.bi-question-circle
+                  = text_field_tag "job[questions][]", question, class: "form-control", placeholder: "Enter a screening question"
+            %div
+              %button.btn.btn-outline-primary{ type: "button", data: { action: "question-fields#add" } }
+                %i.bi.bi-plus-lg.me-1
+                Add Question
+            %template{ data: { question_fields_target: "template" } }
+              .input-group.mt-2
+                %span.input-group-text
+                  %i.bi.bi-question-circle
+                %input.form-control{ type: "text", name: "job[questions][]", placeholder: "Enter a screening question" }
+        .col-md-6
+          = f.input :employment_type, collection: Job.employment_types.keys.map { |value| [value.humanize, value] }, include_blank: false
+        .col-md-6
+          = f.input :workplace_type, collection: Job.workplace_types.keys.map { |value| [value.humanize, value] }, include_blank: false
+        .col-md-6
+          = f.input :status, collection: Job.statuses.keys.map { |value| [value.humanize, value] }, include_blank: false
+        .col-md-4
+          = f.input :pay_period, collection: Job.pay_periods.keys.map { |value| [value.humanize, value] }, include_blank: true
+        .col-md-4
+          = f.label :pay_min
+          .input-group.mt-2
+            %span.input-group-text $
+            = f.input_field :pay_min, class: "form-control"
+        .col-md-4
+          = f.label :pay_max
+          .input-group.mt-2
+            %span.input-group-text $
+            = f.input_field :pay_max, class: "form-control"
+        .col-sm-12
+          %p.text-muted.mb-0.mt-2 
+            %i.bi.bi-info-circle.me-1
+            Start and end dates are especially useful for tours, short-term contracts, and project-based roles. If this position is ongoing or the timing is still flexible, you can leave one or both blank for now.
+        .col-md-4.mt-1
+          = f.input :starts_at, as: :string, input_html: { type: "datetime-local" }
+        .col-md-4.mt-1
+          = f.input :ends_at, as: :string, input_html: { type: "datetime-local" }
+        .col-md-4.mt-1
+          = f.input :application_deadline, as: :string, input_html: { type: "datetime-local" }
+        .col-12.mt-1
+          %label.form-label Specific work dates (optional)
+          %p.text-muted.mb-2
+            For tours and other intermittent gigs, add only the dates when work takes place. Leave this blank when every day in the range is a work day.
+          .d-flex.flex-column.gap-2{ data: { controller: "work-date-fields" } }
+            .d-flex.flex-column.gap-2{ data: { work_date_fields_target: "container" } }
+              - work_date_fields.each do |work_date|
+                .input-group
+                  = date_field_tag "job[work_dates][]", work_date, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date
+                  %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
+                    %i.bi.bi-trash
+            %div
+              %button.btn.btn-outline-primary{ type: "button", data: { action: "work-date-fields#add" } }
+                %i.bi.bi-plus-lg.me-1
+                Add Work Date
+            %template{ data: { work_date_fields_target: "template" } }
+              .input-group
+                %input.form-control{ type: "date", name: "job[work_dates][]", min: job.starts_at&.to_date, max: job.ends_at&.to_date }
+                %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
+                  %i.bi.bi-trash
+        .col-md-3
+          = f.input :requires_travel
+        .col-md-3
+          = f.input :is_visa_sponsorship_available, label: "Visa sponsorship available"
+        .col-md-3
+          = f.input :is_active
+        .col-md-3
+          = f.input :editable_by_company, label: "Allow company editors to edit this job"
+
+        = f.simple_fields_for :locations, location do |location_fields|
+          .col-12
+            %h5.fw-semibold.mb-2 Location
+            %p.text-muted.mb-1 Add the primary location for this role (optional)
+          .col-md-6
+            = location_fields.input :address_line_1, label: "Address Line 1"
+          .col-md-6
+            = location_fields.input :address_line_2, label: "Address Line 2", required: false
+          .col-md-4
+            = location_fields.input :city
+          .col-md-4
+            = location_fields.input :state
+          .col-md-4
+            = location_fields.input :zip_code, label: "ZIP Code"
+          .col-md-6
+            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: true, input_html: { class: "form-control form-control-muted" }
+
+      .d-flex.justify-content-between.align-items-center.mt-4
+        = link_to "Back to Company", usr_company_path(company), class: "btn btn-quiet"
+        = f.submit "Publish", class: "btn btn-primary"

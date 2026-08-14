@@ -1,0 +1,89 @@
+.card.border-0.shadow-sm.mt-4
+  .card-body.p-4
+    .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-3
+      %div
+        %h4.fw-semibold.mb-1 Find Crew for This Job
+        %p.text-muted.mb-0 Search qualified people in the context of #{job.title}.
+
+    = form_with url: helpers.usr_job_crew_path(job), method: :get, class: "row g-3 align-items-end mb-4" do |form|
+      - filter_fields.each do |field|
+        .col-md-3
+          .taxonomy-multiselect{
+            data: {
+              controller: "searchable-select",
+              action: "click@window->searchable-select#clickOutside"
+            }
+          }
+            = form.label field[:name], field[:label], class: "form-label"
+            = select_tag field[:name],
+              options_for_select(field[:options], field[:selected]),
+              id: field[:id],
+              class: "visually-hidden",
+              tabindex: "-1",
+              aria: { hidden: "true" },
+              data: { searchable_select_target: "select" }
+            .taxonomy-multiselect-control
+              = search_field_tag "#{field[:name]}_search",
+                selected_filter_label(field),
+                id: "#{field[:id]}_search",
+                class: "form-control",
+                placeholder: field[:blank_label],
+                role: "combobox",
+                autocomplete: "off",
+                aria: { autocomplete: "list", controls: "#{field[:id]}_options", expanded: "false" },
+                data: { searchable_select_target: "input", action: "input->searchable-select#search keydown->searchable-select#navigate focus->searchable-select#show" }
+              .taxonomy-multiselect-options.list-group.d-none{
+                id: "#{field[:id]}_options",
+                role: "listbox",
+                aria: { label: field[:label] },
+                data: { searchable_select_target: "options" }
+              }
+                - field[:options].each_with_index do |(label, value), index|
+                  %button.list-group-item.list-group-item-action{
+                    id: "#{field[:id]}_option_#{index}",
+                    type: "button",
+                    role: "option",
+                    tabindex: "-1",
+                    aria: { selected: (value.to_s == field[:selected]).to_s },
+                    data: {
+                      action: "mousedown->searchable-select#select",
+                      searchable_select_target: "option",
+                      searchable_select_value: value,
+                      searchable_select_label: label,
+                      searchable_select_search_text: label.downcase
+                    }
+                  }
+                    = label
+              .visually-hidden{ role: "status", aria: { live: "polite" }, data: { searchable_select_target: "status" } }
+      .col-12.d-flex.gap-2
+        = form.submit "Search Crew", class: "btn btn-primary"
+        = link_to "Clear", helpers.usr_job_crew_path(job), class: "btn btn-quiet"
+
+    - if results.any?
+      .row.g-3
+        - results.each do |result|
+          .col-12.col-lg-6
+            .border.rounded-3.p-3.h-100{ data: { crew_search_result: true } }
+              .d-flex.justify-content-between.align-items-start.gap-3
+                %div
+                  .fw-semibold= link_to result.profile.user.full_name, helpers.usr_profile_path(result.profile), class: "text-dark text-decoration-none"
+                  .text-muted.small= result.profile.formatted_headline
+                  .text-muted.small= result.profile.formatted_location
+                %span.badge.rounded-pill{ class: availability_badge_class(result.availability.state) }
+                  = result.availability.label
+              %p.small.mt-3.mb-2= result.match_reason
+              - if result.matched_skills_and_equipment.any?
+                %p.small.text-muted.mb-3= "Matched: #{result.matched_skills_and_equipment.to_sentence}"
+              .d-flex.flex-wrap.gap-2
+                = button_to "Invite to Job",
+                  helpers.usr_profile_job_invitations_path(result.profile),
+                  params: { job_invitation: { job_id: job.id } },
+                  class: "btn btn-sm btn-primary"
+                - crew_shortlists.each do |shortlist|
+                  = button_to "Add to #{shortlist.name}",
+                    helpers.usr_crew_shortlist_memberships_path(shortlist),
+                    params: { profile_id: result.profile.id },
+                    class: "btn btn-sm btn-outline-primary"
+    - else
+      .alert.alert-light.border.mb-0
+        No qualified crew match these filters yet. Adjust the filters or add structured requirements to the job.

@@ -1,0 +1,14 @@
+.tab-pane.fade.show.active#company-home{ role: "tabpanel", aria: { labelledby: "company-home-tab" } }
+  %h5.fw-semibold Overview
+  %p.text-muted
+    = company.description.presence || "This company builds great teams and delivers reliable work across industries. Known for clear communication, safe job sites, and steady project flow."
+  .row.mt-3
+    .col-sm-4
+      %div.text-muted.small Company Size
+      %div.fw-semibold="#{company.employee_range} employees"
+    .col-sm-4
+      %div.text-muted.small Founded
+      %div.fw-semibold= company.founded_at&.year || "N/A"
+    .col-sm-4
+      %div.text-muted.small Headquarters
+      %div.fw-semibold= company.formatted_location

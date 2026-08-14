@@ -1,0 +1,168 @@
+%div{ id: "company_details_form", class: ("d-none" if visible_form != "company_details_form"), data: { controller: ("company-mock-data" if source_action == "new") } }
+  %div{ id: "company_plan_display_card" }
+    - if plan.present?
+      .card.border-0.shadow-sm.mb-4
+        .card-body
+          %p.mb-0
+            %i.bi.bi-check-circle-fill
+            You have selected the
+            %span.fw-bold= plan.name
+            plan.
+  .card.border-0.shadow-sm
+    .card-body
+      - if f.object.errors.any?
+        .alert.alert-danger{ id: "company-validation-errors", role: "alert", aria: { live: "polite" } }
+          %p.fw-semibold.mb-2 Please correct the following errors:
+          %ul.mb-0
+            - f.object.errors.full_messages.each do |message|
+              %li= message
+      .row.g-3
+        .d-flex.flex-wrap.justify-content-between.align-items-start.gap-2
+          %div
+            %h3.fw-bold.mb-0 Company Details
+            %p.text-muted.mt-1.mb-0 Provide the following general information about your company.
+          - if source_action == "new" && can_fill_mock_data
+            = hidden_field_tag :mock_company, "0", data: { company_mock_data_target: "billingBypass" }
+            %button.btn.btn-sm.btn-outline-secondary{ type: "button", data: { action: "company-mock-data#fill" } }
+              %i.bi.bi-magic.me-1
+              Fill with mock data
+        .col-sm-12
+          = f.input :name
+        .col-sm-12
+          = f.input :description, as: :text
+        .col-sm-12
+          = f.input :image, as: :file, label: "Company Logo", hint: "Upload a logo to represent your company."
+          - if f.object.image_url.present?
+            .mb-2.d-flex.align-items-center.gap-3
+              = image_tag f.object.image_url, alt: f.object.name, class: "rounded", style: "width: 64px; height: 64px; object-fit: cover;"
+              %span.text-muted Current logo
+        .col-sm-12
+          = f.input :contact_email
+        .col-sm-12
+          = f.input :contact_phone
+
+        = f.simple_fields_for :locations do |location_fields|
+          .row
+            = location_fields.input :id, as: :hidden
+            .col-sm-12.col-md-4
+              = location_fields.input :city, required: true, input_html: { class: "form-control form-control-muted" }
+            .col-sm-12.col-md-4
+              = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: true, input_html: { class: "form-control form-control-muted" }
+            .col-sm-12.col-md-4
+              = location_fields.input :state, as: :select, collection: Location::STATES, include_blank: true, required: false, input_html: { class: "form-control form-control-muted" }
+
+        .col-sm-12
+          .taxonomy-multiselect{
+            id: "company_industry_ids_combobox",
+            data: {
+              controller: "taxonomy-multiselect",
+              taxonomy_multiselect_kind_value: "industries",
+              action: "click@window->taxonomy-multiselect#clickOutside"
+            }
+          }
+            = label_tag "company_industry_ids_search", "Industries", class: "form-label"
+            = hidden_field_tag "company[industry_ids][]", ""
+            = select_tag "company[industry_ids][]",
+              options_from_collection_for_select(industries, :id, :name, selected_industry_ids),
+              multiple: true,
+              class: "visually-hidden",
+              id: "company_industry_ids",
+              tabindex: "-1",
+              aria: { hidden: "true" },
+              data: { taxonomy_multiselect_target: "select" }
+            .taxonomy-multiselect-control
+              = search_field_tag "industry_search",
+                nil,
+                id: "company_industry_ids_search",
+                class: "form-control taxonomy-multiselect-input",
+                placeholder: "Search industries...",
+                role: "combobox",
+                autocomplete: "off",
+                aria: { autocomplete: "list", controls: "company_industry_ids_options", expanded: "false" },
+                data: { taxonomy_multiselect_target: "input", action: "input->taxonomy-multiselect#search keydown->taxonomy-multiselect#navigate focus->taxonomy-multiselect#show" }
+              .taxonomy-multiselect-options.list-group.d-none{
+                id: "company_industry_ids_options",
+                role: "listbox",
+                aria: { multiselectable: "true", label: "Industries" },
+                data: { taxonomy_multiselect_target: "options" }
+              }
+                - industries.each do |industry|
+                  %button.list-group-item.list-group-item-action.d-flex.justify-content-between.align-items-center{
+                    id: "company_industry_ids_option_#{industry.id}",
+                    type: "button",
+                    role: "option",
+                    tabindex: "-1",
+                    aria: { selected: selected_industry_ids.include?(industry.id).to_s },
+                    data: {
+                      action: "taxonomy-multiselect#toggle",
+                      taxonomy_multiselect_target: "option",
+                      taxonomy_value: industry.id,
+                      taxonomy_name: industry.name,
+                      taxonomy_search_text: industry.name.downcase
+                    }
+                  }
+                    %span= industry.name
+                    %i.bi.bi-check-lg.taxonomy-multiselect-check{ aria: { hidden: "true" } }
+              .visually-hidden{ role: "status", aria: { live: "polite" }, data: { taxonomy_multiselect_target: "status" } }
+            .taxonomy-multiselect-chips{ data: { taxonomy_multiselect_target: "chips" } }
+              - industries.select { |industry| selected_industry_ids.include?(industry.id) }.each do |industry|
+                %button.taxonomy-multiselect-chip{
+                  type: "button",
+                  aria: { label: "Remove #{industry.name}" },
+                  data: {
+                    action: "taxonomy-multiselect#remove",
+                    taxonomy_multiselect_target: "chip",
+                    taxonomy_value: industry.id,
+                    taxonomy_name: industry.name
+                  }
+                }
+                  %span= industry.name
+                  %i.bi.bi-x-lg{ aria: { hidden: "true" } }
+            %p.form-text Search and select one or more industries that fit your company.
+          - if f.object.errors[:industries].any?
+            .invalid-feedback.d-block{ id: "company-industry-errors" }
+              = f.object.errors.full_messages_for(:industries).to_sentence
+        .col-sm-3
+          = f.input :founded_at, as: :string, label: "Founded", input_html: { type: "date" }
+        .col-sm-12
+          = f.input :is_public, as: :boolean, label: "Make Company Profile Public", hint: "If checked, your company profile will be visible to others on Crewbase."
+  .card.border-0.shadow-sm.mt-3
+    .card-body
+      .row.g-3
+        %h3.fw-bold.mb-0 Socials
+        %p.text-muted.mt-1.mb-3 Add links to your company's social media profiles to enhance your online presence.
+        .col-sm-12
+          = f.input :website_url, label: "Website URL", placeholder: "https://www.example.com"
+        .col-sm-12
+          = f.input :twitter_handle, label: "Twitter Handle", placeholder: "@yourhandle"
+        .col-sm-12
+          = f.input :instagram_handle, label: "Instagram Handle", placeholder: "@yourhandle"
+        .col-sm-12
+          = f.input :tiktok_handle, label: "TikTok Handle", placeholder: "@yourhandle"
+        .col-sm-12
+          = f.input :linkedin_url, label: "LinkedIn URL", placeholder: "https://www.linkedin.com/company/yourcompany"
+        .col-sm-12
+          = f.input :facebook_url, label: "Facebook URL", placeholder: "https://www.facebook.com/yourcompany"
+        .col-sm-12
+          = f.input :youtube_url, label: "YouTube URL", placeholder: "https://www.youtube.com/yourchannel"
+      .row
+        .col-sm-6
+          - if source_action == "new"
+            = link_to previous_form_usr_companies_path(current_page: "company_details_form"), class: "btn btn-quiet" do
+              %i.bi.bi-arrow-left-circle
+              Change Plan
+        .col-sm-6.text-end
+          - if source_action == "new"
+            - if plan.present?
+              .d-flex.flex-wrap.justify-content-end.align-items-center.gap-3.mb-3
+                %span.fw-semibold Billing
+                .form-check.form-check-inline.mb-0
+                  = radio_button_tag :billing_interval, "monthly", true, id: "company_billing_monthly", class: "form-check-input"
+                  = label_tag :company_billing_monthly, "#{plan.monthly_price}/month", class: "form-check-label"
+                .form-check.form-check-inline.mb-0
+                  = radio_button_tag :billing_interval, "annual", false, id: "company_billing_annual", class: "form-check-input"
+                  = label_tag :company_billing_annual, "#{plan.annual_price}/year", class: "form-check-label"
+              %p.small.text-muted.mb-2 Your company is created first, then Stripe securely collects payment details.
+            = f.submit(plan.present? ? "Create Company and Continue to Payment" : "Create Company", class: "btn btn-primary")
+          - else
+            = f.submit "Update Company", class: "btn btn-primary"

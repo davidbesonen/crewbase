@@ -1,0 +1,6 @@
+.row.mb-4
+  .col-12
+    %h1.fw-bold.mb-1 Add Credit
+    %p.text-muted.mb-0 Add a one-off gig or short engagement to your profile.
+
+= render Usr::ProfileConfig::CreditEditorComponent.new(profile: @profile, credit: @credit, companies: @companies)

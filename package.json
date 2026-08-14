@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --load-path=node_modules --no-source-map"
+    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --load-path=node_modules --load-path=node_modules/bootstrap/scss --no-source-map"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",

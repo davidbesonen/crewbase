@@ -1,0 +1,2 @@
+= render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :manager, entitlement: CompanyPlanEntitlement.new(@company))
+= render Usr::Company::ManagerDashboardComponent.new(company: @company, plan: @plan, dashboard: @dashboard)
