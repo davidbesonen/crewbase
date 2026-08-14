@@ -470,7 +470,7 @@ GEM
     stringio (3.2.0)
     stripe (18.4.2)
     temple (0.10.4)
-    thor (1.4.0)
+    thor (1.5.0)
     thruster (0.1.25)
     thruster (0.1.25-aarch64-linux)
     thruster (0.1.25-arm64-darwin)
