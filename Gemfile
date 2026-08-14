@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.1"
+gem "rails", "~> 8.1.1"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -46,7 +46,7 @@ gem "chart-js-rails"
 # Ransack
 gem "ransack"
 gem "ransack_memory"
-gem "pagy"
+gem "pagy", "~> 9.3"
 
 # Simpleform
 gem "simple_form"

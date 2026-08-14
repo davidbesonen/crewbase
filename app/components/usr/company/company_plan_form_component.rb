@@ -21,5 +21,4 @@ class Usr::Company::CompanyPlanFormComponent < ApplicationComponent
   def tier_presentation(plan)
     TIER_PRESENTATION.fetch(tier_key(plan))
   end
-
 end

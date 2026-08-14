@@ -1,4 +1,4 @@
-= simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields" } do |f|
+= helpers.simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields" } do |f|
   - if job.errors[:base].any?
     .alert.alert-warning{ data: { plan_limit_message: true } }= job.errors[:base].to_sentence
   .card.border-0.shadow-sm
