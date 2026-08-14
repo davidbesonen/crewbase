@@ -36,7 +36,7 @@ gem "icalendar"
 gem "countries"
 
 # View
-gem "bootstrap", "~> 5.3", ">= 5.3.3"
+gem "bootstrap", "~> 5.3"
 gem "sassc-rails"
 gem "haml-rails"
 gem "view_component"
@@ -97,4 +97,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "resolv-replace", "~> 0.1.1"
+gem "resolv-replace", "~> 0.2.0"
