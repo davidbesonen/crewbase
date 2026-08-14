@@ -3,10 +3,17 @@ updates:
   - package-ecosystem: bundler
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
     open-pull-requests-limit: 10
     allow:
-      - dependency-type: all
+      - dependency-type: direct
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]  # skip major bumps
@@ -14,7 +21,14 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
     open-pull-requests-limit: 10
     allow:
       - dependency-type: all
