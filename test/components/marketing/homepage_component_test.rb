@@ -29,7 +29,6 @@ class Marketing::HomepageComponentTest < ViewComponent::TestCase
     assert_selector "#platform", text: /clear, job-relevant details/
     assert_selector "#platform", text: /Private crew connections/
     assert_no_text(/deterministic signals/)
-    assert_selector ".marketing-crew-reason", count: 3
     assert_no_text(/% match/)
   end
 end

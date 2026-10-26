@@ -4,3 +4,7 @@
     = render Shared::BrandWordmarkComponent.new(concept: @brand_concept)
   - homepage.with_appearance do
     = render Shared::ThemePickerComponent.new
+  - homepage.with_concert_scene do
+    = render Marketing::ConcertSceneComponent.new
+  - homepage.with_workspace_preview do
+    = render Marketing::WorkspacePreviewComponent.new

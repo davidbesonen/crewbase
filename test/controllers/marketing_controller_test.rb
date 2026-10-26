@@ -64,6 +64,15 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select ".marketing-product-preview", text: /\d+%/, count: 0
   end
 
+  test "concert artwork leads the homepage and the workspace preview remains in the product section" do
+    get welcome_path
+
+    assert_response :success
+    assert_select ".marketing-hero .concert-scene img[alt*='guitarist'][alt*='bassist'][alt*='drummer']"
+    assert_select ".marketing-hero .marketing-product-preview", count: 0
+    assert_select "#platform .marketing-product-preview", count: 1
+  end
+
   test "signed-in visitors are sent directly to their dashboard" do
     user = User.create!(
       first_name: "Marketing",

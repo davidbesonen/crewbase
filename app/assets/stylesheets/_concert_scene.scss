@@ -1,0 +1,68 @@
+.marketing-hero__scene { min-width: 0; position: relative; }
+.concert-scene {
+  position: relative;
+  isolation: isolate;
+  width: calc(100% + 4rem);
+  margin: -2rem;
+  aspect-ratio: 1;
+}
+.concert-scene__stage { position: relative; animation: concert-drift 10s ease-in-out infinite; animation-play-state: paused; }
+.concert-scene__artwork { display: block; position: relative; width: 100%; height: auto; z-index: 1; }
+.concert-scene__halo {
+  position: absolute;
+  inset: 22% 7% 10%;
+  background: radial-gradient(ellipse, rgba(57, 121, 255, .2), transparent 68%);
+  filter: blur(30px);
+  animation: concert-glow 8s ease-in-out infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+}
+.concert-scene__lighting { position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: screen; }
+.concert-scene__beam {
+  display: block;
+  position: absolute;
+  width: 23%;
+  height: 43%;
+  clip-path: polygon(48% 0, 58% 0, 100% 100%, 0 100%);
+  transform-origin: 53% 0;
+  filter: blur(8px);
+  animation: concert-light 7s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.concert-scene__beam--blue { top: 18%; left: 31%; background: linear-gradient(rgba(120, 190, 255, .17), rgba(120, 190, 255, 0)); }
+.concert-scene__beam--warm { top: 21%; left: 56%; background: linear-gradient(rgba(255, 218, 151, .14), rgba(255, 218, 151, 0)); animation-delay: -3s; animation-duration: 9s; }
+.concert-scene[data-motion="playing"] .concert-scene__stage,
+.concert-scene[data-motion="playing"] .concert-scene__halo,
+.concert-scene[data-motion="playing"] .concert-scene__beam { animation-play-state: running; }
+.concert-scene__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  position: absolute;
+  bottom: 0;
+  right: 1.5rem;
+  z-index: 3;
+  min-height: 44px;
+  padding: .5rem .8rem;
+  border: 1px solid #334563;
+  border-radius: 2rem;
+  background: #101827;
+  color: #b9c9e2;
+  font: 600 .7rem "Manrope", sans-serif;
+  transition: border-color .2s, color .2s;
+}
+.concert-scene__toggle[hidden] { display: none; }
+.concert-scene__toggle:hover { border-color: #8fcaff; color: #fff; }
+.concert-scene__toggle:focus-visible { outline: 3px solid #8fcaff; outline-offset: 3px; }
+.concert-scene__toggle i { font-size: 1rem; }
+@keyframes concert-drift { 0%, 100% { transform: translateY(0) rotate(-.3deg); } 50% { transform: translateY(-5px) rotate(.3deg); } }
+@keyframes concert-glow { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+@keyframes concert-light { from { transform: rotate(-5deg); opacity: .6; } to { transform: rotate(5deg); opacity: 1; } }
+@media (max-width: 991.98px) {
+  .concert-scene { width: 100%; max-width: 640px; margin: -1rem auto 0; }
+  .concert-scene__toggle { right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .concert-scene__stage, .concert-scene__halo, .concert-scene__beam { animation: none !important; }
+  .concert-scene__toggle { display: none; }
+}

@@ -41,43 +41,8 @@
             %i.bi.bi-check-circle-fill
             Staffing through show day
 
-      .marketing-product-preview{ aria: { label: "KnowShow staffing dashboard preview" }, data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
-        .marketing-product-preview__topbar
-          .marketing-window-dots{ aria: { hidden: true } }
-            %span
-            %span
-            %span
-          %span Crew recommendations
-          %span.marketing-live-pill On the road
-        .marketing-product-preview__body
-          .marketing-preview-heading
-            %div
-              %span.marketing-preview-label Your next great crew
-              %strong Summer run / Nashville
-            %span.marketing-count Touring
-          .marketing-preview-list
-            .marketing-crew-row
-              .marketing-avatar AB
-              .marketing-crew-row__copy
-                %strong Avery Brooks
-                %span A1 Audio Engineer
-              %span.marketing-crew-reason Occupation + skills
-            .marketing-crew-row
-              .marketing-avatar.marketing-avatar--sky MK
-              .marketing-crew-row__copy
-                %strong Morgan Kim
-                %span Lighting Programmer
-              %span.marketing-crew-reason Skills + equipment
-            .marketing-crew-row
-              .marketing-avatar.marketing-avatar--navy JT
-              .marketing-crew-row__copy
-                %strong Jordan Torres
-                %span Video Engineer
-              %span.marketing-crew-reason Role + location
-          .marketing-preview-note
-            %i.bi.bi-stars
-            Search real experience. See why people match. Confirm the details together.
-          %p.marketing-preview-caption Illustrative workspace · not live availability
+      .marketing-hero__scene{ data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
+        = concert_scene
 
   %section.marketing-trust-strip
     .marketing-container{ data: { marketing_motion_target: "reveal" } }
@@ -215,6 +180,7 @@
         %span.marketing-kicker Built around real operations
         %h2 The network gets you connected. The tools keep you there.
         %p KnowShow stays useful after a match is made, keeping the context for each company, opportunity, and working relationship close at hand.
+        %p KnowShow bases recommendations on clear, job-relevant details: occupations, skills, equipment experience, location, requirements and known availability.
         %ul.marketing-check-list
           %li
             %i.bi.bi-check2
@@ -236,17 +202,7 @@
             %span
               %strong Job documents, saved jobs, crew shortlists, and private reviews
               that keep hiring details organized and make repeat work easier.
-      .marketing-principle-card{ data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
-        %i.bi.bi-stars
-        %span.marketing-kicker Matching without the mystery
-        %h3 Recommendations you can understand.
-        %p KnowShow bases recommendations on clear, job-relevant details: occupations, skills, equipment experience, location, requirements and known availability.
-        .marketing-signal-list
-          %span Occupation
-          %span Skills
-          %span Equipment
-          %span Location
-          %span Availability
+      = workspace_preview
 
   %section.marketing-cta
     .marketing-container
