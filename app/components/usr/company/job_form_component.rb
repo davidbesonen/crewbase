@@ -10,12 +10,13 @@ class Usr::Company::JobFormComponent < ApplicationComponent
   option :occupations, default: proc { [] }
   option :requirement_selections, default: proc { {} }
   option :entitlement
+  option :form_location, optional: true
 
   attr_reader :initial_crew_position, :location, :question_fields, :work_date_fields
 
   def before_render
     @initial_crew_position = job.crew_positions.first || job.crew_positions.build
-    @location = job.locations.first || job.locations.build
+    @location = form_location || job.locations.first || job.locations.build
     @question_fields = Array(job.questions).presence || [ "" ]
     @work_date_fields = Array(job.work_dates).presence || [ nil ]
   end
@@ -46,6 +47,10 @@ class Usr::Company::JobFormComponent < ApplicationComponent
 
   def schedule_input_value(value)
     value&.strftime(job.schedule_has_times? ? "%Y-%m-%dT%H:%M" : "%Y-%m-%d")
+  end
+
+  def deadline_input_value
+    job.application_deadline&.strftime("%Y-%m-%dT%H:%M")
   end
 
   def taxonomy_requirement_fields

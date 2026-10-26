@@ -1,6 +1,10 @@
 = helpers.simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields job-schedule" } do |f|
-  - if job.errors[:base].any?
-    .alert.alert-warning{ data: { plan_limit_message: true } }= job.errors[:base].to_sentence
+  - if job.errors.any?
+    .alert.alert-warning{ role: "alert", data: { plan_limit_message: job.errors[:base].any? } }
+      %strong Please review these fields before saving:
+      %ul.mb-0
+        - job.errors.full_messages.each do |message|
+          %li= message
   .card.border-0.shadow-sm
     .card-body.p-4
       .row.g-4
@@ -205,11 +209,11 @@
           = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { job_schedule_target: "toggle", action: "job-schedule#change" } }
           %p.form-text.mb-0 Times use #{Time.zone.name}. Confirm final work hours in the booking offer.
         .col-md-4.mt-1
-          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { job_schedule_target: "field" } }
+          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
         .col-md-4.mt-1
-          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field" } }
+          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
         .col-md-4.mt-1
-          = f.input :application_deadline, as: :string, input_html: { type: "datetime-local" }
+          = f.input :application_deadline, as: :string, input_html: { type: "datetime-local", value: deadline_input_value }
         .col-12.mt-1
           %label.form-label Specific work dates (optional)
           %p.text-muted.mb-2
@@ -218,7 +222,7 @@
             .d-flex.flex-column.gap-2{ data: { work_date_fields_target: "container" } }
               - work_date_fields.each do |work_date|
                 .input-group
-                  = date_field_tag "job[work_dates][]", work_date, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date
+                  = date_field_tag "job[work_dates][]", work_date, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" }
                   %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
                     %i.bi.bi-trash
             %div
@@ -227,7 +231,7 @@
                 Add Work Date
             %template{ data: { work_date_fields_target: "template" } }
               .input-group
-                %input.form-control{ type: "date", name: "job[work_dates][]", min: job.starts_at&.to_date, max: job.ends_at&.to_date }
+                %input.form-control{ type: "date", name: "job[work_dates][]", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" } }
                 %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
                   %i.bi.bi-trash
         .col-md-3
@@ -252,7 +256,7 @@
           .col-md-4
             = location_fields.input :zip_code, label: "ZIP Code"
           .col-md-6
-            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: true, input_html: { class: "form-control form-control-muted" }
+            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false, input_html: { class: "form-control form-control-muted" }
 
       .d-flex.justify-content-between.align-items-center.mt-4
         = link_to "Back to Company", usr_company_path(company), class: "btn btn-quiet"

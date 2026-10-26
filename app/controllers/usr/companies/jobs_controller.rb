@@ -22,10 +22,9 @@ class Usr::Companies::JobsController < ApplicationController
   def create
     return require_company_feature!(@company, :multi_position_gigs) if requested_multi_position?
 
-    @job = @company.jobs.new(job_attributes)
+    @job = @company.jobs.new(job_attributes.merge(created_by: current_user.id))
     @job.require_initial_crew_position = true
     @job.posting_type = nil unless job_params.key?(:posting_type)
-    apply_status_timestamp(@job)
 
     unless active_job_capacity_available?(@job)
       @job.errors.add(:base, active_job_limit_message)
@@ -34,8 +33,6 @@ class Usr::Companies::JobsController < ApplicationController
     end
 
     if save_job_with_requirements
-      location = find_or_create_location
-      @job.locations << location if location && !@job.locations.include?(location)
       redirect_to job_destination(@job), notice: "Job created successfully!"
     else
       @job.crew_positions.build if @job.crew_positions.empty?
@@ -56,7 +53,6 @@ class Usr::Companies::JobsController < ApplicationController
 
     was_active = active_job?(@job)
     @job.assign_attributes(job_attributes)
-    apply_status_timestamp(@job)
 
     if !was_active && !active_job_capacity_available?(@job)
       @job.errors.add(:base, active_job_limit_message)
@@ -65,7 +61,6 @@ class Usr::Companies::JobsController < ApplicationController
     end
 
     if save_job_with_requirements
-      replace_location
       redirect_to job_destination(@job), notice: "Job updated successfully!"
     else
       @job.locations.build if @job.locations.empty?
@@ -101,6 +96,7 @@ class Usr::Companies::JobsController < ApplicationController
       :employment_type,
       :posting_type,
       :requires_travel,
+      :editable_by_company,
       :is_active,
       :status,
       :description,
@@ -116,7 +112,6 @@ class Usr::Companies::JobsController < ApplicationController
       :closed_at,
       :filled_at,
       :application_deadline,
-      :created_by,
       :project_id,
       required_occupation_ids: [],
       required_capability_keys: [],
@@ -130,11 +125,12 @@ class Usr::Companies::JobsController < ApplicationController
       questions: [],
       work_dates: [],
       crew_positions_attributes: [ :id, :title, :headcount ],
-      locations_attributes: [ :id, :address_line_1, :address_line_2, :city, :state, :zip_code, :country ]
+      locations_attributes: [ :id, *SaveJobPosting::LOCATION_FIELDS ]
     )
   end
 
   def prepare_projects
+    @form_location ||= submitted_location
     @entitlement ||= CompanyPlanEntitlement.new(@company)
     projects = @company.projects.active
     projects = projects.or(@company.projects.where(id: @job.project_id)) if @job&.project_id?
@@ -163,13 +159,10 @@ class Usr::Companies::JobsController < ApplicationController
   end
 
   def save_job_with_requirements
-    Job.transaction do
-      @job.save!
-      JobRequirementsUpdater.new(job: @job, selections: requirement_selections).call if requirement_selections?
-      JobCompletion.new(job: @job).call if @job.completed?
-      ProductEvent.record(user: current_user, name: "job_published", subject: @job, event_key: @job.id) if @job.published?
-      true
-    end
+    @form_location = submitted_location
+    SaveJobPosting.new(job: @job, actor: current_user,
+      requirements: requirement_selections? ? requirement_selections : {},
+      location: @form_location, replace_location: job_params.key?(:locations_attributes)).call
   rescue ActiveRecord::RecordInvalid => error
     error.record.errors.each { |attribute, message| @job.errors.add(attribute, message) } unless error.record == @job
     false
@@ -192,45 +185,12 @@ class Usr::Companies::JobsController < ApplicationController
     job.project ? usr_project_path(job.project) : usr_company_path(@company)
   end
 
-  def find_or_create_location
-    locations_attributes = job_params.fetch(:locations_attributes, {}).values.first
-    return unless locations_attributes.present?
+  def submitted_location
+    return unless params[:job].present? && job_params.key?(:locations_attributes)
 
-    attrs = locations_attributes.to_h.symbolize_keys.slice(
-      :address_line_1,
-      :address_line_2,
-      :city,
-      :state,
-      :zip_code,
-      :country
-    ).transform_values(&:presence).compact
-
-    return if attrs.empty?
-
-    Location.find_or_create_by(attrs)
-  end
-
-  def replace_location
-    location = find_or_create_location
-    return unless location
-
-    @job.location_assignments.destroy_all
-    @job.locations << location
-  end
-
-  def apply_status_timestamp(job)
-    case job.status
-    when "archived"
-      job.archived_at ||= Time.current
-    when "closed"
-      job.closed_at ||= Time.current
-    when "filled"
-      job.filled_at ||= Time.current
-    when "completed"
-      job.completed_at ||= Time.current
-    when "published"
-      job.published_at ||= Time.current
-    end
+    fields = job_params.fetch(:locations_attributes).values.first
+    Location.new(fields.to_h.symbolize_keys.slice(*SaveJobPosting::LOCATION_FIELDS)
+      .transform_values { |value| value.to_s.strip.presence })
   end
 
   def active_job_capacity_available?(job)
