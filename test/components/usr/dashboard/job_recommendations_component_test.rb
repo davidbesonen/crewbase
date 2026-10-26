@@ -33,6 +33,8 @@ class Usr::Dashboard::JobRecommendationsComponentTest < ViewComponent::TestCase
     ))
 
     assert_selector "[data-worker-job-recommendation]", count: 1
+    assert_selector ".card .bi-stars", count: 1
+    assert_no_selector "[data-worker-job-recommendation] .bi-stars"
     assert_selector "a[href='/usr/jobs/12?source=recommendation']", text: "Lighting Technician"
     assert_text "Matches Lighting Technician and GrandMA3"
     assert_text "Located in Chicago, IL"

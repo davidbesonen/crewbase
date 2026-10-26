@@ -255,7 +255,7 @@ class Usr::ProfilesController < ApplicationController
     @profile_headline = @profile.headline.presence || @profile.occupations.limit(2).pluck(:name).to_sentence.presence || "KnowShow Member"
     @location_text = [ primary_location&.city, primary_location&.state ].compact_blank.join(", ").presence || primary_location&.country.presence || "Location not listed"
     @about_items = [
-      { icon: "bi-stars", label: "Open to roles", value: @profile_occupation_names.presence || "Add target roles" },
+      { icon: "bi-person-workspace", label: "Open to roles", value: @profile_occupation_names.presence || "Add target roles" },
       { icon: "bi-geo-alt", label: "Based in", value: @location_text },
       { icon: "bi-calendar-check", label: "Availability", value: @availability_overview.fetch(:status) }
     ]

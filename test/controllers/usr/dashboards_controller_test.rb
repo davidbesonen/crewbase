@@ -246,7 +246,8 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-owned-job-posting-id='#{job.id}']" do
       assert_select "[data-applicant-count] a[href='#{usr_company_applications_path(company, job_id: job.id)}']", text: "2 applicants"
       assert_select "[data-recommended-applicant-count]", text: "3 recommended candidates"
-      assert_select "[data-recommended-applicant-count] .bi-stars", count: 1
+      assert_select "[data-recommended-applicant-count] .bi-person-check", count: 1
+      assert_select ".bi-stars", count: 0
     end
   end
 

@@ -24,7 +24,7 @@
           - if source_action == "new" && can_fill_mock_data
             = hidden_field_tag :mock_company, "0", data: { company_mock_data_target: "billingBypass" }
             %button.btn.btn-sm.btn-outline-secondary{ type: "button", data: { action: "company-mock-data#fill" } }
-              %i.bi.bi-magic.me-1
+              %i.bi.bi-database-add.me-1{ aria: { hidden: true } }
               Fill with mock data
         .col-sm-12
           = f.input :name

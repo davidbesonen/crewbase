@@ -25,7 +25,10 @@ class Usr::Company::CompanyPlanFormComponentTest < ViewComponent::TestCase
     assert_css ".company-plan-card--starter .company-plan-card__icon .bi-rocket-takeoff"
     assert_css ".company-plan-card--team.company-plan-card--featured .company-plan-card__icon .bi-people"
     assert_css ".company-plan-card--team .company-plan-card__badge", text: "For growing teams"
-    assert_css ".company-plan-card--studio .company-plan-card__icon .bi-stars"
+    assert_css ".company-plan-card--studio .company-plan-card__icon .bi-buildings"
+    %w[starter team studio].each do |tier|
+      assert_css ".company-plan-card--#{tier} .bi-stars", count: 1
+    end
     assert_css ".company-plan-card__capacity", count: 9
     assert_css ".company-plan-card__feature", count: Plan::LAUNCH_FEATURES.length * 3
     assert_css ".company-plan-card__feature--included .bi-check-lg.text-success", minimum: 3

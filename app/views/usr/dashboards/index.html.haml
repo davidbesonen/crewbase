@@ -41,7 +41,7 @@
                             %i.bi.bi-people.me-1{ aria: { hidden: true } }
                             = pluralize(posting.applicant_count, "applicant")
                         %span{ data: { recommended_applicant_count: true } }
-                          %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
+                          %i.bi.bi-person-check.text-primary.me-1{ aria: { hidden: true } }
                           = pluralize(posting.recommended_applicant_count, "recommended candidate")
                     .text-muted.small.text-md-end
                       %div{ data: { posted_at: true } }

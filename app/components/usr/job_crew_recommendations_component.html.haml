@@ -22,7 +22,7 @@
                   = result.profile.formatted_location
                 - if result.rating.present?
                   .small.mt-1{ class: recommendation_rating_text_class(result.rating) }
-                    %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                    %i.bi.bi-star-fill.me-1{ aria: { hidden: true } }
                     = "#{result.rating} / 5 rating"
                 - if result.tier == :near
                   .small.fw-semibold.text-warning.mt-1
@@ -30,14 +30,11 @@
                     Near match
             - if result.relevant_years.positive?
               .small.fw-semibold.mt-3
-                %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
                 = relevant_experience_label(result)
             .small.mt-2
-              %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
               = result.match_reason
             - if result.matched_skills_and_equipment.any?
               .small.mt-2
-                %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
                 = "Reported skills & equipment: #{result.matched_skills_and_equipment.to_sentence}"
             - if result.gap_reasons.any?
               - result.gap_reasons.each do |reason|
@@ -46,7 +43,7 @@
                   = reason
             - else
               .small.text-success.mt-2
-                %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                %i.bi.bi-calendar3.me-1{ aria: { hidden: true } }
                 = result.availability_label
     .d-flex.justify-content-end.mt-3
       = link_to "View All", profiles_path, class: "text-muted text-decoration-none fw-semibold"

@@ -105,7 +105,10 @@ class Usr::CompaniesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "#company_details_form[data-controller='company-mock-data']", count: 1
-    assert_select "button[type='button'][data-action='company-mock-data#fill']", text: /Fill with mock data/
+    assert_select "button[type='button'][data-action='company-mock-data#fill']", text: /Fill with mock data/ do
+      assert_select ".bi-database-add", count: 1
+      assert_select ".bi-magic", count: 0
+    end
   end
 
   test "new company form hides mock-data autofill from users without an owner assignment" do

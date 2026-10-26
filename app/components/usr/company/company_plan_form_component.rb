@@ -11,7 +11,7 @@ class Usr::Company::CompanyPlanFormComponent < ApplicationComponent
   TIER_PRESENTATION = {
     "starter" => { icon: "bi-rocket-takeoff", button: "btn-outline-primary" },
     "team" => { icon: "bi-people", button: "btn-primary", badge: "For growing teams" },
-    "studio" => { icon: "bi-stars", button: "btn-dark" }
+    "studio" => { icon: "bi-buildings", button: "btn-dark" }
   }.freeze
 
   def tier_key(plan)

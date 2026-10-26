@@ -66,7 +66,6 @@
                 = status_label(application)
             - if recommendation_for(application)
               .pipeline-recommendation{ data: { recommendation_reason: true } }
-                %i.bi.bi-stars{ aria: { hidden: true } }
                 %span= recommendation_summary(application)
             .pipeline-applicant-actions
               = link_to "View Application", usr_job_application_path(application), class: "btn btn-quiet btn-sm"

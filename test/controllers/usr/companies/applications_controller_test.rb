@@ -49,7 +49,7 @@ class Usr::Companies::ApplicationsControllerTest < ActionDispatch::IntegrationTe
       assert_select ".bi-stars", count: 1
     end
     assert_select "[data-pipeline-application='#{@application.id}'] [data-recommendation-reason]", text: /Matches Stage Manager/ do
-      assert_select ".bi-stars", count: 1
+      assert_select ".bi-stars", count: 0
     end
     assert_select "option[selected]", text: "Shortlisted"
   end

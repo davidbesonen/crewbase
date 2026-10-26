@@ -43,7 +43,10 @@ class Usr::Dashboard::CrewRecommendationsComponentTest < ViewComponent::TestCase
     assert rendered.css("[data-crew-recommendation]").all? { |recommendation| recommendation.text.scan("Tour Lighting").one? }
     assert_selector "a[href='/usr/profiles?recommended=1']", text: "View more people"
     assert_selector "h5 .bi-stars", count: 1
-    assert_selector "[data-crew-recommendation] .bi-stars", count: 6
+    assert_selector ".card .bi-stars", count: 1
+    assert_no_selector "[data-crew-recommendation] .bi-stars"
+    assert_selector "[data-crew-recommendation-rating] .bi-star-fill", count: 1
+    assert_selector "[data-crew-recommendation] .bi-calendar3", count: 2
   end
 
   test "prompts the owner to post a job when there are no active jobs" do
@@ -108,7 +111,7 @@ class Usr::Dashboard::CrewRecommendationsComponentTest < ViewComponent::TestCase
 
     assert rating_line
     assert_equal "4.7 / 5 rating, Available for job dates", rating_line.text.squish
-    assert_equal 1, rating_line.css(".bi-stars").length
+    assert_equal 1, rating_line.css(".bi-star-fill").length
   end
 
   test "keeps unconfirmed availability separate from the rating" do

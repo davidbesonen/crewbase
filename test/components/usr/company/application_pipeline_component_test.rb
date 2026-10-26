@@ -127,6 +127,8 @@ class Usr::Company::ApplicationPipelineComponentTest < ViewComponent::TestCase
 
     assert_selector ".pipeline-applicant .recommended-applicant-badge.text-bg-success", text: "Recommended Applicant"
     assert_selector ".pipeline-applicant [data-recommendation-reason]", text: "Matches Camera Operator • Available for all dates"
+    assert_selector ".pipeline-applicant .bi-stars", count: 1
+    assert_no_selector "[data-recommendation-reason] .bi-stars"
   end
 
   test "opens offer terms for a multi-position gig application" do

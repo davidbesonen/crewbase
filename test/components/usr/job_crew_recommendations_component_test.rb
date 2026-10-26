@@ -43,7 +43,10 @@ class Usr::JobCrewRecommendationsComponentTest < ViewComponent::TestCase
     assert_selector "a[href='/usr/profiles/41']", text: "Riley Crew"
     assert_selector "a[href='/usr/profiles?recommended=1']", text: "View All"
     assert_selector "h4 .bi-stars", count: 1
-    assert_selector "[data-job-crew-recommendation] .bi-stars", count: 5
+    assert_selector ".card .bi-stars", count: 1
+    assert_no_selector "[data-job-crew-recommendation] .bi-stars"
+    assert_selector "[data-job-crew-recommendation] .bi-star-fill", count: 1
+    assert_selector "[data-job-crew-recommendation] .bi-calendar3", count: 1
   end
 
   test "does not render an empty recommendation card" do

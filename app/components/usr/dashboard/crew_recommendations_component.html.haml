@@ -26,13 +26,12 @@
                     Near match
                 - if result.rating.present?
                   .small{ class: recommendation_rating_text_class(result.rating), data: { crew_recommendation_rating: true } }
-                    %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                    %i.bi.bi-star-fill.me-1{ aria: { hidden: true } }
                     = "#{result.rating} / 5 rating#{',' if availability_follows_rating?(result)}"
                     - if availability_follows_rating?(result)
                       %span.text-success.ms-2
                         = result.availability_label
               .small.mt-2
-                %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
                 = "#{match_reason_for(result)} for"
                 = link_to result.job.title, job_path(result.job), class: "text-dark fw-semibold"
               - if result.gap_reasons.any?
@@ -42,7 +41,7 @@
                     = reason
               - unless availability_follows_rating?(result) || result.gap_reasons.any?
                 .small.text-success.mt-1
-                  %i.bi.bi-stars.me-1{ aria: { hidden: true } }
+                  %i.bi.bi-calendar3.me-1{ aria: { hidden: true } }
                   = result.availability_label
       .mt-3
         = link_to "View more people", profiles_path, class: "text-muted text-decoration-none fw-semibold"

@@ -40,6 +40,8 @@ class Usr::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "audio_systems" ], profile.attributes["equipment_family_keys"]
     assert_equal "Live sound mixing", profile.skills_text
     get usr_profile_path(profile)
+    assert_select "#profile-about .bi-person-workspace", count: 1
+    assert_select "#profile-about .bi-stars", count: 0
     assert_select "#profile-skills", text: /Audio production/
     assert_select "#profile-skills", text: /Audio systems/
     get edit_usr_profile_path(profile), params: { source: "completed_profile" }
