@@ -64,4 +64,24 @@ class Usr::ExperienceCategoryFieldsComponentTest < ViewComponent::TestCase
     assert_selector "input[name='job[preferred_capability_keys][]'][value='planning'][checked]", visible: :all
     assert_no_selector "input[name='job[required_capability_keys][]'][value='planning'][checked]", visible: :all
   end
+
+  test "job suggestions start collapsed with selected experience still visible" do
+    job = Job.new(required_capability_keys: [ "audio" ])
+    render_inline Usr::ExperienceCategoryFieldsComponent.new(record: job, scope: :job)
+    assert_selector "details[data-category-picker]:not([open])", count: 4
+    assert_selector "[data-experience-categories-target='summary']", text: "Audio production"
+    assert_no_selector "input[type='search']"
+    assert_selector "summary [data-category-selected-count]", text: "1 selected"
+  end
+
+  test "profile choices stay expanded and invalid job choices open for correction" do
+    render_inline Usr::ExperienceCategoryFieldsComponent.new(record: Profile.new, scope: :profile)
+    assert_selector "details[data-category-picker][open]", count: 2
+
+    job = Job.new
+    job.errors.add(:preferred_capability_keys, "contains an unavailable choice")
+    render_inline Usr::ExperienceCategoryFieldsComponent.new(record: job, scope: :job)
+    assert_selector "details[data-category-picker][open]", count: 1
+    assert_text "contains an unavailable choice"
+  end
 end

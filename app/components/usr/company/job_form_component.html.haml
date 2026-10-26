@@ -158,12 +158,15 @@
           %p.text-muted Occupations already cover their core duties. Add any additional capabilities and equipment families this job needs. Required experience must match a person's occupations or selections; preferred experience helps rank matches.
           = experience_categories
         .col-12
-          %h5.fw-semibold Specific requirements (optional)
-          %p.text-muted.small Use these only when a particular technique, product or model matters. One entry per line. Required entries need matching named experience; a broad category alone will not satisfy them.
-          .row.g-3
-            - personal_requirement_fields.each do |field|
-              .col-md-6
-                = f.input field[:attribute], as: :text, label: field[:label], input_html: { rows: 4, maxlength: ExperienceTerms::MAX_TEXT_LENGTH, value: field[:value] }
+          %details.border.rounded.p-3{ open: specific_requirements_expanded?, data: { specific_requirements: true } }
+            %summary.fw-semibold Specific requirements (optional)
+            %p.text-muted.small.mt-3 Most roles only need the broad experience choices above. Add named techniques, products or models here only when those details matter.
+            %p.small Required entries filter job recommendations and flag gaps in recommended crew. Preferred entries improve ranking.
+            %p.text-muted.small One entry per line. Names must match experience on the person's profile, ignoring case and extra spaces. Alternate names and spellings are not matched automatically, and entries are not converted into broad categories.
+            .row.g-3
+              - personal_requirement_fields.each do |field|
+                .col-md-6
+                  = f.input field[:attribute], as: :text, label: field[:label], hint: field[:hint], placeholder: field[:placeholder], input_html: { rows: 2, maxlength: ExperienceTerms::MAX_TEXT_LENGTH, value: field[:value] }
         .col-12
           %label.form-label Screening Questions
           %p.text-muted.mb-2 Add custom screening questions for applicants. Use the plus button to add another question.

@@ -43,6 +43,7 @@ export default class extends Controller {
       coreSummary.hidden = !coreNames.length
       coreSummary.textContent = `Included through occupations: ${coreNames.join(", ")}`
       group.querySelector('[data-experience-categories-target="summary"]').textContent = names.join(", ") || "No categories selected"
+      group.querySelector("[data-category-selected-count]").textContent = `${selected.length} selected`
       const relevant = this.relevant?.[group.dataset.categoryType] || new Set()
       const primary = group.querySelector("[data-category-primary]")
       const other = group.querySelector("[data-category-other]")
@@ -56,8 +57,8 @@ export default class extends Controller {
       })
       group.querySelector('[data-category-section="other"]').hidden = other.children.length === 0
       group.querySelector("[data-category-guidance]").textContent = relevant.size
-        ? "Relevant to selected occupations and your selections"
-        : "All categories — select occupations to tailor choices"
+        ? "Suggested for selected occupations, plus your selections"
+        : "All choices — select occupations to tailor suggestions"
       this.filterGroup(group)
     })
   }

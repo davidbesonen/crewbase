@@ -45,7 +45,7 @@ class Usr::ExperienceCategoryFieldsComponent < ApplicationComponent
       primary, other = available.partition { |category| relevant.empty? || relevant.include?(category.key) || selected.include?(category.key) }
       primary.sort_by! { |category| relevant.index(category.key) || relevant.length }
       other.sort_by!(&:name)
-      { field:, type:, label: LABELS.fetch(field), selected:, redundant:,
+      { field:, type:, label: LABELS.fetch(field), selected:, redundant:, expanded: scope == "profile" || @record.errors[field].any?,
         core_names: ExperienceCategories.selected(type, ExperienceCategories.most_specific(type, core)).map(&:name),
         sections: { primary: primary, other: other }, tailored: relevant.any?,
         names: ExperienceCategories.selected(type, selected).map(&:name), errors: @record.errors.full_messages_for(field) }

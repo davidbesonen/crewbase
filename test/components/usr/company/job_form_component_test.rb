@@ -15,10 +15,30 @@ class Usr::Company::JobFormComponentTest < ViewComponent::TestCase
     assert_selector "[data-controller='taxonomy-multiselect']", count: 1
     assert_selector "select[name='job[required_occupation_ids][]'][multiple]", visible: false
     assert_selector "[data-taxonomy-multiselect-target='chip'][data-taxonomy-value='#{occupations(:one).id}']"
-    assert_selector "textarea[name='job[required_skills_text]']", text: "Pro Tools"
-    assert_selector "textarea[name='job[preferred_skills_text]']"
-    assert_selector "textarea[name='job[required_equipment_text]']"
-    assert_selector "textarea[name='job[preferred_equipment_text]']"
+    assert_selector "textarea[name='job[required_skills_text]']", text: "Pro Tools", visible: :all
+    assert_selector "textarea[name='job[preferred_skills_text]']", visible: :all
+    assert_selector "textarea[name='job[required_equipment_text]']", visible: :all
+    assert_selector "textarea[name='job[preferred_equipment_text]']", visible: :all
     assert_no_selector "select[name='job[required_skill_ids][]']", visible: false
+  end
+
+  test "empty specific requirements are collapsed and explain their matching consequences" do
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job: Job.new, entitlement: Entitlement.new(true))
+    assert_selector "details[data-specific-requirements]:not([open])"
+    assert_no_selector "textarea[name='job[required_skills_text]']"
+    assert_selector "[data-specific-requirements]", text: "Required entries filter job recommendations", visible: :all
+    assert_selector "[data-specific-requirements]", text: "Preferred entries improve ranking", visible: :all
+    assert_selector "[data-specific-requirements]", text: "Alternate names and spellings are not matched automatically", visible: :all
+  end
+
+  test "existing or invalid specific requirements are expanded" do
+    job = Job.new(preferred_equipment_text: "Vectorworks")
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job:, entitlement: Entitlement.new(true))
+    assert_selector "details[data-specific-requirements][open] textarea", text: "Vectorworks"
+
+    job.preferred_equipment_text = ""
+    job.errors.add(:required_skills_text, "has too many entries")
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job:, entitlement: Entitlement.new(true))
+    assert_selector "details[data-specific-requirements][open]"
   end
 end

@@ -31,9 +31,21 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     end
     assert_selector "trix-editor figure.attachment"
     assert_no_selector "trix-editor progress"
-    check "job_required_capability_keys_coordination"
+    assert_selector "details[data-category-picker]:not([open])", count: 4
+    within("fieldset", text: "Required capabilities") do
+      find("[data-category-picker] > summary").click
+      fill_in "Search required capabilities", with: "coordination"
+      assert_text "matching choices"
+      check "job_required_capability_keys_coordination"
+      assert_text "1 selected"
+      fill_in "Search required capabilities", with: ""
+      find("[data-category-picker] > summary").click
+      assert_selector "[data-experience-categories-target='summary']", text: "Client & vendor coordination"
+    end
     fill_in "Required occupations", with: occupation.name
     find("#job_required_occupation_ids_option_#{occupation.id}").click
+    assert_selector "details[data-category-picker]:not([open])", count: 4
+    find("[data-specific-requirements] > summary").click
     fill_in "Required skills", with: "Tour advancing"
     fill_in "Preferred equipment", with: "Wireless Workbench"
     find("input[name='job[questions][]']").set("Can you travel?")

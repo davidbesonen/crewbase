@@ -58,13 +58,25 @@ class Usr::Company::JobFormComponent < ApplicationComponent
   end
 
   def personal_requirement_fields
-    requirements = JobExperienceRequirements.new(job)
-    JobExperienceRequirements::TEXT_FIELDS.keys.map do |attribute|
-      { attribute: attribute, label: attribute.to_s.delete_suffix("_text").humanize, value: requirements.names_for(attribute).join("\n") }
-    end
+    @personal_requirement_fields ||= build_personal_requirement_fields
+  end
+
+  def specific_requirements_expanded?
+    personal_requirement_fields.any? { |field| field[:value].present? || job.errors[field[:attribute]].any? }
   end
 
   private
+
+  def build_personal_requirement_fields
+    requirements = JobExperienceRequirements.new(job)
+    JobExperienceRequirements::TEXT_FIELDS.keys.map do |attribute|
+      type, importance = JobExperienceRequirements::TEXT_FIELDS.fetch(attribute)
+      { attribute: attribute, label: attribute.to_s.delete_suffix("_text").humanize,
+        value: requirements.names_for(attribute).join("\n"),
+        placeholder: type == "Skill" ? "One named technique or service per line" : "One product, tool or software name per line",
+        hint: importance == "required" ? "Must-have named experience. Use sparingly to avoid excluding suitable crew." : "Nice-to-have named experience. Leave room for transferable experience." }
+    end
+  end
 
   def taxonomy_requirement_field(type, importance, label, collection)
     attribute = "#{importance}_#{type}_ids"
