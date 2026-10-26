@@ -67,9 +67,9 @@ class ColorAccentsTest < ActiveSupport::TestCase
     refute_match(/gradient/, hero_rule[:body])
   end
 
-  test "application background uses a soft blue gradient behind cards" do
-    assert_match(/^body\s*\{[^}]*background:.*radial-gradient/m, @application_stylesheet)
-    assert_match(/^body\s*\{[^}]*linear-gradient/m, @application_stylesheet)
-    assert_match(/^body\s*\{[^}]*background-attachment: fixed/m, @application_stylesheet)
+  test "application shell keeps the new brand surface quiet behind content" do
+    body_rule = @application_stylesheet.match(/^body\s*\{(?<body>.*?)\}/m)
+    assert body_rule
+    refute_match(/gradient/, body_rule[:body])
   end
 end

@@ -1,9 +1,9 @@
 .container.py-5
   .mx-auto{ style: "max-width: 820px;" }
     = link_to root_path, class: "d-inline-block mb-4" do
-      = render Shared::CrewbaseLogoTextComponent.new
+      = render Shared::BrandWordmarkComponent.new
     %p.text-uppercase.text-muted.small.fw-semibold Product updates
-    %h1.fw-bold What’s new at Crewbase
+    %h1.fw-bold What’s new at KnowShow
     %p.lead.text-muted.mb-5 Straightforward notes about improvements that help crew members and production teams.
     - @change_log_entries.each do |entry|
       %article.card.border-0.shadow-sm.mb-3

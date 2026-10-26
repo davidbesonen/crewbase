@@ -4,18 +4,18 @@ class Marketing::HomepageComponentTest < ViewComponent::TestCase
   test "presents the product story and visitor call to action" do
     render_inline(
       Marketing::HomepageComponent.new(
-        primary_cta_label: "Join Crewbase",
+        primary_cta_label: "Join KnowShow",
         primary_cta_path: "/users/sign_up",
         show_auth_links: true
       )
-    ) { |homepage| homepage.with_brand { "Crewbase" } }
+    ) { |homepage| homepage.with_brand { "KnowShow" } }
 
     assert_selector "main[data-marketing-homepage][data-controller~='marketing-motion']"
     assert_selector "[data-marketing-motion-target~='reveal']", minimum: 12
     assert_selector "[data-marketing-motion-target~='parallax']", minimum: 1
     assert_selector "[data-marketing-motion-stagger]", minimum: 6
     assert_selector "nav[aria-label='Primary navigation']"
-    assert_selector "a[href='/users/sign_up']", text: "Join Crewbase", minimum: 2
+    assert_selector "a[href='/users/sign_up']", text: "Join KnowShow", minimum: 2
     assert_selector "a[href='/users/sign_in']", text: /Sign in/
     assert_selector "#how-it-works article", count: 3
     assert_selector "#how-it-works h3", text: "Confirm bookings together"

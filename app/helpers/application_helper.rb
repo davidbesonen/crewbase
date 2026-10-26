@@ -3,14 +3,14 @@ module ApplicationHelper
     current_user && (current_user.onboarding_completed_at.present? || current_user.has_completed_user_profile?)
   end
 
-  def crewbase_credit_badge(variant: :blue, compact: false)
-    classes = [ "crewbase-credit-badge", "crewbase-credit-badge-#{variant}" ]
+  def knowshow_credit_badge(variant: :blue, compact: false)
+    classes = [ "knowshow-credit-badge", "knowshow-credit-badge-#{variant}" ]
     options = { class: classes.join(" ") }
-    options[:aria] = { label: "Verified Crewbase Credit" } if compact
+    options[:aria] = { label: "Verified KnowShow Credit" } if compact
 
     content_tag(:span, **options) do
-      image_tag("crewbase-credit-badge-#{variant}.svg", alt: "", aria: { hidden: true }) +
-        (compact ? "" : "Crewbase Credit")
+      image_tag("knowshow-credit-badge-#{variant}.svg", alt: "", aria: { hidden: true }) +
+        (compact ? "" : "KnowShow Credit")
     end
   end
 

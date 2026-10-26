@@ -1,5 +1,5 @@
 // Bootstrap handles native controls and semantic alerts. These tokens and
-// overrides cover Crewbase's custom surfaces and legacy light-only utilities.
+// overrides cover KnowShow's custom surfaces and legacy light-only utilities.
 .theme-picker {
   display: inline-flex;
   align-items: center;
@@ -12,34 +12,34 @@
 
 [data-bs-theme="dark"] {
   color-scheme: dark;
-  --bs-body-bg: #111c2a;
-  --bs-body-bg-rgb: 17, 28, 42;
+  --bs-body-bg: #090d16;
+  --bs-body-bg-rgb: 9, 13, 22;
   --bs-body-color: #e1eaf3;
   --bs-body-color-rgb: 225, 234, 243;
   --bs-emphasis-color: #f3f7fb;
   --bs-emphasis-color-rgb: 243, 247, 251;
   --bs-secondary-color: #a6b8cb;
   --bs-secondary-color-rgb: 166, 184, 203;
-  --bs-secondary-bg: #172434;
-  --bs-secondary-bg-rgb: 23, 36, 52;
-  --bs-tertiary-bg: #203247;
-  --bs-tertiary-bg-rgb: 32, 50, 71;
-  --bs-border-color: #3a4e64;
+  --bs-secondary-bg: #111827;
+  --bs-secondary-bg-rgb: 17, 24, 39;
+  --bs-tertiary-bg: #1b2537;
+  --bs-tertiary-bg-rgb: 27, 37, 55;
+  --bs-border-color: #2b3951;
   --bs-border-color-translucent: rgba(110, 139, 169, .3);
-  --bs-primary: #9bc9ef;
-  --bs-light: #203247;
-  --bs-link-color: #9bc9ef;
-  --bs-link-color-rgb: 155, 201, 239;
+  --bs-primary: #95bbff;
+  --bs-light: #1b2537;
+  --bs-link-color: #95bbff;
+  --bs-link-color-rgb: 149, 187, 255;
   --bs-link-hover-color: #c8e5ff;
   --bs-link-hover-color-rgb: 200, 229, 255;
-  --app-surface-navy: #203247;
+  --app-surface-navy: #1b2537;
   --app-surface-cyan: #18353e;
   --app-surface-sky: #1d344a;
   --app-ink-navy: #b1d1ec;
   --app-ink-cyan: #93d4df;
   --app-ink-sky: #a0ceef;
 
-  body { background: radial-gradient(ellipse at 85% 0%, #1a3045 0%, transparent 55%), var(--bs-body-bg); }
+  body { background: var(--bs-body-bg); }
   .card, .pipeline-workspace, .conversation-thread, .conversation-list-item,
   .dashboard-quick-search, #dashboard-quick-search-results {
     background: var(--bs-secondary-bg);
@@ -76,7 +76,7 @@
     --bs-table-striped-bg: #1d2d40;
     --bs-table-striped-color: var(--bs-body-color);
   }
-  .table > thead { --bs-table-bg: #203247; --bs-table-color: #bfd0e2; }
+  .table > thead { --bs-table-bg: #1b2537; --bs-table-color: #bfd0e2; }
   .form-control, .form-select, .input-group-text, trix-editor {
     background-color: var(--bs-body-bg);
     color: var(--bs-body-color);
@@ -104,7 +104,7 @@
     border-color: var(--bs-border-color);
     &:hover, &:focus-visible, &:active { background: var(--bs-tertiary-bg); color: var(--bs-emphasis-color); border-color: #779bbd; }
   }
-  @each $kind, $ink in (primary: #9bc9ef, secondary: #b3c7db, danger: #f5a9b4, success: #93d5b6, info: #91d2e0, warning: #edcc87) {
+  @each $kind, $ink in (primary: #95bbff, secondary: #b3c7db, danger: #f5a9b4, success: #93d5b6, info: #91d2e0, warning: #edcc87) {
     .btn-outline-#{$kind} {
       color: $ink;
       border-color: $ink;
@@ -152,7 +152,7 @@
   .message-bubble-received { background: var(--bs-secondary-bg); color: var(--bs-body-color); border-color: var(--bs-border-color); }
   .message-composer { border-color: var(--bs-border-color); }
   .conversation-list-item:hover { background: var(--bs-tertiary-bg); }
-  .dashboard .profile-completion-wheel { background: conic-gradient(#9bc9ef var(--profile-completion), #30455b 0); }
+  .dashboard .profile-completion-wheel { background: conic-gradient(#95bbff var(--profile-completion), #30455b 0); }
   .dashboard .profile-completion-wheel__center { color: var(--bs-primary); }
   .profile-show #profile-skills .text-bg-primary { color: var(--bs-primary) !important; background-color: var(--bs-tertiary-bg) !important; border-color: var(--bs-border-color); }
   .company-plan-card--team, .company-plan-card--studio { background: var(--bs-secondary-bg); }
@@ -169,7 +169,7 @@
   .flatpickr-day, .flatpickr-weekday { color: var(--bs-body-color); }
   .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay, .flatpickr-day.flatpickr-disabled { color: #7e91a5; }
   .flatpickr-day:hover { background: var(--bs-tertiary-bg); border-color: var(--bs-border-color); }
-  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #315f86; border-color: #9bc9ef; color: #fff; }
+  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #315f86; border-color: #95bbff; color: #fff; }
   .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month { fill: var(--bs-body-color); color: var(--bs-body-color); }
 }
 
@@ -178,32 +178,7 @@
     background: var(--bs-secondary-bg); color: var(--bs-primary); border-color: var(--bs-border-color);
     &:hover, &:focus-visible { background: var(--bs-tertiary-bg); color: var(--bs-link-hover-color); }
   }
-  .marketing-home {
-    --marketing-navy: #a6d2ed;
-    --marketing-navy-deep: #e0edf7;
-    --marketing-sky: #243e52;
-    --marketing-ice: #142333;
-    --marketing-ink: #e1eaf3;
-    --marketing-muted: #aec1d0;
-    background: var(--bs-body-bg);
-  }
-  .marketing-nav, .marketing-eyebrow, .marketing-product-preview, .marketing-crew-row,
-  .marketing-trust-strip, .marketing-step, .marketing-feature, .marketing-team-member {
-    background: var(--bs-secondary-bg); border-color: var(--bs-border-color);
-  }
-  .marketing-hero::before, .marketing-hero::after { opacity: .1; }
-  .marketing-proof, .marketing-trust-strip__items, .marketing-preview-note { color: var(--bs-secondary-color); }
-  .marketing-preview-note, .marketing-avatar, .marketing-team-member__placeholder { background: var(--bs-tertiary-bg); color: var(--bs-body-color); }
-  .marketing-product-preview__topbar { border-color: var(--bs-border-color); }
-  .marketing-team-member__media, .marketing-team-member__placeholder span { background: var(--bs-tertiary-bg); }
-  .marketing-crew-row__copy span { color: var(--bs-secondary-color); }
-  .marketing-crew-reason { color: #93d5b6; }
-  .marketing-live-pill { background: #203c38; color: #93d5b6; }
-  .marketing-audience-icon { color: #112b3c; }
-  .marketing-audience-icon--navy, .marketing-flow span { background: #294a65; color: #e1eaf3; }
-  .marketing-price-card--featured, .marketing-price-card__badge, .marketing-founder-offer { background: #274761; color: #fff; }
-  .marketing-cta, .marketing-footer, .marketing-platform { --marketing-navy-deep: #0b2436; }
-  .marketing-tag-row span, .marketing-signal-list span { border-color: var(--bs-border-color); }
+
 }
 
 @media (max-width: 575.98px) {

@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   post "stripe/webhooks", to: "stripe_webhooks#create", as: :stripe_webhook
 
   root "marketing#show"
+  get "welcome", to: "marketing#preview", as: :welcome
+  get "brand", to: "marketing#brand", as: :brand_directions
   get "meet-the-team", to: "marketing#team", as: :meet_the_team
   get "job-postings/:id", to: "public_job_postings#show", as: :public_job_posting
   get "job-invitations/:token", to: "public_job_invitations#show", as: :public_job_invitation

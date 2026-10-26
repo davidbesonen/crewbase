@@ -5,7 +5,7 @@ class CreateUserSubscriptionCheckoutTest < ActiveSupport::TestCase
   UserRecord = Data.define(:id, :email)
 
   test "creates a hosted subscription checkout for the requested billing interval" do
-    plan = Plan.new(id: 9, name: "Crewbase Pro", stripe_monthly_price_id: "price_pro_monthly", stripe_annual_price_id: "price_pro_annual")
+    plan = Plan.new(id: 9, name: "KnowShow Pro", stripe_monthly_price_id: "price_pro_monthly", stripe_annual_price_id: "price_pro_annual")
     user = UserRecord.new(id: 12, email: "crew@example.com")
     session = Data.define(:url).new(url: "https://checkout.stripe.com/session")
     gateway = Class.new do
@@ -36,7 +36,7 @@ class CreateUserSubscriptionCheckoutTest < ActiveSupport::TestCase
   end
 
   test "rejects checkout when the Stripe price has not been configured" do
-    plan = Plan.new(id: 9, name: "Crewbase Pro", stripe_monthly_price_id: nil, stripe_annual_price_id: nil)
+    plan = Plan.new(id: 9, name: "KnowShow Pro", stripe_monthly_price_id: nil, stripe_annual_price_id: nil)
     user = UserRecord.new(id: 12, email: "crew@example.com")
 
     result = CreateUserSubscriptionCheckout.new(
@@ -54,7 +54,7 @@ class CreateUserSubscriptionCheckoutTest < ActiveSupport::TestCase
   test "rejects unsupported billing intervals" do
     result = CreateUserSubscriptionCheckout.new(
       user: UserRecord.new(id: 12, email: "crew@example.com"),
-      plan: Plan.new(id: 9, name: "Crewbase Pro", stripe_monthly_price_id: nil, stripe_annual_price_id: nil),
+      plan: Plan.new(id: 9, name: "KnowShow Pro", stripe_monthly_price_id: nil, stripe_annual_price_id: nil),
       billing_interval: "weekly",
       success_url: "https://crewbase.test/success",
       cancel_url: "https://crewbase.test/cancel"

@@ -4,7 +4,7 @@ class PublicJobInvitationsController < ApplicationController
 
   def show
     @marketing_page = true
-    @page_title = "Invitation to apply for #{@invitation.job.title} | Crewbase"
+    @page_title = "Invitation to apply for #{@invitation.job.title} | KnowShow"
     session[:return_to_after_auth] = public_job_invitation_path(@invitation.token) unless current_user
   end
 

@@ -4,11 +4,11 @@
       %div
         .profile-credits-heading.d-flex.align-items-center.gap-2
           .profile-credits-heading__icon
-            = helpers.crewbase_credit_badge(variant: :blue, compact: true)
-          %h5.card-section-title.fw-bold.mb-0 Crewbase Credits
+            = helpers.knowshow_credit_badge(variant: :blue, compact: true)
+          %h5.card-section-title.fw-bold.mb-0 KnowShow Credits
           %span.badge.rounded-pill.text-bg-light.border{ data: { profile_credit_count: true } }
             = "#{helpers.pluralize(credits.size, "credit")} earned"
-        %p.text-muted.mb-0 Work credits distinguish verified Crewbase gigs from self-reported experience.
+        %p.text-muted.mb-0 Work credits distinguish verified KnowShow gigs from self-reported experience.
       - if owner_view && !visible
         %span.badge.text-bg-light.border Hidden from others
     - if credits.any?
@@ -28,7 +28,7 @@
               .text-md-end
                 %span.badge.text-bg-light.border.rounded-pill= credit.display_dates
                 - if credit.verified?
-                  .mt-2= helpers.crewbase_credit_badge(variant: :blue)
+                  .mt-2= helpers.knowshow_credit_badge(variant: :blue)
                 - else
                   .mt-2
                     %span.badge.text-bg-light.border Self-reported
@@ -38,4 +38,4 @@
             - if credit.description.present?
               %p.text-muted.mt-2.mb-0= credit.description
     - else
-      %p.text-muted.mt-3.mb-0 Complete jobs through Crewbase to earn verified credits.
+      %p.text-muted.mt-3.mb-0 Complete jobs through KnowShow to earn verified credits.

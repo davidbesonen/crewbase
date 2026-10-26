@@ -197,7 +197,7 @@
               - @recent_notifications.each do |notification|
                 .pb-3.border-bottom
                   - if notification.kind == "crewbase_credit_earned"
-                    = crewbase_credit_badge(variant: :neutral, compact: true)
+                    = knowshow_credit_badge(variant: :neutral, compact: true)
                   %p.mb-1= notification.message
                   %p.text-muted.small.mb-0= l(notification.created_at.to_date, format: :long)
             .mt-3

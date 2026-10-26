@@ -21,7 +21,7 @@ class Usr::BillingControllerTest < ActionDispatch::IntegrationTest
       stripe_monthly_price_id: "price_monthly",
       stripe_annual_price_id: "price_annual",
       data: {
-        included: [ "Support Crewbase through its beta" ],
+        included: [ "Support KnowShow through its beta" ],
         roadmap: [ "Application insights" ]
       }
     )

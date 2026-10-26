@@ -151,7 +151,7 @@ class Usr::NotificationsControllerTest < ActionDispatch::IntegrationTest
     get usr_notifications_path
 
     assert_select "[data-notification-id='#{notification.id}']" do
-      assert_select ".crewbase-credit-badge-blue", text: /Crewbase Credit/
+      assert_select ".knowshow-credit-badge-blue", text: /KnowShow Credit/
       assert_select "a.notification-action-link[href='#{edit_usr_profile_path(profile, source: "completed_profile", anchor: "credits_form")}']", text: /Review profile credit settings/
       assert_select "a.btn", text: /Review profile credit settings/, count: 0
     end

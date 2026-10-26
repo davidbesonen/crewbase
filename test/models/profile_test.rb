@@ -59,7 +59,7 @@ class ProfileTest < ActiveSupport::TestCase
     profile.update!(bio: "Experienced production professional.")
     assert_equal 65, profile.completion_percentage
 
-    profile.experiences.create!(title: "Audio Engineer", company_name: "Crewbase")
+    profile.experiences.create!(title: "Audio Engineer", company_name: "KnowShow")
     assert_equal 80, profile.completion_percentage
 
     profile.update!(website_url: "https://example.com")

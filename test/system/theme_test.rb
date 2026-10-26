@@ -40,8 +40,8 @@ class ThemeTest < ApplicationSystemTestCase
     click_link user.full_name
     assert_selector "textarea"
     assert_selector "html[data-bs-theme='dark']"
-    assert_equal "rgb(23, 36, 52)", page.evaluate_script("getComputedStyle(document.querySelector('.card')).backgroundColor")
-    assert_equal "rgb(17, 28, 42)", page.evaluate_script("getComputedStyle(document.querySelector('textarea')).backgroundColor")
+    assert_equal "rgb(17, 24, 39)", page.evaluate_script("getComputedStyle(document.querySelector('.card')).backgroundColor")
+    assert_equal "rgb(9, 13, 22)", page.evaluate_script("getComputedStyle(document.querySelector('textarea')).backgroundColor")
     page.save_screenshot("/private/tmp/crewbase-dark-admin.png")
     click_link "Workspace", exact: true
     assert_current_path usr_dashboards_path

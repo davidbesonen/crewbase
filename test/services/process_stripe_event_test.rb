@@ -96,7 +96,7 @@ class ProcessStripeEventTest < ActiveSupport::TestCase
 
   test "synchronizes crew premium subscription metadata" do
     user = User.create!(first_name: "Crew", last_name: "Premium", email: "crew-premium-webhook@example.com", password: "password123")
-    user_plan = UserPlan.create!(name: "Crewbase Pro", slug: "crewbase-pro-webhook", monthly_price_cents: 700, annual_price_cents: 7_000, stripe_monthly_price_id: "price_crew_monthly")
+    user_plan = UserPlan.create!(name: "KnowShow Pro", slug: "crewbase-pro-webhook", monthly_price_cents: 700, annual_price_cents: 7_000, stripe_monthly_price_id: "price_crew_monthly")
     event = stripe_event(
       id: "evt_crew_subscription",
       type: "customer.subscription.created",

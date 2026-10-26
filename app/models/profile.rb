@@ -98,7 +98,7 @@ class Profile < ApplicationRecord
   end
 
   def formatted_headline
-    self.headline.presence || self.occupations.limit(2).pluck(:name).to_sentence.presence || "Crewbase Member"
+    self.headline.presence || self.occupations.limit(2).pluck(:name).to_sentence.presence || "KnowShow Member"
   end
 
   def formatted_location

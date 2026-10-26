@@ -5,7 +5,7 @@
         %button.btn.btn-quiet.btn-icon.btn-sm.d-lg-none{ type: "button", data: { bs_toggle: "offcanvas", bs_target: "#userSidenav" }, aria: { controls: "userSidenav", label: "Open menu" } }
           %i.bi.bi-list
       = link_to usr_dashboards_path, class: "navbar-brand" do
-        = render Shared::CrewbaseLogoTextComponent.new
+        = render Shared::BrandWordmarkComponent.new
     .d-flex.align-items-center.gap-3
       = render Shared::ThemePickerComponent.new
       .dropdown

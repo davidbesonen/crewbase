@@ -16,7 +16,7 @@ class Usr::CreditsControllerTest < ActionDispatch::IntegrationTest
     sign_in @user, scope: :user
   end
 
-  test "profile owner cannot manually create a Crewbase Credit" do
+  test "profile owner cannot manually create a KnowShow Credit" do
     assert_no_difference "@profile.credits.count" do
       post usr_profile_credits_path(@profile), params: {
         credit: {

@@ -6,6 +6,7 @@ class Marketing::HomepageComponent < ApplicationComponent
   option :primary_cta_label
   option :primary_cta_path
   option :show_auth_links
+  option :brand_concept, default: proc { "signal" }
 
   renders_one :brand
   renders_one :appearance

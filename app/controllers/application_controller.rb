@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   def set_page_title
-    @page_title = "#{current_user ? current_user.full_name : 'Welcome'} | Crewbase"
+    @page_title = "#{current_user ? current_user.full_name : 'Welcome'} | KnowShow"
   end
 
   def current_profile

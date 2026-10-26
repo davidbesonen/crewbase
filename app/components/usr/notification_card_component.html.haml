@@ -37,7 +37,7 @@
             = link_to "View shared job", helpers.usr_network_job_share_path(notification.notifiable), class: "notification-action-link"
         - if notification.kind == "crewbase_credit_earned" && notification.notifiable_type == "Credit"
           .notification-card__actions.d-flex.align-items-center.flex-wrap.gap-3.mt-3
-            = helpers.crewbase_credit_badge(variant: :blue)
+            = helpers.knowshow_credit_badge(variant: :blue)
             = link_to "Review profile credit settings",
               helpers.edit_usr_profile_path(notification.notifiable.profile_id, source: "completed_profile", anchor: "credits_form"),
               class: "notification-action-link"

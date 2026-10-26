@@ -15,7 +15,7 @@ class QuickStartTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
     assert_redirected_to "/usr/onboarding"
     follow_redirect!
-    assert_select "h1", text: "What brings you to Crewbase?"
+    assert_select "h1", text: "What brings you to KnowShow?"
     assert_select "input[name='onboarding[intent]']", count: 3
   end
 

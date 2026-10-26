@@ -480,7 +480,7 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     profile.occupations << Occupation.create!(name: "Dashboard Complete Occupation")
     profile.skills << Skill.create!(name: "Dashboard Complete Skill")
     profile.update!(bio: "A complete profile.", website_url: "https://example.com")
-    profile.experiences.create!(title: "Audio Engineer", company_name: "Crewbase")
+    profile.experiences.create!(title: "Audio Engineer", company_name: "KnowShow")
     profile.calendar_events.create!(
       event_type: "blockout",
       provider: "manual",

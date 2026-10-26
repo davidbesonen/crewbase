@@ -35,7 +35,7 @@ class Admin::OperationalReadiness
   def configured?(keys)
     keys.all? do |key|
       value = environment[key].to_s
-      value.present? && !value.include?("example.com") && !value.include?("crewbase.invalid")
+      value.present? && !value.include?("example.com") && !value.include?("crewbase.invalid") && !value.include?("knowshow.invalid")
     end
   end
 

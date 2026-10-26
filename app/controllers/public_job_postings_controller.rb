@@ -7,7 +7,7 @@ class PublicJobPostingsController < ApplicationController
       .find(params[:id])
     @experience_requirements = JobExperienceRequirements.new(@job).entries
     @marketing_page = true
-    @page_title = "#{@job.title} at #{@job.company.name} | Crewbase"
+    @page_title = "#{@job.title} at #{@job.company.name} | KnowShow"
     session[:return_to_after_auth] = public_job_posting_path(@job) unless current_user
   end
 end

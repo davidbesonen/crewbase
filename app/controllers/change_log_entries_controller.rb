@@ -4,6 +4,6 @@ class ChangeLogEntriesController < ApplicationController
   def index
     @change_log_entries = ChangeLogEntry.published
     @marketing_page = true
-    @page_title = "What's new | Crewbase"
+    @page_title = "What's new | KnowShow"
   end
 end

@@ -1,6 +1,6 @@
 - content_for :hide_default_footer, "true"
-= render Marketing::HomepageComponent.new(primary_cta_label: @primary_cta_label, primary_cta_path: @primary_cta_path, show_auth_links: current_user.blank?) do |homepage|
+= render Marketing::HomepageComponent.new(primary_cta_label: @primary_cta_label, primary_cta_path: @primary_cta_path, show_auth_links: current_user.blank?, brand_concept: @brand_concept) do |homepage|
   - homepage.with_brand do
-    = render Shared::CrewbaseLogoTextComponent.new
+    = render Shared::BrandWordmarkComponent.new(concept: @brand_concept)
   - homepage.with_appearance do
     = render Shared::ThemePickerComponent.new

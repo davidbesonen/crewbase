@@ -54,11 +54,11 @@
         .col-sm-12
           %p.form-label.mb-1 Industry
           %p.fw-semibold.mb-1{ data: { touring_industry: true } }= TouringCatalog.industry_name
-          %p.form-text Crewbase currently connects crew, musicians and companies working in live music touring.
+          %p.form-text KnowShow currently connects crew, musicians and companies working in live music touring.
         .col-sm-3
           = f.input :founded_at, as: :string, label: "Founded", input_html: { type: "date" }
         .col-sm-12
-          = f.input :is_public, as: :boolean, label: "Make Company Profile Public", hint: "If checked, your company profile will be visible to others on Crewbase."
+          = f.input :is_public, as: :boolean, label: "Make Company Profile Public", hint: "If checked, your company profile will be visible to others on KnowShow."
   .card.border-0.shadow-sm.mt-3
     .card-body
       %details.mb-4

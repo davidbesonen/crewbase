@@ -10,7 +10,7 @@ class Usr::Network::PersonComponent < ApplicationComponent
   attr_reader :profile, :credits, :connection
 
   def subtitle
-    profile.headline.presence || profile.occupations.map(&:name).first(3).join(" · ").presence || "Crewbase member"
+    profile.headline.presence || profile.occupations.map(&:name).first(3).join(" · ").presence || "KnowShow member"
   end
 
   def location

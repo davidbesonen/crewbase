@@ -13,7 +13,7 @@ class Usr::ProfileExperienceFormLayoutTest < ActionDispatch::IntegrationTest
       password: "password123"
     )
     @profile = @user.profiles.create!(profile_type: "user", completed_at: Time.current)
-    @profile.experiences.create!(title: "Audio Engineer", company_name: "Crewbase")
+    @profile.experiences.create!(title: "Audio Engineer", company_name: "KnowShow")
     sign_in @user, scope: :user
   end
 

@@ -252,7 +252,7 @@ class Usr::ProfilesController < ApplicationController
     @capability_names = @profile.capability_names
     @equipment_family_names = @profile.equipment_family_names
     @profile_name = @profile.user.full_name
-    @profile_headline = @profile.headline.presence || @profile.occupations.limit(2).pluck(:name).to_sentence.presence || "Crewbase Member"
+    @profile_headline = @profile.headline.presence || @profile.occupations.limit(2).pluck(:name).to_sentence.presence || "KnowShow Member"
     @location_text = [ primary_location&.city, primary_location&.state ].compact_blank.join(", ").presence || primary_location&.country.presence || "Location not listed"
     @about_items = [
       { icon: "bi-stars", label: "Open to roles", value: @profile_occupation_names.presence || "Add target roles" },

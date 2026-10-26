@@ -5,18 +5,42 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
 
   self.fixture_table_names = []
 
-  test "homepage explains Crewbase to visitors and offers clear account actions" do
+  test "KnowShow identity reaches public pages and metadata" do
+    [ root_path, new_user_session_path, new_user_registration_path, meet_the_team_path ].each do |path|
+      get path
+      assert_response :success
+      assert_select "title", text: /KnowShow/
+      assert_select "[aria-label='KnowShow']", minimum: 1
+      assert_select "meta[property='og:title'][content*='KnowShow']"
+      assert_select "link[rel='icon'][href*='icon.svg']"
+      assert_no_match(/Crewbase|crewbase/i, response.body)
+    end
+  end
+
+  test "logo review presents four portable directions and a real site preview" do
+    get "/brand"
+    assert_response :success
+    assert_select "[data-brand-direction]", count: 4
+    assert_select "a[href*='/welcome?concept=']", count: 4
+    assert_select "a[download][href$='.svg']", minimum: 4
+    get "/welcome", params: { concept: "afterhours" }
+    assert_response :success
+    assert_select "main[data-brand-concept='afterhours']"
+    assert_select "img[src*='knowshow-afterhours-on-dark']", minimum: 1
+  end
+
+  test "homepage explains KnowShow to visitors and offers clear account actions" do
     get root_path
 
     assert_response :success
-    assert_select "title", text: /Crewbase.*Live event teams/
+    assert_select "title", text: /KnowShow.*live music touring/
     assert_select "main[data-marketing-homepage]"
     assert_select ".app-content [data-marketing-homepage]", count: 0
     assert_select "body.vh-100", count: 0
     assert_select "#userSidenav", count: 0
     assert_select "nav.navbar", count: 0
-    assert_select "h1", text: /Build the right crew/
-    assert_select "a[href='#{new_user_registration_path}']", text: /Join Crewbase/
+    assert_select "h1", text: /Know your crew/
+    assert_select "a[href='#{new_user_registration_path}']", text: /Join KnowShow/
     assert_select "a[href='#{new_user_session_path}']", text: /Sign in/
     assert_select "#how-it-works"
     assert_select "#for-crew"
@@ -68,7 +92,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
       assert_select "[data-team-placeholder]"
       assert_select "h2", text: "Dayne deHaven"
       assert_select "*", text: /Co-Founder, Lighting Designer and Production Company Owner/
-      assert_select "*", text: /came up with the idea for Crewbase/i
+      assert_select "*", text: /came up with the idea for KnowShow/i
       assert_select "*", text: /Twenty One Pilots and Jon Bellion/
     end
   end
@@ -83,8 +107,8 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_select "meta[name='description'][content*='live event']"
-    assert_select "meta[property='og:description'][content*='live event']"
-    assert_select "meta[name='twitter:description'][content*='live event']"
+    assert_select "meta[name='description'][content*='touring']"
+    assert_select "meta[property='og:description'][content*='touring']"
+    assert_select "meta[name='twitter:description'][content*='touring']"
   end
 end

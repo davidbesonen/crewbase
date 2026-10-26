@@ -2,7 +2,7 @@
   .d-flex.justify-content-between.align-items-center.flex-wrap.gap-3.mb-3
     %div
       %h4.fw-semibold.mb-1 Experience Timeline
-      %p.text-muted.mb-0 Add significant, longer-term roles. Completed Crewbase gigs are added automatically as verified Credits.
+      %p.text-muted.mb-0 Add significant, longer-term roles. Completed KnowShow gigs are added automatically as verified Credits.
     %button.btn.btn-outline-primary{ type: "button", data: { action: "nested-experience-fields#add" } }
       %i.bi.bi-plus-lg.me-1
       Add Experience
@@ -70,7 +70,7 @@
       .border.rounded-3.p-3.mb-3{ data: { experience_fields_wrapper: true, new_record: experience_fields.object.new_record?.to_s } }
         - if overlapping_credits(experience_fields.object).any?
           .alert.alert-warning.py-2{ role: "status" }
-            This role overlaps a verified Crewbase Credit from the same company and year. Keep it only if it represents a distinct, significant engagement.
+            This role overlaps a verified KnowShow Credit from the same company and year. Keep it only if it represents a distinct, significant engagement.
             = link_to "Review credits", "#credits_form", class: "alert-link ms-1"
         = experience_fields.input :id, as: :hidden
         = experience_fields.input :_destroy, as: :hidden, input_html: { value: "0" }

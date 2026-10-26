@@ -1,7 +1,7 @@
-%main.marketing-home{ data: { marketing_homepage: true, controller: "marketing-motion" } }
+%main.marketing-home{ data: { marketing_homepage: true, brand_concept: brand_concept, controller: "marketing-motion" } }
   %nav.marketing-nav{ aria: { label: "Primary navigation" } }
     .marketing-container.marketing-nav__inner
-      = link_to root_path, class: "marketing-brand", aria: { label: "Crewbase home" } do
+      = link_to root_path, class: "marketing-brand", aria: { label: "KnowShow home" } do
         = brand
       .marketing-nav__links
         = link_to "How it works", "#how-it-works", class: "marketing-nav__anchor"
@@ -21,14 +21,16 @@
       .marketing-hero__copy{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
         .marketing-eyebrow
           %span.marketing-eyebrow__dot
-          Built for live music touring
-        %h1 Build the right crew. Run a better show.
+          The live music touring network
+        %h1
+          Know your crew.
+          %span Own the show.
         %p.marketing-hero__lede
-          Crewbase connects touring crew, musicians, engineers and live music production companies. Find the right people, book the work and keep the tour moving.
+          Your people. Your next show. Connect with touring crew, musicians and engineers who know the work, then keep every booking moving.
         .marketing-hero__actions
           = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary btn-lg"
           = link_to "See how it works", "#how-it-works", class: "btn btn-outline-primary btn-lg"
-        .marketing-proof{ aria: { label: "Crewbase benefits" } }
+        .marketing-proof{ aria: { label: "KnowShow benefits" } }
           %span
             %i.bi.bi-check-circle-fill
             Profiles built for touring
@@ -39,20 +41,20 @@
             %i.bi.bi-check-circle-fill
             Staffing through show day
 
-      .marketing-product-preview{ aria: { label: "Crewbase staffing dashboard preview" }, data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
+      .marketing-product-preview{ aria: { label: "KnowShow staffing dashboard preview" }, data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
         .marketing-product-preview__topbar
           .marketing-window-dots{ aria: { hidden: true } }
             %span
             %span
             %span
           %span Crew recommendations
-          %span.marketing-live-pill Live
+          %span.marketing-live-pill On the road
         .marketing-product-preview__body
           .marketing-preview-heading
             %div
-              %span.marketing-preview-label Available this weekend
-              %strong Chicago, IL
-            %span.marketing-count 18 crew
+              %span.marketing-preview-label Your next great crew
+              %strong Summer run / Nashville
+            %span.marketing-count Touring
           .marketing-preview-list
             .marketing-crew-row
               .marketing-avatar AB
@@ -74,7 +76,8 @@
               %span.marketing-crew-reason Role + location
           .marketing-preview-note
             %i.bi.bi-stars
-            Matched by occupation, skills, equipment experience, location, and availability.
+            Search real experience. See why people match. Confirm the details together.
+          %p.marketing-preview-caption Illustrative workspace · not live availability
 
   %section.marketing-trust-strip
     .marketing-container{ data: { marketing_motion_target: "reveal" } }
@@ -92,13 +95,13 @@
       .marketing-section-heading{ data: { marketing_motion_target: "reveal" } }
         %span.marketing-kicker From search to show day
         %h2 Staffing should feel organized from the start.
-        %p Crewbase replaces scattered posts, texts, and spreadsheets with a workflow everyone can understand.
+        %p KnowShow replaces scattered posts, texts, and spreadsheets with a workflow everyone can understand.
       .marketing-steps
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
           %span.marketing-step__number 01
           %i.bi.bi-person-vcard
           %h3 Show what you do
-          %p Build a useful professional profile or company presence with occupations, broad capabilities, equipment families, specific experience, verified Crewbase Credits, and availability.
+          %p Build a useful professional profile or company presence with occupations, broad capabilities, equipment families, specific experience, verified KnowShow Credits, and availability.
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
           %span.marketing-step__number 02
           %i.bi.bi-search-heart
@@ -124,7 +127,7 @@
           .marketing-feature__icon
             %i.bi.bi-person-badge
           %h3 Broad experience, specific strengths
-          %p Choose occupations, transferable capabilities and equipment families to match relevant work. Add your own techniques, products and experience examples, alongside verified Crewbase Credits and reviews visible only to company owners.
+          %p Choose occupations, transferable capabilities and equipment families to match relevant work. Add your own techniques, products and experience examples, alongside verified KnowShow Credits and reviews visible only to company owners.
           .marketing-tag-row
             %span A1 Audio
             %span GrandMA3
@@ -211,7 +214,7 @@
       .marketing-platform__copy{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
         %span.marketing-kicker Built around real operations
         %h2 The network gets you connected. The tools keep you there.
-        %p Crewbase stays useful after a match is made, keeping the context for each company, opportunity, and working relationship close at hand.
+        %p KnowShow stays useful after a match is made, keeping the context for each company, opportunity, and working relationship close at hand.
         %ul.marketing-check-list
           %li
             %i.bi.bi-check2
@@ -237,7 +240,7 @@
         %i.bi.bi-stars
         %span.marketing-kicker Matching without the mystery
         %h3 Recommendations you can understand.
-        %p Crewbase bases recommendations on clear, job-relevant details like occupations, skills, equipment experience, location, requirements, and known availability—not an unexplained black box.
+        %p KnowShow bases recommendations on clear, job-relevant details: occupations, skills, equipment experience, location, requirements and known availability.
         .marketing-signal-list
           %span Occupation
           %span Skills
@@ -260,7 +263,7 @@
     .marketing-container.marketing-footer__inner
       .marketing-footer__brand
         = brand
-        %span Live event teams, connected.
+        %span Your people. Your next show.
       = link_to "What’s new", change_log_entries_path
       = link_to "Meet the Team", meet_the_team_path
-      %p © #{Time.current.year} Crewbase
+      %p © #{Time.current.year} KnowShow

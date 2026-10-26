@@ -1,0 +1,24 @@
+%main.brand-directions
+  .brand-directions__header
+    = link_to "knowshow / brand directions", welcome_path, class: "brand-directions__back"
+    %p.brand-directions__eyebrow Four directions. One name.
+    %h1 A little blue. A little after dark.
+    %p Lowercase knowshow. Two shades of blue. Pick the personality that feels right.
+    %span.brand-directions__note Signal is the working default while you choose. Previewing a direction does not change the app.
+  .brand-directions__grid
+    - concepts.each_with_index do |concept, index|
+      %article.brand-direction{ data: { brand_direction: concept.key } }
+        .brand-direction__stage.brand-surface-dark
+          %span.brand-direction__number= "0#{index + 1}"
+          = wordmarks[index]
+        .brand-direction__light.brand-surface-light
+          = wordmarks[index]
+          %span Light surface
+        .brand-direction__body
+          %h2= "#{index + 1}. #{concept.name}"
+          %p.brand-direction__character= concept.character
+          %p= concept.description
+          .brand-direction__actions
+            = link_to "Preview site", welcome_path(concept: concept.key), class: "btn btn-primary"
+            = link_to "Dark SVG", "/brand/knowshow-#{concept.key}-on-dark.svg", download: true
+            = link_to "Light SVG", "/brand/knowshow-#{concept.key}-on-light.svg", download: true

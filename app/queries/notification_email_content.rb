@@ -14,7 +14,7 @@ class NotificationEmailContent
   def title
     {
       "job_alert" => "A new job matches your experience",
-      "recommended_role" => "Your weekly Crewbase recommendations",
+      "recommended_role" => "Your weekly KnowShow recommendations",
       "upcoming_job_reminder" => "Your booking starts soon",
       "job_offer" => "You have a new job offer"
     }.fetch(delivery.kind)

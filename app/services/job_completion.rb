@@ -56,7 +56,7 @@ class JobCompletion
       actor: job.company&.owner,
       notifiable: credit,
       kind: "crewbase_credit_earned",
-      message: "#{job.title} has been added to your profile as a verified Crewbase Credit."
+      message: "#{job.title} has been added to your profile as a verified KnowShow Credit."
     )
   end
 end

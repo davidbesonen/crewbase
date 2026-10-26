@@ -3,7 +3,7 @@ require "test_helper"
 class ExperienceCreditOverlapTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
-  test "finds a Crewbase Credit from the same company and year" do
+  test "finds a KnowShow Credit from the same company and year" do
     user = User.create!(first_name: "Overlap", last_name: "Worker", email: "overlap@example.com", password: "password123")
     profile = user.profiles.create!(profile_type: "user")
     company = Company.create!(name: "Show Company", contact_email: "show@example.com", industries: [ Industry.create!(name: "Live Events") ])

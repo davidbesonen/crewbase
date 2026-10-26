@@ -13,7 +13,7 @@ class Usr::JobOffersController < ApplicationController
 
     response.headers["Cache-Control"] = "private, no-store"
     send_data BookingCalendar.new(offer: @offer, url: usr_job_offer_url(@offer)).to_ical,
-      type: "text/calendar; charset=utf-8", disposition: "attachment", filename: "crewbase-booking-#{@offer.id}.ics"
+      type: "text/calendar; charset=utf-8", disposition: "attachment", filename: "knowshow-booking-#{@offer.id}.ics"
   end
 
   def new

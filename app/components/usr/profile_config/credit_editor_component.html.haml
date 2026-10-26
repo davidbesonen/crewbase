@@ -8,9 +8,9 @@
         .col-md-6
           = f.input :project_name, label: "Project or Event", placeholder: "Summer Sound Festival"
         .col-md-6
-          = f.input :company_id, collection: companies.map { |company| [company.name, company.id] }, include_blank: "External or unlisted company", label: "Crewbase Company"
+          = f.input :company_id, collection: companies.map { |company| [company.name, company.id] }, include_blank: "External or unlisted company", label: "KnowShow Company"
         .col-md-6
-          = f.input :company_name, label: "Client or Company Name", hint: "Use this when the company is not listed in Crewbase."
+          = f.input :company_name, label: "Client or Company Name", hint: "Use this when the company is not listed in KnowShow."
         .col-md-4
           = f.input :starts_on, as: :string, input_html: { type: "date" }
         .col-md-4

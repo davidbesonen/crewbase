@@ -38,11 +38,11 @@ class Usr::ProfileCreditsVisibilityTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#profile-credits" do
       assert_select ".profile-credits-heading.align-items-center" do
-        assert_select "> .profile-credits-heading__icon > .crewbase-credit-badge"
-        assert_select "> h5", text: "Crewbase Credits"
+        assert_select "> .profile-credits-heading__icon > .knowshow-credit-badge"
+        assert_select "> h5", text: "KnowShow Credits"
         assert_select "[data-profile-credit-count]", text: "1 credit earned"
       end
-      assert_select ".crewbase-credit-badge-blue"
+      assert_select ".knowshow-credit-badge-blue"
       assert_select "*", text: /Camera Operator/
       assert_select "*", text: /Documentary Day/
     end
@@ -63,7 +63,7 @@ class Usr::ProfileCreditsVisibilityTest < ActionDispatch::IntegrationTest
     get usr_profile_path(@profile)
 
     assert_response :success
-    assert_select "#profile-credits", text: /Complete jobs through Crewbase/
+    assert_select "#profile-credits", text: /Complete jobs through KnowShow/
     assert_select "#profile-credits", text: /Documentary Day/, count: 0
   end
 

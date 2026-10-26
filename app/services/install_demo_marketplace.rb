@@ -52,7 +52,7 @@ class InstallDemoMarketplace
     user = User.create!(first_name: first, last_name: last, email: email, password: password)
     user.roles << Role.find_by!(name: "user")
     profile = user.profiles.create!(profile_type: "user", headline: occupation_name,
-      bio: "Fictional demo profile for exploring Crewbase's staffing and recommendation tools.", completed_at: Time.current)
+      bio: "Fictional demo profile for exploring KnowShow's staffing and recommendation tools.", completed_at: Time.current)
     profile.occupations << Occupation.find_by!(name: occupation_name, category_key: nil)
     profile.locations.create!(city: "Chicago", state: "IL", country: "United States")
     user
@@ -62,7 +62,7 @@ class InstallDemoMarketplace
     industry = Industry.music_touring!
     company = Company.create!(name: "Demo Live Productions", contact_email: "team@crewbase-demo.example",
       industries: [ industry ], is_public: true,
-      description: "A fictional live music touring company. These sample jobs are for trying Crewbase, not real openings.")
+      description: "A fictional live music touring company. These sample jobs are for trying KnowShow, not real openings.")
     company.company_plans.create!(plan: Plan.find_by!(key: "team_2026"), status: "active")
     company.company_assignments.create!(user: owner, profile: owner.user_profile, role: "owner")
     company.locations.create!(city: "Chicago", state: "IL", country: "United States")

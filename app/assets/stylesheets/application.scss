@@ -5,6 +5,7 @@
 @import "actiontext";
 @import "taxonomy_multiselect";
 @import "marketing";
+@import "brand";
 
 :root {
   --app-shell-padding-x: clamp(1rem, 3vw, 3rem);
@@ -26,8 +27,7 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(ellipse at 85% 0%, #dfeefa 0%, transparent 55%),
-    linear-gradient(155deg, #f5f9fe 0%, #edf4fb 48%, #f7f9fc 100%);
+  background: #f5f7fb;
   background-attachment: fixed;
 }
 
@@ -531,7 +531,7 @@ body {
   color: var(--bs-info-text-emphasis);
 }
 
-.crewbase-credit-badge {
+.knowshow-credit-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -569,16 +569,16 @@ body {
     line-height: 0;
   }
 
-  .crewbase-credit-badge {
+  .knowshow-credit-badge {
     display: flex;
   }
 }
 
-.crewbase-credit-badge-blue {
+.knowshow-credit-badge-blue {
   color: var(--bs-primary);
 }
 
-.crewbase-credit-badge-neutral {
+.knowshow-credit-badge-neutral {
   color: var(--bs-secondary-color);
 }
 

@@ -1,13 +1,13 @@
-// One palette for Bootstrap components, utilities, and Crewbase's custom UI.
-$primary: #315f86;
-$secondary: #54738f;
+// One palette for Bootstrap components, utilities, and KnowShow's custom UI.
+$primary: #255ce8;
+$secondary: #5f6e87;
 $success: #39755b;
 $info: #35758a;
 $warning: #896414;
 $danger: #b54453;
-$dark: #233c55;
+$dark: #101827;
 $light: #f4f8fc;
-$logo: #5fa8d3;
+$logo: #3979ff;
 $neutral: #e7f0fa;
 
 $body-color: $dark;
@@ -17,16 +17,16 @@ $border-color: #dce6f0;
 $border-color-translucent: rgba(216, 228, 240, 0.85);
 $link-color: $primary;
 $link-hover-color: #214f7d;
-$font-family-sans-serif: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+$font-family-sans-serif: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
 $font-size-base: 0.9375rem;
 $headings-font-weight: 600;
 $h4-font-size: 1.125rem;
 $h5-font-size: 1.025rem;
 $h6-font-size: 0.925rem;
 
-$border-radius: 0.75rem;
+$border-radius: 0.5rem;
 $border-radius-sm: 0.55rem;
-$border-radius-lg: 1.15rem;
+$border-radius-lg: 0.875rem;
 $box-shadow: 0 4px 24px rgba(39, 74, 112, 0.035);
 $box-shadow-sm: $box-shadow;
 $box-shadow-lg: 0 16px 48px rgba(39, 74, 112, 0.12);

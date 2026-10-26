@@ -3,7 +3,7 @@ require "test_helper"
 class CreditTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
-  test "stores an external one-off gig without requiring a Crewbase job" do
+  test "stores an external one-off gig without requiring a KnowShow job" do
     user = User.create!(
       first_name: "Casey",
       last_name: "Crew",

@@ -14,7 +14,7 @@ class QuickStartRecommendationsTest < ApplicationSystemTestCase
     login_as worker, scope: :user
     page.driver.browser.manage.window.resize_to(390, 1000)
     visit usr_dashboards_path
-    assert_text "What brings you to Crewbase?"
+    assert_text "What brings you to KnowShow?"
     choose "Find work"
     find("summary", text: "Choose your roles").click
     check "FOH Engineer"

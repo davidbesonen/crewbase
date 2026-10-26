@@ -3,25 +3,23 @@
   %head
     %meta{name: "viewport", content: "width=device-width, initial-scale=1"}
     %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
-    %title= @page_title || "crewbase"
-    %meta{:content => "width=device-width,initial-scale=1", :name => "viewport"}/
+    %title= @page_title || BrandIdentity::NAME
     %meta{:content => "yes", :name => "apple-mobile-web-app-capable"}/
     %meta{:content => "yes", :name => "mobile-web-app-capable"}/
-    %meta{property: "og:title", content: "Crewbase"}
-    %meta{name: "description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
-    %meta{property: "og:description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
-    -# %meta{property: "og:image", content: image_url('campus_clash_logo.png')}
+    %meta{property: "og:title", content: "KnowShow"}
+    %meta{name: "description", content: @meta_description || BrandIdentity::DESCRIPTION}
+    %meta{property: "og:description", content: @meta_description || BrandIdentity::DESCRIPTION}
+    %meta{property: "og:image", content: image_url("/brand/knowshow-social.png")}
     %meta{property: "og:url", content: request.original_url}
     %meta{name: "twitter:card", content: "summary_large_image"}
-    %meta{name: "twitter:title", content: "Crewbase"}
-    %meta{name: "twitter:description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
-    -# %meta{name: "twitter:image", content: image_url('campus_clash_logo.png')}
-    %link{ rel: "preconnect", href: "https://fonts.googleapis.com" }
-    %link{ rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" }
-    %link{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" }
+    %meta{name: "twitter:title", content: "KnowShow"}
+    %meta{name: "twitter:description", content: @meta_description || BrandIdentity::DESCRIPTION}
+    %meta{name: "twitter:image", content: image_url("/brand/knowshow-social.png")}
+    %meta{name: "apple-mobile-web-app-title", content: BrandIdentity::NAME}
+    %meta{name: "theme-color", content: "#090d16"}
+    %link{rel: "icon", type: "image/svg+xml", href: "/icon.svg"}
+    %link{rel: "apple-touch-icon", href: "/icon.png"}
     %link{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" }
-    -# %link{ rel: "apple-touch-icon", sizes: "180x180", href: asset_path('campus_clash_logo.png') }
-    -# %link{ rel: "icon", type: "image/png", sizes: "192x192", href: asset_path('campus_clash_logo.png') }
     = csrf_meta_tags
     = csp_meta_tag
     = javascript_include_tag "theme", nonce: true, "data-turbo-track": "reload", "data-turbo-eval": "false"
@@ -76,4 +74,4 @@
     = turbo_frame_tag "remote_modal", target: "_top", data: { controller: "remote-modal", action: "turbo:before-render@document->remote-modal#hideBeforeRender turbo:submit-end->remote-modal#closeOnSuccess turbo:frame-load->remote-modal#showModal" }
     - unless content_for?(:hide_default_footer)
       %footer.text-center.mt-5.mb-3.text-muted
-        © #{Time.current.year} Crewbase
+        © #{Time.current.year} KnowShow

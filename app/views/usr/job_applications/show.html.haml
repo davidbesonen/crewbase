@@ -70,10 +70,10 @@
       .card.border-0.shadow-sm.mt-4
         .card-body.p-4
           .d-flex.align-items-center.gap-2.mb-2
-            = crewbase_credit_badge(variant: :blue, compact: true)
-            %h4.fw-semibold.mb-0 Crewbase Credit earned
+            = knowshow_credit_badge(variant: :blue, compact: true)
+            %h4.fw-semibold.mb-0 KnowShow Credit earned
           %p.text-muted.mb-3 This job was verified and added automatically when the company marked it completed.
-          = link_to "View Crewbase Credit", usr_profile_path(@job_application.profile, anchor: "profile-credits"), class: "btn btn-outline-primary"
+          = link_to "View KnowShow Credit", usr_profile_path(@job_application.profile, anchor: "profile-credits"), class: "btn btn-outline-primary"
 
   .col-12.col-lg-4
     - if @company_owner_view && !@job_application.accepted?
