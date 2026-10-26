@@ -5,7 +5,8 @@ export default class extends Controller {
 
   add() {
     this.containerTarget.insertAdjacentHTML("beforeend", this.templateTarget.innerHTML.trim())
-    this.containerTarget.querySelector('input[name="job[work_dates][]"]:last-of-type')?.focus()
+    const fields = this.containerTarget.querySelectorAll('input[name="job[work_dates][]"]')
+    fields[fields.length - 1]?.focus()
   }
 
   remove(event) {

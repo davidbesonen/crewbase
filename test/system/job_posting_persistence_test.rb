@@ -20,8 +20,9 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
 
     visit new_usr_company_job_path(company)
     choose "Single job posting"
-    fill_in "Posting or gig title", with: "Browser audio role"
-    select project.name, from: "Project"
+    assert_field "Job title"
+    fill_in "Job title", with: "Browser audio role"
+    select project.name, from: "Project (optional)"
     find("trix-editor").set("Mix the main stage.")
     attachment = Tempfile.new([ "posting-note", ".txt" ])
     attachment.write("Production reference for this posting.")
@@ -31,6 +32,7 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     end
     assert_selector "trix-editor figure.attachment"
     assert_no_selector "trix-editor progress"
+    find("[data-additional-experience] > summary").click
     assert_selector "details[data-category-picker]:not([open])", count: 4
     within("fieldset", text: "Required capabilities") do
       find("[data-category-picker] > summary").click
@@ -48,9 +50,16 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     find("[data-specific-requirements] > summary").click
     fill_in "Required skills", with: "Tour advancing"
     fill_in "Preferred equipment", with: "Wireless Workbench"
+    find("[data-screening-questions] > summary").click
     find("input[name='job[questions][]']").set("Can you travel?")
     click_button "Add Question"
+    assert_equal all("input[name='job[questions][]']").last.native, page.driver.browser.switch_to.active_element
+    all("input[name='job[questions][]']").last.set("Remove this question")
+    all("button[aria-label='Remove question']").last.click
+    assert_selector "input[name='job[questions][]']", count: 1
+    click_button "Add Question"
     all("input[name='job[questions][]']").last.set("What is your availability?")
+    find("[data-posting-options] > summary").click
     select "Contract", from: "Employment type"
     select "On site", from: "Workplace type"
     fill_in "Pay min", with: "450.50"
@@ -58,16 +67,18 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     select "Daily", from: "Pay period"
     fill_in "Start date (optional)", with: Date.new(2030, 2, 10)
     fill_in "End date (optional)", with: Date.new(2030, 2, 12)
+    find("[data-schedule-options] > summary").click
     assert_selector "input[name='job[work_dates][]'][min='2030-02-10'][max='2030-02-12']"
     find("input[name='job[work_dates][]']").set(Date.new(2030, 2, 10))
     click_button "Add Work Date"
+    assert_equal all("input[name='job[work_dates][]']").last.native, page.driver.browser.switch_to.active_element
     all("input[name='job[work_dates][]']").last.set(Date.new(2030, 2, 12))
     fill_in "Application deadline", with: Time.zone.local(2030, 2, 1, 18, 30)
     check "Requires travel"
     uncheck "Allow company editors to edit this job"
     fill_in "City", with: "Chicago"
     select "United States", from: "Country"
-    click_button "Publish", exact: true
+    click_button "Publish job", exact: true
     assert_text "Job created successfully!"
     job = company.jobs.find_by!(title: "Browser audio role")
     assert_equal [ occupation.id ], job.required_occupations.ids
@@ -87,7 +98,7 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     click_button "Add Work Date"
     assert_selector "input[name='job[work_dates][]'][max='2030-02-15']", count: 3
     all("input[name='job[work_dates][]']").last.set(Date.new(2030, 2, 15))
-    click_button "Publish", exact: true
+    click_button "Save changes", exact: true
     assert_text "Job updated successfully!"
     assert_equal Date.new(2030, 2, 15), job.reload.work_dates.last
     assert_equal Time.zone.local(2030, 2, 1, 18, 30), job.application_deadline
@@ -95,15 +106,19 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
 
     visit new_usr_company_job_path(company)
     choose "Multi-position gig"
-    fill_in "Position title", with: "Stage Manager"
+    assert_field "Gig title"
+    fill_in "Role title", with: "Stage Manager"
     fill_in "How many people?", with: "3"
+    fill_in "Gig title", with: "Browser multi-position gig"
     choose "Single job posting"
-    assert_field "Position title", disabled: true, visible: :all
+    assert_field "Job title", with: "Browser multi-position gig"
+    assert_field "Role title", disabled: true, visible: :all
     choose "Multi-position gig"
-    assert_field "Position title", with: "Stage Manager"
-    fill_in "Posting or gig title", with: "Browser multi-position gig"
+    assert_field "Role title", with: "Stage Manager"
+    assert_field "Gig title", with: "Browser multi-position gig"
+    fill_in "Gig title", with: "Browser multi-position gig"
     find("trix-editor").set("Staff the stage.")
-    click_button "Publish", exact: true
+    click_button "Publish job", exact: true
     assert_text "Job created successfully!"
     gig = company.jobs.find_by!(title: "Browser multi-position gig")
     assert_equal [ [ "Stage Manager", 3 ] ], gig.crew_positions.pluck(:title, :headcount)

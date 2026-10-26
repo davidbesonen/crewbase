@@ -3,6 +3,14 @@ require "test_helper"
 class JobTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
+  test "an unfinished description can be saved privately as a draft but cannot be published" do
+    job = build_job(status: :draft, description: "")
+    assert job.valid?, job.errors.full_messages.to_sentence
+    job.status = :published
+    assert_not job.valid?
+    assert_includes job.errors[:description], "can't be blank"
+  end
+
   test "date-only schedules cover the entire selected days" do
     job = build_job(schedule_has_times: false, starts_at: "2026-11-09", ends_at: "2026-11-09")
     assert job.valid?, job.errors.full_messages.to_sentence

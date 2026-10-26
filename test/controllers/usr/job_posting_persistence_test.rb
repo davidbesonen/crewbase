@@ -17,6 +17,54 @@ class Usr::JobPostingPersistenceTest < ActionDispatch::IntegrationTest
     sign_in @owner, scope: :user
   end
 
+  test "a new project job starts with sensible editable defaults and its project dates" do
+    @project.update!(starts_on: "2030-02-10", ends_on: "2030-02-12")
+    get new_usr_company_job_path(@company, project_id: @project.id)
+    assert_response :success
+    assert_select "input[name='job[posting_type]'][value='single_role'][checked]"
+    assert_select "select[name='job[employment_type]'] option[value='contract'][selected]"
+    assert_select "input[name='job[starts_at]'][value='2030-02-10']"
+    assert_select "input[name='job[ends_at]'][value='2030-02-12']"
+    assert_select "a[href='#{usr_project_path(@project)}']", text: "Back to project"
+    assert_empty @project.jobs
+  end
+
+  test "an unfinished draft stays private when publishing fails" do
+    post usr_company_jobs_path(@company), params: { publication_action: "draft", job: attributes.merge(description: "") }
+    assert_response :redirect
+    job = @company.jobs.last
+    assert job.draft?
+    patch usr_company_job_path(@company, job), params: { publication_action: "publish", job: { title: job.title } }
+    assert_response :unprocessable_entity
+    assert_select "[role='alert']", text: /Description can't be blank/
+    assert job.reload.draft?
+    assert_nil job.published_at
+  end
+
+  test "draft and publish buttons determine visibility regardless of stale status values" do
+    post usr_company_jobs_path(@company), params: { publication_action: "draft", job: attributes.merge(status: "published") }
+    job = @company.jobs.last
+    assert job.draft?
+    assert_nil job.published_at
+    patch usr_company_job_path(@company, job), params: { publication_action: "publish", job: { status: "draft", is_active: "0" } }
+    assert job.reload.published?
+    assert job.is_active?
+    assert_not_nil job.published_at
+  end
+
+  test "publish action still enforces capacity while a draft is allowed" do
+    @company.company_plans.last.plan.update!(data: { "active_jobs_limit" => 0 })
+    assert_no_difference "Job.count" do
+      post usr_company_jobs_path(@company), params: { publication_action: "publish", job: attributes.merge(status: "draft") }
+    end
+    assert_response :unprocessable_entity
+    assert_select "[data-plan-limit-message]", text: /active jobs/
+    assert_difference "Job.count", 1 do
+      post usr_company_jobs_path(@company), params: { publication_action: "draft", job: attributes }
+    end
+    assert @company.jobs.last.draft?
+  end
+
   test "every scalar category and named requirement survives create and edit" do
     post usr_company_jobs_path(@company), params: { job: attributes }
     assert_redirected_to usr_project_path(@project)

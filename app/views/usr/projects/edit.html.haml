@@ -1,10 +1,11 @@
-.row.mb-4
-  .col-12
-    %h1.fw-bold.mb-1 Edit Project
-    %p.text-muted.mb-0= "Update #{@project.name}."
+.staffing-form.staffing-form--project
+  .row.mb-4
+    .col-12
+      %h1.fw-bold.mb-1 Edit Project
+      %p.text-muted.mb-0= "Update #{@project.name}."
 
-.row
-  .col-12
-    - if @project.errors[:base].any?
-      .alert.alert-warning{ data: { plan_limit_message: true } }= @project.errors[:base].to_sentence
-    = render Usr::Company::ProjectFormComponent.new(company: @company, project: @project)
+  .row
+    .col-12
+      - if @project.errors[:base].any?
+        .alert.alert-warning{ data: { plan_limit_message: true } }= @project.errors[:base].to_sentence
+      = render Usr::Company::ProjectFormComponent.new(company: @company, project: @project)

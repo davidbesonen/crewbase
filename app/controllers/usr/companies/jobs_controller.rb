@@ -11,10 +11,12 @@ class Usr::Companies::JobsController < ApplicationController
 
   def new
     @entitlement = CompanyPlanEntitlement.new(@company)
-    @job = @company.jobs.new(schedule_has_times: false)
-    @job.posting_type = nil
+    @job = @company.jobs.new(schedule_has_times: false, posting_type: :single_role, employment_type: :contract, workplace_type: :on_site)
     @job.crew_positions.build
     @job.project = @company.projects.active.find(params[:project_id]) if params[:project_id].present?
+    if @job.project
+      @job.assign_attributes(starts_at: @job.project.starts_on, ends_at: @job.project.ends_on)
+    end
     @job.locations.build if @job.locations.empty?
     prepare_projects
   end
@@ -86,7 +88,7 @@ class Usr::Companies::JobsController < ApplicationController
   end
 
   def set_job
-    @job = @company.jobs.find(params[:id])
+    @job = @company.jobs.includes(:project, :locations, :crew_positions, job_requirements: :requirement).find(params[:id])
   end
 
   def job_params
@@ -151,11 +153,19 @@ class Usr::Companies::JobsController < ApplicationController
   end
 
   def job_attributes
-    attributes = job_params.except(:locations_attributes, *REQUIREMENT_PARAMETER_KEYS)
+    attributes = job_params.except(:locations_attributes, *REQUIREMENT_PARAMETER_KEYS).merge(publication_attributes)
     return attributes unless attributes[:project_id].present?
     return attributes if @job&.persisted? && attributes[:project_id].to_s == @job.project_id.to_s
 
     attributes.merge(project_id: @company.projects.active.find(attributes[:project_id]).id)
+  end
+
+  def publication_attributes
+    case params[:publication_action]
+    when "publish" then { status: "published", is_active: true }
+    when "draft" then { status: "draft" }
+    else {}
+    end
   end
 
   def save_job_with_requirements

@@ -290,7 +290,7 @@ class Job < ApplicationRecord
   end
 
   def description_must_be_present
-    return if plain_description.present?
+    return if draft? || plain_description.present?
 
     errors.add(:description, "can't be blank")
   end

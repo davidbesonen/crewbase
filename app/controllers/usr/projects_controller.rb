@@ -25,7 +25,8 @@ class Usr::ProjectsController < ApplicationController
     end
 
     if @project.save
-      redirect_to usr_project_path(@project), notice: "Project created successfully."
+      destination = params[:next_step] == "post_job" ? new_usr_company_job_path(@company, project_id: @project.id) : usr_project_path(@project)
+      redirect_to destination, notice: "Project created successfully."
     else
       render :new, status: :unprocessable_entity
     end

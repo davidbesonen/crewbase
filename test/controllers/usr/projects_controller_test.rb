@@ -58,6 +58,27 @@ class Usr::ProjectsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-project-company='#{@company.id}']", text: /No projects yet/
   end
 
+  test "create and post goes directly to a scoped first job without creating a job yet" do
+    sign_in @owner, scope: :user
+    assert_difference "@company.projects.count", 1 do
+      assert_no_difference "Job.count" do
+        post usr_company_projects_path(@company), params: { next_step: "post_job", project: { name: "Quick tour" } }
+      end
+    end
+    project = @company.projects.last
+    assert_redirected_to new_usr_company_job_path(@company, project_id: project.id)
+  end
+
+  test "failed project creation keeps the form and continuation action" do
+    sign_in @owner, scope: :user
+    assert_no_difference "Project.count" do
+      post usr_company_projects_path(@company), params: { next_step: "post_job", project: { name: "", ends_on: "2030-01-02", starts_on: "2030-01-03" } }
+    end
+    assert_response :unprocessable_entity
+    assert_select "details[data-project-options][open] input[value='2030-01-02']"
+    assert_select "button[name='next_step'][value='post_job']"
+  end
+
   test "company owner creates and manages a lightweight project" do
     sign_in @owner, scope: :user
 

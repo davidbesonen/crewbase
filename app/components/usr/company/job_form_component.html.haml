@@ -5,13 +5,13 @@
       %ul.mb-0
         - job.errors.full_messages.each do |message|
           %li= message
-  .card.border-0.shadow-sm
+  .card.border-0.shadow-sm.mb-4
     .card-body.p-4
-      .row.g-4
+      .row.g-3
         .col-12
           %fieldset{ data: { posting_type_choice: true } }
             %legend.h5.fw-semibold.mb-2 What are you posting?
-            %p.text-muted.mb-3 Choose how people will apply and how you will staff this opportunity.
+            %p.text-muted.mb-3 Start with one role, or switch to a gig with several positions.
             .row.g-3
               .col-md-6
                 .border.rounded-3.p-3.h-100
@@ -23,7 +23,7 @@
                     = f.label :posting_type_single_role, class: "form-check-label fw-semibold" do
                       Single job posting
                   %p.text-muted.small.mb-0.mt-2
-                    Hire one person for one role. Applicants apply directly to this job, and no crew-position workspace is created.
+                    Hire one person for one role.
               .col-md-6
                 .border.rounded-3.p-3.h-100
                   .form-check
@@ -35,7 +35,7 @@
                     = f.label :posting_type_multi_position, class: "form-check-label fw-semibold" do
                       Multi-position gig
                   %p.text-muted.small.mb-0.mt-2
-                    Staff a gig with several roles and headcounts. After publishing, use “Staff This Gig” to add positions and assign crew.
+                    Staff several roles and headcounts in one gig.
                   - unless multi_position_available?
                     %p.small.text-primary.fw-semibold.mb-0.mt-2{ data: { feature_upgrade: "multi-position-gigs" } }
                       %i.bi.bi-lock-fill.me-1
@@ -48,14 +48,14 @@
             data: { gig_positions: true, posting_type_fields_target: "positions" }
           }
             .border.rounded-3.p-3
-              %h5.fw-semibold.mb-2 Define the first position
+              %h5.fw-semibold.mb-2 First role to fill
               %p.text-muted.mb-3
-                Every multi-position gig needs at least one crew position. You can add more positions later from “Staff This Gig.”
+                Add the first role now. You can add more roles in the gig’s staffing workspace.
               = f.simple_fields_for :crew_positions, initial_crew_position do |position_fields|
                 .row.g-3
                   .col-md-8
                     = position_fields.input :title,
-                      label: "Position title",
+                      label: "Role title",
                       placeholder: "e.g. Audio Engineer",
                       required: true,
                       input_html: { disabled: !job.multi_position?, data: { posting_type_fields_target: "positionField" } }
@@ -66,21 +66,99 @@
                       input_html: { min: 1, step: 1, value: initial_crew_position.headcount || 1, disabled: !job.multi_position?, data: { posting_type_fields_target: "positionField" } }
               - if crew_position_error_messages.present?
                 .text-danger.small.mt-2= crew_position_error_messages
-        .col-12
-          = f.input :title, label: "Posting or gig title", input_html: { autofocus: true }
+        .col-12{ class: ("col-md-8" if projects.any?) }
+          = f.input :title, label: tag.span(posting_title_label, data: { posting_type_fields_target: "titleLabel" }), input_html: { autofocus: true, placeholder: posting_title_placeholder, data: { posting_type_fields_target: "title" } }
         - if projects.any?
-          .col-12
+          .col-12.col-md-4
             = f.input :project_id,
               collection: projects.map { |project| [project.name, project.id] },
               include_blank: "No project",
-              label: "Project"
+              label: "Project (optional)"
         .col-12
-          %p.form-label Description
-          = f.rich_text_area :description, placeholder: "Job description, years experience, primary responsibilities, etc.", class: "job-description-editor"
+          = f.label :description, "Description", class: "form-label"
+          = f.rich_text_area :description, placeholder: "Describe the work, responsibilities, and what the crew should know.", class: "job-description-editor"
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      %h2.h5.fw-semibold.mb-2 When, where & pay
+      %p.text-muted.mb-3 Add what you know now. Dates, location and pay can be updated later.
+      - if project_schedule_prefilled?
+        %p.small.text-muted Dates start from your project schedule. Adjust them for this role.
+      .row.g-3
+        .col-md-6
+          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
+        .col-md-6
+          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
         .col-12
-          %h5.fw-semibold.mb-2 Crew requirements
+          %details.staffing-form__options{ open: schedule_options_expanded?, data: { schedule_options: true } }
+            %summary.fw-semibold Additional schedule options
+            .row.g-3.mt-1
+              .col-md-6
+                = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { job_schedule_target: "toggle", action: "job-schedule#change" } }
+                %p.form-text.mb-0 Times use #{Time.zone.name}. Confirm final work hours in the booking offer.
+              .col-md-6
+                = f.input :application_deadline, as: :string, input_html: { type: "datetime-local", value: deadline_input_value }
+              .col-12.mt-1
+                %label.form-label Specific work dates (optional)
+                %p.text-muted.mb-2
+                  For tours and other intermittent gigs, add only the dates when work takes place. Leave this blank when every day in the range is a work day.
+                .d-flex.flex-column.gap-2{ data: { controller: "work-date-fields" } }
+                  .d-flex.flex-column.gap-2{ data: { work_date_fields_target: "container" } }
+                    - work_date_fields.each do |work_date|
+                      .input-group
+                        = date_field_tag "job[work_dates][]", work_date, id: nil, aria: { label: "Work date" }, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" }
+                        %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
+                          %i.bi.bi-trash
+                  %div
+                    %button.btn.btn-outline-primary{ type: "button", data: { action: "work-date-fields#add" } }
+                      %i.bi.bi-plus-lg.me-1
+                      Add Work Date
+                  %template{ data: { work_date_fields_target: "template" } }
+                    .input-group
+                      %input.form-control{ type: "date", name: "job[work_dates][]", aria: { label: "Work date" }, min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" } }
+                      %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
+                        %i.bi.bi-trash
+        .col-md-6
+          = f.input :workplace_type, collection: Job.workplace_types.keys.map { |value| [value.humanize, value] }, include_blank: false
+        .col-md-6.d-flex.align-items-center
+          = f.input :requires_travel
+        = f.simple_fields_for :locations, location do |location_fields|
+          .col-md-4
+            = location_fields.input :city
+          .col-md-4
+            = location_fields.input :state
+          .col-md-4
+            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false
+          .col-12
+            %details.staffing-form__options{ open: street_address_expanded?, data: { street_address: true } }
+              %summary.fw-semibold Street address (optional)
+              .row.g-3.mt-1
+                .col-md-6
+                  = location_fields.input :address_line_1, label: "Address Line 1"
+                .col-md-6
+                  = location_fields.input :address_line_2, label: "Address Line 2", required: false
+                .col-md-4
+                  = location_fields.input :zip_code, label: "ZIP Code"
+        .col-12.border-top.pt-3
+          %h3.h6.fw-semibold.mb-0 Compensation (optional)
+        .col-md-4
+          = f.input :pay_period, collection: Job.pay_periods.keys.map { |value| [value.humanize, value] }, include_blank: true
+        .col-md-4
+          = f.label :pay_min
+          .input-group.mt-2
+            %span.input-group-text $
+            = f.input_field :pay_min, class: "form-control"
+        .col-md-4
+          = f.label :pay_max
+          .input-group.mt-2
+            %span.input-group-text $
+            = f.input_field :pay_max, class: "form-control"
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      .row.g-3
+        .col-12
+          %h2.h5.fw-semibold.mb-2 Who do you need?
           %p.text-muted.mb-3
-            Choose occupations and describe the skills and equipment needed. Every required entry must match reported experience; preferred entries improve ranking. Verify qualifications before hiring.
+            Choose occupations to help match this posting with relevant crew. Add extra experience only when it matters for the role.
           .row.g-3
             - taxonomy_requirement_fields.each do |field|
               .col-md-6
@@ -154,9 +232,10 @@
                         %span= option.name
                         %i.bi.bi-x-lg{ aria: { hidden: "true" } }
         .col-12
-          %h5.fw-semibold Broad experience
-          %p.text-muted Occupations already cover their core duties. Add any additional capabilities and equipment families this job needs. Required experience must match a person's occupations or selections; preferred experience helps rank matches.
-          = experience_categories
+          %details.staffing-form__options{ open: additional_experience_expanded?, data: { additional_experience: true } }
+            %summary.fw-semibold Additional capabilities & equipment (optional)
+            %p.text-muted.small.mt-3 Occupations already cover their core duties. Add other capabilities and equipment families only when needed. Required experience filters matches; preferred experience helps rank them.
+            = experience_categories
         .col-12
           %details.border.rounded.p-3{ open: specific_requirements_expanded?, data: { specific_requirements: true } }
             %summary.fw-semibold Specific requirements (optional)
@@ -167,100 +246,52 @@
               - personal_requirement_fields.each do |field|
                 .col-md-6
                   = f.input field[:attribute], as: :text, label: field[:label], hint: field[:hint], placeholder: field[:placeholder], input_html: { rows: 2, maxlength: ExperienceTerms::MAX_TEXT_LENGTH, value: field[:value] }
-        .col-12
-          %label.form-label Screening Questions
-          %p.text-muted.mb-2 Add custom screening questions for applicants. Use the plus button to add another question.
-          .d-flex.flex-column.gap-2{ data: { controller: "question-fields" } }
-            .d-flex.flex-column.gap-2{ data: { question_fields_target: "container" } }
-              - question_fields.each do |question|
-                .input-group
-                  %span.input-group-text
-                    %i.bi.bi-question-circle
-                  = text_field_tag "job[questions][]", question, class: "form-control", placeholder: "Enter a screening question"
-            %div
-              %button.btn.btn-outline-primary{ type: "button", data: { action: "question-fields#add" } }
-                %i.bi.bi-plus-lg.me-1
-                Add Question
-            %template{ data: { question_fields_target: "template" } }
-              .input-group.mt-2
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      %details.staffing-form__options{ open: screening_questions_expanded?, data: { screening_questions: true } }
+        %summary.fw-semibold Screening questions (optional)
+        %p.text-muted.small.mt-3 Ask applicants only what you need to decide who to hire.
+        .d-flex.flex-column.gap-2{ data: { controller: "question-fields" } }
+          .d-flex.flex-column.gap-2{ data: { question_fields_target: "container" } }
+            - question_fields.each do |question|
+              .input-group
                 %span.input-group-text
                   %i.bi.bi-question-circle
-                %input.form-control{ type: "text", name: "job[questions][]", placeholder: "Enter a screening question" }
-        .col-md-6
-          = f.input :employment_type, collection: Job.employment_types.keys.map { |value| [value.humanize, value] }, include_blank: false
-        .col-md-6
-          = f.input :workplace_type, collection: Job.workplace_types.keys.map { |value| [value.humanize, value] }, include_blank: false
-        .col-md-6
-          = f.input :status, collection: Job.statuses.keys.map { |value| [value.humanize, value] }, include_blank: false
-        .col-md-4
-          = f.input :pay_period, collection: Job.pay_periods.keys.map { |value| [value.humanize, value] }, include_blank: true
-        .col-md-4
-          = f.label :pay_min
-          .input-group.mt-2
-            %span.input-group-text $
-            = f.input_field :pay_min, class: "form-control"
-        .col-md-4
-          = f.label :pay_max
-          .input-group.mt-2
-            %span.input-group-text $
-            = f.input_field :pay_max, class: "form-control"
-        .col-sm-12
-          %p.text-muted.mb-0.mt-2 
-            %i.bi.bi-info-circle.me-1
-            Dates are optional for ongoing roles or flexible schedules. For gigs, tours, and short-term work, add the dates you know. Include exact times only when a call time or shift matters.
-        .col-12
-          = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { job_schedule_target: "toggle", action: "job-schedule#change" } }
-          %p.form-text.mb-0 Times use #{Time.zone.name}. Confirm final work hours in the booking offer.
-        .col-md-4.mt-1
-          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
-        .col-md-4.mt-1
-          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
-        .col-md-4.mt-1
-          = f.input :application_deadline, as: :string, input_html: { type: "datetime-local", value: deadline_input_value }
-        .col-12.mt-1
-          %label.form-label Specific work dates (optional)
-          %p.text-muted.mb-2
-            For tours and other intermittent gigs, add only the dates when work takes place. Leave this blank when every day in the range is a work day.
-          .d-flex.flex-column.gap-2{ data: { controller: "work-date-fields" } }
-            .d-flex.flex-column.gap-2{ data: { work_date_fields_target: "container" } }
-              - work_date_fields.each do |work_date|
-                .input-group
-                  = date_field_tag "job[work_dates][]", work_date, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" }
-                  %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
-                    %i.bi.bi-trash
-            %div
-              %button.btn.btn-outline-primary{ type: "button", data: { action: "work-date-fields#add" } }
-                %i.bi.bi-plus-lg.me-1
-                Add Work Date
-            %template{ data: { work_date_fields_target: "template" } }
-              .input-group
-                %input.form-control{ type: "date", name: "job[work_dates][]", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" } }
-                %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
-                  %i.bi.bi-trash
-        .col-md-3
-          = f.input :requires_travel
-        .col-md-3
-          = f.input :is_active
-        .col-md-3
-          = f.input :editable_by_company, label: "Allow company editors to edit this job"
-
-        = f.simple_fields_for :locations, location do |location_fields|
-          .col-12
-            %h5.fw-semibold.mb-2 Location
-            %p.text-muted.mb-1 Add the primary location for this role (optional)
+                = text_field_tag "job[questions][]", question, id: nil, class: "form-control", placeholder: "Enter a screening question", aria: { label: "Screening question" }
+                %button.btn.btn-outline-secondary{ type: "button", aria: { label: "Remove question" }, data: { action: "question-fields#remove" } }
+                  %i.bi.bi-x-lg{ aria: { hidden: true } }
+          %div
+            %button.btn.btn-outline-primary{ type: "button", data: { action: "question-fields#add" } }
+              %i.bi.bi-plus-lg.me-1
+              Add Question
+          %template{ data: { question_fields_target: "template" } }
+            .input-group.mt-2
+              %span.input-group-text
+                %i.bi.bi-question-circle
+              %input.form-control{ type: "text", name: "job[questions][]", placeholder: "Enter a screening question", aria: { label: "Screening question" } }
+              %button.btn.btn-outline-secondary{ type: "button", aria: { label: "Remove question" }, data: { action: "question-fields#remove" } }
+                %i.bi.bi-x-lg{ aria: { hidden: true } }
+      %details.staffing-form__options.mt-3{ open: posting_options_expanded?, data: { posting_options: true } }
+        %summary.fw-semibold Posting settings
+        .row.g-3.mt-1
           .col-md-6
-            = location_fields.input :address_line_1, label: "Address Line 1"
+            = f.input :employment_type, collection: Job.employment_types.keys.map { |value| [value.humanize, value] }, include_blank: false
+          - if job.persisted?
+            .col-md-6
+              = f.input :status, collection: Job.statuses.keys.map { |value| [value.humanize, value] }, include_blank: false
           .col-md-6
-            = location_fields.input :address_line_2, label: "Address Line 2", required: false
-          .col-md-4
-            = location_fields.input :city
-          .col-md-4
-            = location_fields.input :state
-          .col-md-4
-            = location_fields.input :zip_code, label: "ZIP Code"
+            = f.input :is_active, label: "Accept applications when published"
           .col-md-6
-            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false, input_html: { class: "form-control form-control-muted" }
-
-      .d-flex.justify-content-between.align-items-center.mt-4
-        = link_to "Back to Company", usr_company_path(company), class: "btn btn-quiet"
-        = f.submit "Publish", class: "btn btn-primary"
+            = f.input :editable_by_company, label: "Allow company editors to edit this job"
+  .staffing-form__actions
+    = link_to cancel_label, cancel_path, class: "btn btn-quiet"
+    .d-flex.flex-wrap.gap-2
+      - if job.new_record?
+        = button_tag "Save draft", name: "publication_action", value: "draft", class: "btn btn-outline-primary"
+        = button_tag "Publish job", name: "publication_action", value: "publish", class: "btn btn-primary"
+      - else
+        = f.submit "Save changes", class: "btn btn-primary"
+        - if job.draft?
+          = button_tag "Publish job", name: "publication_action", value: "publish", class: "btn btn-outline-primary"
+  - if job.new_record? || job.draft?
+    %p.small.text-muted.mt-2.mb-4 Drafts are private to your company. Publish when you are ready to receive applications.

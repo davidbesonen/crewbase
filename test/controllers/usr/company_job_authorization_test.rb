@@ -262,7 +262,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "new job form starts with a clear required posting type choice" do
+  test "new job form defaults to a single role with a clear way to staff several positions" do
     sign_in @owner, scope: :user
 
     get new_usr_company_job_path(@company)
@@ -270,7 +270,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "fieldset[data-posting-type-choice]" do
       assert_select "legend", text: "What are you posting?"
-      assert_select "input[type='radio'][name='job[posting_type]'][value='single_role'][required]"
+      assert_select "input[type='radio'][name='job[posting_type]'][value='single_role'][required][checked]"
       assert_select "label", text: /Single job posting/
       assert_select "*", text: /one person for one role/
       assert_select "input[type='radio'][name='job[posting_type]'][value='multi_position'][required]"

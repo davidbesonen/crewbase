@@ -2,17 +2,25 @@
   .card.border-0.shadow-sm
     .card-body.p-4
       = f.error_notification
-      .row.g-3
-        .col-12
-          = f.input :name, label: "Project Name", input_html: { autofocus: true }
-        .col-12
-          = f.input :description, as: :text, input_html: { rows: 5 }, hint: "A short overview of the work, scope, or production."
-        .col-md-4
-          = f.input :status, collection: Project.statuses.keys.map { |status| [status.humanize, status] }, include_blank: false
-        .col-md-4
-          = f.input :starts_on, as: :string, input_html: { type: "date" }
-        .col-md-4
-          = f.input :ends_on, as: :string, input_html: { type: "date" }
-      .btn-group-responsive.justify-content-between.mt-4
+      = f.input :name, label: "Project name", placeholder: "e.g. Summer tour or festival weekend", input_html: { autofocus: true }
+      %p.text-muted.small Group related job postings under a tour, event, or production. Only the project name is required.
+      %details.staffing-form__options.mt-4{ open: options_expanded?, data: { project_options: true } }
+        %summary.fw-semibold Project details (optional)
+        .row.g-3.mt-1
+          .col-12
+            = f.input :description, as: :text, input_html: { rows: 3 }, hint: "A short overview for your company. Project details are private."
+          .col-md-4
+            = f.input :starts_on, as: :string, input_html: { type: "date", value: project.starts_on&.iso8601 }
+          .col-md-4
+            = f.input :ends_on, as: :string, input_html: { type: "date", value: project.ends_on&.iso8601 }
+          .col-md-4
+            = f.input :status, collection: Project.statuses.keys.map { |status| [status.humanize, status] }, include_blank: false
+        %p.form-text.mb-0 Project dates provide a starting point for new jobs. Each job can have its own schedule.
+      .staffing-form__actions.mt-4
         = link_to "Cancel", project.persisted? ? usr_project_path(project) : usr_company_projects_path(company), class: "btn btn-quiet"
-        = f.submit class: "btn btn-primary"
+        .d-flex.flex-wrap.gap-2
+          - if project.new_record?
+            = f.submit "Create project only", class: "btn btn-outline-primary"
+            = button_tag "Create project & post a job", name: "next_step", value: "post_job", class: "btn btn-primary"
+          - else
+            = f.submit "Save changes", class: "btn btn-primary"

@@ -5,6 +5,49 @@ class Usr::Company::JobFormComponentTest < ViewComponent::TestCase
     def allowed?(_feature) = available
   end
 
+  test "shows the essentials and tucks empty optional sections away" do
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job: Job.new(posting_type: :single_role, schedule_has_times: false), entitlement: Entitlement.new(true))
+
+    assert_selector "input[name='job[title]']"
+    assert_selector "label[for='job_title']", text: "Job title"
+    assert_selector "input[name='job[starts_at]']"
+    assert_selector "input[name='job[locations_attributes][0][city]']"
+    assert_selector "input[name='job[pay_min]']"
+    %w[additional-experience screening-questions schedule-options street-address posting-options].each do |section|
+      assert_selector "details[data-#{section}]:not([open])"
+    end
+    assert_selector "button[name='publication_action'][value='publish']", text: "Publish job"
+    assert_selector "button[name='publication_action'][value='draft']", text: "Save draft"
+    assert_no_selector "select[name='job[status]']", visible: :all
+  end
+
+  test "multi-position gigs use a gig title and separate role title" do
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job: Job.new(posting_type: :multi_position), entitlement: Entitlement.new(true))
+    assert_selector "label[for='job_title']", text: "Gig title"
+    assert_selector "label[for='job_crew_positions_attributes_0_title']", text: "Role title"
+  end
+
+  test "saved optional values and validation errors stay visible" do
+    job = Job.new(required_capability_keys: [ "audio" ], questions: [ "Which consoles do you know?" ],
+      application_deadline: 2.weeks.from_now, employment_type: :full_time)
+    job.locations.build(address_line_1: "1 Stage Road")
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job:, entitlement: Entitlement.new(true))
+    %w[additional-experience screening-questions schedule-options street-address posting-options].each do |section|
+      assert_selector "details[data-#{section}][open]"
+    end
+
+    job = Job.new
+    job.errors.add(:questions, "needs attention")
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job:, entitlement: Entitlement.new(true))
+    assert_selector "details[data-screening-questions][open]"
+  end
+
+  test "editing retains lifecycle controls and labels saving accurately" do
+    render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job: jobs(:one), entitlement: Entitlement.new(true))
+    assert_selector "details[data-posting-options][open] select[name='job[status]']"
+    assert_selector "input[type='submit'][value='Save changes']"
+  end
+
   test "keeps a searchable occupation picker and uses personal requirement text fields" do
     job = jobs(:one)
     job.job_requirements.create!(requirement: occupations(:one), importance: :required)

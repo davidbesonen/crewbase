@@ -21,6 +21,31 @@ class Usr::Company::JobFormComponent < ApplicationComponent
     @work_date_fields = Array(job.work_dates).presence || [ nil ]
   end
 
+  def posting_title_label = job.multi_position? ? "Gig title" : "Job title"
+  def posting_title_placeholder = job.multi_position? ? "e.g. Summer tour production crew" : "e.g. FOH Audio Engineer"
+  def cancel_label = job.project ? "Back to project" : "Back to company"
+  def cancel_path = job.project ? usr_project_path(job.project) : usr_company_path(company)
+
+  def project_schedule_prefilled?
+    job.new_record? && job.project && (job.project.starts_on || job.project.ends_on)
+  end
+
+  def additional_experience_expanded?
+    fields_present_or_invalid?(*ExperienceCategories::JOB_FIELDS.keys)
+  end
+
+  def screening_questions_expanded? = fields_present_or_invalid?(:questions)
+  def schedule_options_expanded? = job.schedule_has_times? || fields_present_or_invalid?(:work_dates, :application_deadline)
+
+  def street_address_expanded?
+    %i[address_line_1 address_line_2 zip_code].any? { |field| location.public_send(field).present? || location.errors[field].any? }
+  end
+
+  def posting_options_expanded?
+    job.persisted? || (job.employment_type.present? && !job.contract?) || !job.is_active? || !job.editable_by_company? ||
+      %i[employment_type status is_active editable_by_company].any? { |field| job.errors[field].any? }
+  end
+
   def selected_requirement_ids(type, importance)
     parameter_key = :"#{importance}_#{type}_ids"
     if requirement_selections.key?(parameter_key)
@@ -66,6 +91,10 @@ class Usr::Company::JobFormComponent < ApplicationComponent
   end
 
   private
+
+  def fields_present_or_invalid?(*fields)
+    fields.any? { |field| job.public_send(field).present? || job.errors[field].any? }
+  end
 
   def build_personal_requirement_fields
     requirements = JobExperienceRequirements.new(job)

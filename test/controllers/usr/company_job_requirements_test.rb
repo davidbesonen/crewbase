@@ -132,7 +132,7 @@ class Usr::CompanyJobRequirementsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".job-description-editor"
-    assert_select "p.form-label", text: "Description"
+    assert_select "label.form-label[for='job_description']", text: "Description"
     assert_select "*", text: /uploads coming soon/i, count: 0
     assert_select "[data-controller='taxonomy-multiselect']", count: 1
     assert_select "input[type='search'][role='combobox']", count: 1

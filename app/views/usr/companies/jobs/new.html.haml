@@ -1,14 +1,15 @@
-.row.mb-4
-  .col-sm-12
-    %h1.fw-bold.mb-1= @job.project ? "Add a Job Posting" : "Create a New Job"
-    %p.text-muted.mb-0
-      - if @job.project
-        Add a role to #{@job.project.name} for #{@company.name}.
-      - else
-        Add a new role for #{@company.name}.
+.staffing-form
+  .row.mb-4
+    .col-sm-12
+      %h1.fw-bold.mb-1= @job.project ? "Add a Job Posting" : "Create a New Job"
+      %p.text-muted.mb-0
+        - if @job.project
+          Add a role to #{@job.project.name} for #{@company.name}.
+        - else
+          Add a new role for #{@company.name}.
 
-.row.mt-4
-  .col-sm-12
-    = render Usr::Company::JobFormComponent.new(company: @company, job: @job, projects: @projects, occupations: @occupations, requirement_selections: @requirement_selections, entitlement: @entitlement, form_location: @form_location) do |section|
-      - section.with_experience_categories do
-        = render Usr::ExperienceCategoryFieldsComponent.new(record: @job, scope: :job, occupations: @occupations, selected_occupation_ids: section.selected_requirement_ids(:occupation, :required))
+  .row.mt-4
+    .col-sm-12
+      = render Usr::Company::JobFormComponent.new(company: @company, job: @job, projects: @projects, occupations: @occupations, requirement_selections: @requirement_selections, entitlement: @entitlement, form_location: @form_location) do |section|
+        - section.with_experience_categories do
+          = render Usr::ExperienceCategoryFieldsComponent.new(record: @job, scope: :job, occupations: @occupations, selected_occupation_ids: section.selected_requirement_ids(:occupation, :required))
