@@ -48,7 +48,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "body.vh-100", count: 0
     assert_select "#userSidenav", count: 0
     assert_select "nav.navbar", count: 0
-    assert_select "h1", text: /Staff your gigs/
+    assert_select "h1", text: /Know your gigs/
     assert_select "a[href='#{new_user_registration_path}']", text: /Start staffing/
     assert_select "a[href='#{new_user_session_path}']", text: /Sign in/
     assert_select "#how-it-works"
@@ -80,7 +80,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_operator labels.index("For companies"), :<, labels.index("For crew")
     assert_select ".concert-scene button", count: 0
     assert_select ".concert-scene[data-controller]", count: 0
-    assert_select "meta[name='description'][content*='Create your company'][content*='free profiles']"
+    assert_select "meta[name='description'][content^='Know your gigs. Own the show.'][content*='Create your company'][content*='free profiles']"
   end
 
   test "concert artwork leads the homepage and the workspace preview remains in the product section" do

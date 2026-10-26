@@ -1,7 +1,7 @@
 class BrandIdentity
   NAME = "KnowShow"
   DEFAULT_CONCEPT_KEY = "drive"
-  DESCRIPTION = "Create your company, staff live music touring gigs, and manage hiring in KnowShow. Crew, musicians and engineers can build free profiles and find their next gig."
+  DESCRIPTION = "Know your gigs. Own the show. Create your company and staff live music touring gigs in KnowShow. Crew, musicians and engineers can build free profiles and find work."
   Concept = Data.define(:key, :name, :character, :description, :colors)
   CONCEPTS = [
     Concept.new(key: "signal", name: "Signal", character: "Clean. Geometric. Confident.",
