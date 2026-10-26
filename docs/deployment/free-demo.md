@@ -1,5 +1,10 @@
 # Free Crewbase demo
 
+Preview: https://crewbase-demo.onrender.com
+
+Render service: `srv-dbfnkg59el5s73fuh1o0`, deployed from `codex/free-demo`.
+Neon project: `crimson-term-65790348`, branch `production`.
+
 Render runs one Ruby web service on its Free plan. Neon supplies PostgreSQL and
 private S3-compatible object storage, both in AWS Ohio. No paid worker or disk is
 required. Render can sleep after inactivity, so the first request can take about
@@ -19,7 +24,9 @@ in Render (never commit their values):
   demo branch's object storage. `S3_BUCKET=crewbase-demo`, `S3_REGION=us-east-2`.
 
 The Blueprint sets `CREWBASE_DEMO=true`, a single Puma process, and Solid Queue's
-threaded supervisor mode to fit the free instance. Keep database TLS enabled.
+threaded supervisor mode to fit the free instance. `config/puma.rb` also passes
+that mode to the Puma plugin; the supervisor environment variable alone does not
+prevent the plugin from forking extra Ruby processes. Keep database TLS enabled.
 Uploads stay private and are served using signed URLs. The app uses its existing
 authorization rules for attachments.
 
