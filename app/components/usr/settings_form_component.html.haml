@@ -8,7 +8,7 @@
 
   .card.border-0.shadow-sm.card-accent.card-accent-cyan.mb-4
     .card-body.p-4
-      %h2.h5.fw-bold.mb-1 Account information
+      %h2.h5.fw-bold.mb-1 Account Information
       %p.text-muted.mb-4 Keep your contact details current so crews and KnowShow can reach you.
       .row.g-3
         .col-md-6
@@ -34,11 +34,11 @@
 
   .card.border-0.shadow-sm.card-accent.card-accent-sky.mb-4
     .card-body.p-4
-      %h2.h5.fw-bold.mb-1 Notification preferences
+      %h2.h5.fw-bold.mb-1 Notification Preferences
       %p.text-muted.mb-4 Choose how KnowShow contacts you and which updates you want to receive.
 
       %fieldset.mb-4
-        %legend.h6.fw-bold Delivery channels
+        %legend.h6.fw-bold Delivery Channels
         .form-check.form-switch.mb-3
           = form.check_box :email_notifications_enabled, class: "form-check-input", role: "switch"
           = form.label :email_notifications_enabled, "Email notifications", class: "form-check-label fw-semibold"
@@ -49,7 +49,7 @@
           .form-text SMS delivery is not available. Email is the supported delivery channel.
 
       %fieldset
-        %legend.h6.fw-bold Updates you want
+        %legend.h6.fw-bold Updates You Want
         .form-check.mb-3
           = form.check_box :job_alert_notifications_enabled, class: "form-check-input"
           = form.label :job_alert_notifications_enabled, "Job alerts", class: "form-check-label fw-semibold"
@@ -65,7 +65,7 @@
 
   .card.border-0.shadow-sm.mb-4
     .card-body.p-4
-      %h2.h5.fw-bold.mb-1 Account tools
+      %h2.h5.fw-bold.mb-1 Account Tools
       %p.text-muted.mb-3 Manage your goals, support requests, and contact preferences.
       .d-flex.flex-wrap.gap-2
         = link_to helpers.usr_reports_path, class: "btn btn-outline-secondary" do

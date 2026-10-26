@@ -10,7 +10,7 @@
       .row.g-3
         .col-12
           %fieldset{ data: { posting_type_choice: true } }
-            %legend.h5.fw-semibold.mb-2 What are you posting?
+            %legend.h5.fw-semibold.mb-2 What Are You Posting?
             %p.text-muted.mb-3 Start with one role, or switch to a gig with several positions.
             .row.g-3
               .col-md-6
@@ -48,7 +48,7 @@
             data: { gig_positions: true, posting_type_fields_target: "positions" }
           }
             .border.rounded-3.p-3
-              %h5.fw-semibold.mb-2 First role to fill
+              %h5.fw-semibold.mb-2 First Role To Fill
               %p.text-muted.mb-3
                 Add the first role now. You can add more roles in the gig’s staffing workspace.
               = f.simple_fields_for :crew_positions, initial_crew_position do |position_fields|
@@ -79,7 +79,7 @@
           = f.rich_text_area :description, placeholder: "Describe the work, responsibilities, and what the crew should know.", class: "job-description-editor"
   .card.border-0.shadow-sm.mb-4
     .card-body.p-4
-      %h2.h5.fw-semibold.mb-2 When, where & pay
+      %h2.h5.fw-semibold.mb-2 When, Where & Pay
       %p.text-muted.mb-3 Add what you know now. Dates, location and pay can be updated later.
       - if project_schedule_prefilled?
         %p.small.text-muted Dates start from your project schedule. Adjust them for this role.
@@ -90,7 +90,7 @@
           = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
         .col-12
           %details.staffing-form__options{ open: schedule_options_expanded?, data: { schedule_options: true } }
-            %summary.fw-semibold Additional schedule options
+            %summary.fw-semibold Additional Schedule Options
             .row.g-3.mt-1
               .col-md-6
                 = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { job_schedule_target: "toggle", action: "job-schedule#change" } }
@@ -130,7 +130,7 @@
             = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false
           .col-12
             %details.staffing-form__options{ open: street_address_expanded?, data: { street_address: true } }
-              %summary.fw-semibold Street address (optional)
+              %summary.fw-semibold Street Address (Optional)
               .row.g-3.mt-1
                 .col-md-6
                   = location_fields.input :address_line_1, label: "Address Line 1"
@@ -139,7 +139,7 @@
                 .col-md-4
                   = location_fields.input :zip_code, label: "ZIP Code"
         .col-12.border-top.pt-3
-          %h3.h6.fw-semibold.mb-0 Compensation (optional)
+          %h3.h6.fw-semibold.mb-0 Compensation (Optional)
         .col-md-4
           = f.input :pay_period, collection: Job.pay_periods.keys.map { |value| [value.humanize, value] }, include_blank: true
         .col-md-4
@@ -156,7 +156,7 @@
     .card-body.p-4
       .row.g-3
         .col-12
-          %h2.h5.fw-semibold.mb-2 Who do you need?
+          %h2.h5.fw-semibold.mb-2 Who Do You Need?
           %p.text-muted.mb-3
             Choose occupations to help match this posting with relevant crew. Add extra experience only when it matters for the role.
           .row.g-3
@@ -233,12 +233,12 @@
                         %i.bi.bi-x-lg{ aria: { hidden: "true" } }
         .col-12
           %details.staffing-form__options{ open: additional_experience_expanded?, data: { additional_experience: true } }
-            %summary.fw-semibold Additional capabilities & equipment (optional)
+            %summary.fw-semibold Additional Capabilities & Equipment (Optional)
             %p.text-muted.small.mt-3 Occupations already cover their core duties. Add other capabilities and equipment families only when needed. Required experience filters matches; preferred experience helps rank them.
             = experience_categories
         .col-12
           %details.border.rounded.p-3{ open: specific_requirements_expanded?, data: { specific_requirements: true } }
-            %summary.fw-semibold Specific requirements (optional)
+            %summary.fw-semibold Specific Requirements (Optional)
             %p.text-muted.small.mt-3 Most roles only need the broad experience choices above. Add named techniques, products or models here only when those details matter.
             %p.small Required entries filter job recommendations and flag gaps in recommended crew. Preferred entries improve ranking.
             %p.text-muted.small One entry per line. Names match experience reported on the person's profile. MA3 and grandMA3 are recognized as the same console family; MA2 is separate. Other alternate names and spellings are not matched automatically, and entries are not converted into broad categories.
@@ -249,7 +249,7 @@
   .card.border-0.shadow-sm.mb-4
     .card-body.p-4
       %details.staffing-form__options{ open: screening_questions_expanded?, data: { screening_questions: true } }
-        %summary.fw-semibold Screening questions (optional)
+        %summary.fw-semibold Screening Questions (Optional)
         %p.text-muted.small.mt-3 Ask applicants only what you need to decide who to hire.
         .d-flex.flex-column.gap-2{ data: { controller: "question-fields" } }
           .d-flex.flex-column.gap-2{ data: { question_fields_target: "container" } }
@@ -272,7 +272,7 @@
               %button.btn.btn-outline-secondary{ type: "button", aria: { label: "Remove question" }, data: { action: "question-fields#remove" } }
                 %i.bi.bi-x-lg{ aria: { hidden: true } }
       %details.staffing-form__options.mt-3{ open: posting_options_expanded?, data: { posting_options: true } }
-        %summary.fw-semibold Posting settings
+        %summary.fw-semibold Posting Settings
         .row.g-3.mt-1
           .col-md-6
             = f.input :employment_type, collection: Job.employment_types.keys.map { |value| [value.humanize, value] }, include_blank: false

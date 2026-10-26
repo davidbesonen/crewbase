@@ -36,7 +36,7 @@ class Usr::Network::FormsTest < ViewComponent::TestCase
     jobs(:one).title = "Private production details"
     share = NetworkJobShare.new(job: jobs(:one), sender: users(:one), recipient: users(:two), created_at: Time.current)
     render_inline Usr::Network::SharedJobComponent.new(share:, viewer: users(:two), detail: true)
-    assert_text "Job no longer available"
+    assert_text "Job No Longer Available"
     assert_no_text jobs(:one).title
     assert_no_selector "a", text: "View job"
   end

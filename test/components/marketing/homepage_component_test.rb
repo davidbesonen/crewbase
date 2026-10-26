@@ -16,16 +16,16 @@ class Marketing::HomepageComponentTest < ViewComponent::TestCase
     assert_selector "nav[aria-label='Primary navigation']"
     assert_selector "a[href='/users/sign_up']", text: "Start staffing", minimum: 2
     assert_selector "a[href='/users/sign_in']", text: /Sign in/
-    assert_selector "h1", text: "Know your gigs. Own the show.", normalize_ws: true
+    assert_selector "h1", text: "Know Your Gigs. Own The Show.", normalize_ws: true
     assert_selector ".marketing-hero__lede", text: /Know who’s on your crew and where each gig stands/
     assert_selector ".marketing-footer__brand", text: "Know your gigs. Own the show."
     assert_selector "#how-it-works article", count: 3
-    assert_selector "#how-it-works h3", text: "Confirm bookings together"
+    assert_selector "#how-it-works h3", text: "Confirm Bookings Together"
     assert_selector "#for-crew .marketing-feature", count: 3
-    assert_selector "#for-crew h2", text: "Looking for your next gig?"
+    assert_selector "#for-crew h2", text: "Looking For Your Next Gig?"
     assert_selector "#for-companies .marketing-feature", count: 3
     assert_selector "#pricing .marketing-price-card", count: 2
-    assert_selector "#pricing", text: /Start staffing free/
+    assert_selector "#pricing", text: /Start Staffing Free/
     assert_selector "#pricing", text: /\$19/
     assert_no_text(/Founding Company|\$99|\$49/)
     assert_selector "#platform", text: /clear, job-relevant details/

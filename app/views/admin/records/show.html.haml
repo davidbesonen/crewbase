@@ -2,6 +2,6 @@
 .card.mt-4
   .card-body
     .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2.mb-3
-      %h2.h5.mb-0 Recent administrative history
+      %h2.h5.mb-0 Recent Administrative History
       = link_to "View full history", admin_audit_events_path(subject_type: @record.class.name, subject_id: @record.id), class: "btn btn-sm btn-outline-secondary"
     = render Admin::AuditLogComponent.new(events: @events)

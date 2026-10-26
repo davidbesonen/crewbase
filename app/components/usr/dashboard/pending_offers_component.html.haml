@@ -2,7 +2,7 @@
   .card-body.p-4
     .d-flex.flex-wrap.align-items-center.justify-content-between.gap-2.mb-3
       %div
-        %h2#pending-offers-heading.h5.fw-semibold.mb-1 Offers need your reply
+        %h2#pending-offers-heading.h5.fw-semibold.mb-1 Offers Need Your Reply
         %p.small.text-muted.mb-0 Review the dates and terms before confirming your booking.
       = link_to "View all (#{@count})", usr_job_offers_path(view: "needs_reply"), class: "btn btn-outline-primary btn-sm"
     - @offers.each do |offer|

@@ -19,7 +19,7 @@ class AffordablePricingTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_not_includes response.body, "Continue to Payment"
     assert_not_includes response.body, "company_billing_monthly"
-    assert_select "details:not([open]) summary", text: "Website & social links (optional)"
+    assert_select "details:not([open]) summary", text: "Website & Social Links (Optional)"
 
     post usr_companies_path, params: { plan_id: free.id, company: { name: "Free Company", contact_email: "free@example.com", industry_ids: [ @industry.id ] } }
     company = @owner.owned_companies.find_by!(name: "Free Company")
@@ -54,7 +54,7 @@ class AffordablePricingTest < ActionDispatch::IntegrationTest
   test "crew billing explains free access without selling a roadmap" do
     get usr_settings_billing_path
     assert_response :success
-    assert_select "h2", text: "Free for crew"
+    assert_select "h2", text: "Free For Crew"
     assert_select "form[action='#{subscription_checkout_usr_settings_billing_path}']", count: 0
     assert_select "a[href='#{usr_jobs_path}']", text: /Find work/
     assert_not_includes response.body, "Roadmap"

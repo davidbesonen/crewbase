@@ -53,7 +53,7 @@
 - else
   .empty-state.empty-state-sky
     %i.bi.bi-bookmark.fs-2.text-primary.mb-3{ aria: { hidden: true } }
-    %h2.h5.fw-semibold= filtered? ? "No saved jobs match these filters" : "No Saved Jobs Yet"
+    %h2.h5.fw-semibold= filtered? ? "No Saved Jobs Match These Filters" : "No Saved Jobs Yet"
     %p.text-muted= filtered? ? "Try another search or view all your saved opportunities." : "Save jobs while browsing to compare them and come back later."
     - if filtered?
       = link_to "Show all saved jobs", usr_saved_jobs_path, class: "btn btn-outline-primary"

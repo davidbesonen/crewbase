@@ -2,13 +2,13 @@
   .row.g-3
     - groups.each do |group|
       %fieldset.col-md-6{ data: { experience_categories_target: "group", category_type: group[:type] } }
-        %legend.fs-6.fw-semibold= group[:label]
+        %legend.fs-6.fw-semibold= ui_title(group[:label])
         %p.small.text-muted{ hidden: group[:core_names].empty?, data: { category_core_summary: true }, aria: { live: "polite" } }= "Included through occupations: #{group[:core_names].join(', ')}"
         = hidden_field_tag "#{scope}[#{group[:field]}][]", ""
         %p.small.text-muted{ data: { experience_categories_target: "summary" }, aria: { live: "polite" } }= group[:names].presence&.to_sentence || "No categories selected"
         %details.border.rounded.p-3{ open: group[:expanded], data: { category_picker: true } }
           %summary.fw-semibold
-            Browse suggestions
+            Browse Suggestions
             %span.badge.text-bg-secondary.ms-2{ data: { category_selected_count: true } }= "#{group[:selected].length} selected"
           %p.small.fw-semibold.mt-3{ data: { category_guidance: true }, aria: { live: "polite" } }= group[:tailored] ? "Suggested for selected occupations, plus your selections" : "All choices — select occupations to tailor suggestions"
           = label_tag "#{scope}_#{group[:field]}_search", "Search #{group[:label].downcase}", class: "visually-hidden"
@@ -16,7 +16,7 @@
           %p.small.text-muted{ data: { category_search_status: true }, aria: { live: "polite" } }
           - group[:sections].each do |section, categories|
             %details{ open: section == :primary, hidden: section == :other && categories.empty?, data: { category_section: section }, class: "mb-2" }
-              %summary.small.fw-semibold= section == :primary ? "Suggested choices & selections" : "Other categories"
+              %summary.small.fw-semibold= section == :primary ? "Suggested Choices & Selections" : "Other Categories"
               .mt-3.overflow-auto.experience-category-options{ data: { "category-#{section}" => true } }
                 - categories.each do |category|
                   .form-check.mb-3{ hidden: group[:redundant].include?(category.key), data: { category_row: true } }

@@ -63,7 +63,7 @@
             - if @unread_notification_count.positive?
               %span.badge.rounded-pill.ms-auto.workspace-sidenav__count= @unread_notification_count
     %nav.workspace-sidenav__group.workspace-sidenav__companies{ aria: { label: "Your companies" } }
-      %h2.workspace-sidenav__heading Your companies
+      %h2.workspace-sidenav__heading Your Companies
       %ul.nav.flex-column
         - if @sidenav_companies.any?
           - @sidenav_companies.each do |company|

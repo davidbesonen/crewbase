@@ -15,7 +15,7 @@
             %dt.col-sm-4 Respond by
             %dd.col-sm-8= l(@offer.expires_at, format: :long)
         - if @offer.terms.present?
-          %h2.h6 Essential terms
+          %h2.h6 Essential Terms
           = simple_format(@offer.terms)
         - if @offer.cancelled?
           .alert.alert-secondary
@@ -35,7 +35,7 @@
         - if @offer.accepted? && !@offer.job.conversation_archived? && @offer.ends_at > Time.current
           .alert.alert-success Booking confirmed. Changes to the agreed terms require cancellation and a new offer.
           %details.border.rounded-3.p-3.mt-3
-            %summary.text-danger.fw-semibold Cancel this booking
+            %summary.text-danger.fw-semibold Cancel This Booking
             = form_with url: usr_job_offer_path(@offer), method: :patch, builder: ActionView::Helpers::FormBuilder, class: "mt-3" do |form|
               = form.hidden_field :decision, value: "cancel"
               .mb-3

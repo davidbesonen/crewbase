@@ -1,7 +1,7 @@
 .staffing-form
   .row.mb-4
     .col-sm-12
-      %h1.fw-bold.mb-1= @job.project ? "Add a Job Posting" : "Create a New Job"
+      %h1.fw-bold.mb-1= @job.project ? "Add A Job Posting" : "Create A New Job"
       %p.text-muted.mb-0
         - if @job.project
           Add a role to #{@job.project.name} for #{@company.name}.

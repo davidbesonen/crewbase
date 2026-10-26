@@ -23,7 +23,7 @@ class ProductPrivacyTest < ActionDispatch::IntegrationTest
     sign_in @admin
     get "/admin/product_metrics"
     assert_response :success
-    assert_select "h1", text: "Product outcomes"
+    assert_select "h1", text: "Product Outcomes"
     assert_no_match @other.email, response.body
     assert_no_match @other.full_name, response.body
   end

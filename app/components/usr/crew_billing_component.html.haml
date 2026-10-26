@@ -2,7 +2,7 @@
   .card-body.p-4
     .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3
       %div
-        %h2.h4.fw-bold.mb-1 Free for crew
+        %h2.h4.fw-bold.mb-1 Free For Crew
         %p.text-muted.mb-0 Find work and manage your career without a subscription.
       %span.badge.text-bg-success $0
     %p.mt-3 Profiles, applications, messages, invitations, saved jobs, and availability remain free. There are no application credits to buy, and paying does not improve your recommendation ranking.
@@ -17,7 +17,7 @@
   .card.border-0.shadow-sm.mb-4
     .card-body.p-4
       .d-flex.flex-wrap.align-items-center.gap-2.mb-2
-        %h2.h5.fw-bold.mb-0 Existing crew subscription
+        %h2.h5.fw-bold.mb-0 Existing Crew Subscription
         %span.badge.text-bg-secondary= subscription_status
       %p.text-muted Your existing #{subscription.user_plan.name} subscription has not been changed. Manage or cancel it securely in Stripe. Your crew features stay free if you cancel.
       = button_to "Manage billing in Stripe", helpers.portal_usr_settings_billing_path, class: "btn btn-outline-primary", data: { turbo: false }

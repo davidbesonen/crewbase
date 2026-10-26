@@ -6,7 +6,7 @@ class Usr::JobOffer::InboxComponentTest < ViewComponent::TestCase
     assert_selector "nav[aria-label='Filter offers'] a[aria-current='page']", text: /Needs your reply/
     assert_selector "label[for='q']", text: "Search offers"
     assert_selector "input[type='hidden'][name='view'][value='needs_reply']", visible: :all
-    assert_selector "h2", text: "No offers yet"
+    assert_selector "h2", text: "No Offers Yet"
     assert_selector "a[href='/usr/jobs']", text: "Browse jobs"
   end
 

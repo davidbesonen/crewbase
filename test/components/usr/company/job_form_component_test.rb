@@ -8,6 +8,8 @@ class Usr::Company::JobFormComponentTest < ViewComponent::TestCase
   test "shows the essentials and tucks empty optional sections away" do
     render_inline Usr::Company::JobFormComponent.new(company: companies(:one), job: Job.new(posting_type: :single_role, schedule_has_times: false), entitlement: Entitlement.new(true))
 
+    assert_selector "h2", text: "When, Where & Pay"
+    assert_selector "summary", text: "Additional Schedule Options"
     assert_selector "input[name='job[title]']"
     assert_selector "label[for='job_title']", text: "Job title"
     assert_selector "input[name='job[starts_at]']"

@@ -28,7 +28,7 @@ class Usr::JobCompanySelectionsControllerTest < ActionDispatch::IntegrationTest
     get "/usr/jobs/select_company"
 
     assert_response :success
-    assert_select "h1", text: "Which company?"
+    assert_select "h1", text: "Which Company?"
     assert_select "a[href='#{new_usr_company_job_path(@first_company)}']", text: @first_company.name
     assert_select "a[href='#{new_usr_company_job_path(@second_company)}']", text: @second_company.name
     assert_select "a", text: @other_company.name, count: 0

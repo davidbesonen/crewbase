@@ -3,17 +3,17 @@
 %p.text-muted= "#{@report.subject_type} ##{@report.subject_id} · Reported by #{@report.reporter.full_name} · #{@report.status.humanize}"
 .card.mb-4
   .card-body
-    %h2.h5= SafetyReport::CATEGORIES[@report.category]
+    %h2.h5= ui_title(SafetyReport::CATEGORIES[@report.category])
     %p.mb-0= @report.details
 .card.mb-4
   .card-body
-    %h2.h5 Investigate and take action
+    %h2.h5 Investigate And Take Action
     %p.small.text-muted Changing the report status records a decision. Use the linked record to suspend an account or place a company or job on hold, then document the outcome below.
     .d-flex.flex-wrap.gap-2
       - @management_targets.each do |target|
         = link_to "Manage #{target.model_name.human.downcase} ##{target.id}", polymorphic_path([:admin, target]), class: "btn btn-outline-primary"
 = render Admin::ModerationDecisionFormComponent.new(report: @report, decision: @decision)
-%h2.h5.mt-4 Decision history
+%h2.h5.mt-4 Decision History
 - @decisions.each do |decision|
   .card.mb-3
     .card-body

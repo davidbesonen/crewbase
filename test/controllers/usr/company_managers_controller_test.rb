@@ -33,7 +33,7 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /Company Manager/
     assert_select "[data-company-manager-metric]", minimum: 6
     assert_select "[data-studio-benefit]", count: 0
-    assert_select ".card", text: /Next steps/
+    assert_select ".card", text: /Next Steps/
     assert_select "canvas[data-controller='admin-chart']", count: 1
   end
 

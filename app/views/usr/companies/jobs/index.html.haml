@@ -1,7 +1,7 @@
 .row.mb-4
   .col-12.d-flex.flex-wrap.align-items-start.justify-content-between.gap-3
     %div
-      %h1.fw-bold.mb-1= "Jobs for #{@company.name}"
+      %h1.fw-bold.mb-1= "Jobs For #{@company.name}"
       %p.text-muted.mb-0 Create and manage this company's job listings.
     = link_to new_usr_company_job_path(@company), class: "btn btn-primary" do
       %i.bi.bi-plus-lg.me-1{ aria: { hidden: true } }

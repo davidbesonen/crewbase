@@ -2,7 +2,7 @@
   .card-body
     %h5.card-title.fw-semibold.mb-3
       %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
-      Jobs Recommended for You
+      Jobs Recommended For You
     - if results.any?
       .d-flex.flex-column.gap-3
         - results.each do |result|
@@ -30,7 +30,7 @@
                     .text-muted.small= result.job.pay_period.humanize
                 .text-muted.small= result.job.relative_published_at
             %details.mt-2
-              %summary.small.text-muted Not interested?
+              %summary.small.text-muted Not Interested?
               = form_with url: usr_job_recommendation_feedback_path(result.job.id), builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mt-2" do |form|
                 = form.label :reason, "Why hide this recommendation?", for: "feedback_reason_#{result.job.id}", class: "visually-hidden"
                 = form.select :reason, RecommendationFeedback::REASONS.map { |key, label| [label, key] }, {}, id: "feedback_reason_#{result.job.id}", class: "form-select form-select-sm w-auto"

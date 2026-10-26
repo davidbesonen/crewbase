@@ -1,4 +1,6 @@
 module ApplicationHelper
+  def ui_title(text) = UiTitle.format(text)
+
   def workspace_navigation_visible?
     current_user && (current_user.onboarding_completed_at.present? || current_user.has_completed_user_profile?)
   end

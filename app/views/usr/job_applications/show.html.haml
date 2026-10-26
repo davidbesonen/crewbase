@@ -71,7 +71,7 @@
         .card-body.p-4
           .d-flex.align-items-center.gap-2.mb-2
             = knowshow_credit_badge(variant: :blue, compact: true)
-            %h4.fw-semibold.mb-0 KnowShow Credit earned
+            %h4.fw-semibold.mb-0 KnowShow Credit Earned
           %p.text-muted.mb-3 This job was verified and added automatically when the company marked it completed.
           = link_to "View KnowShow Credit", usr_profile_path(@job_application.profile, anchor: "profile-credits"), class: "btn btn-outline-primary"
 
@@ -92,7 +92,7 @@
     - if @offers.any?
       .card.border-0.shadow-sm.mb-4
         .card-body.p-4
-          %h2.h5 Offers & booking history
+          %h2.h5 Offers & Booking History
           - @offers.each do |offer|
             %p.mb-2= link_to "#{offer.role} · #{offer.effective_status.humanize}", usr_job_offer_path(offer)
 

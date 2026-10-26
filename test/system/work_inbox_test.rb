@@ -28,7 +28,7 @@ class WorkInboxTest < ApplicationSystemTestCase
     assert_text "Reply due soon"
     fill_in "Search offers", with: "Does not exist"
     click_button "Search"
-    assert_text "No offers match your search"
+    assert_text "No Offers Match Your Search"
     assert_selector "nav[aria-label='Filter offers'] a[aria-current='page']", text: /Needs your reply/
     click_link "Clear search"
     assert_selector "[data-offer-id='#{pending.id}']"

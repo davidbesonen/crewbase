@@ -21,8 +21,8 @@ class Usr::ProfileAvailabilityHeadingsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: "Welcome David 👋"
-    assert_select "h4", text: "Tell us about yourself..."
-    assert_select "h4", text: "What is your availability for the next year?"
+    assert_select "p.h4", text: "Tell us about yourself..."
+    assert_select "h4", text: "What Is Your Availability For The Next Year?"
   end
 
   test "completed profile uses availability management headings" do
@@ -34,6 +34,6 @@ class Usr::ProfileAvailabilityHeadingsTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "Manage Availability"
     assert_select "h4", text: "Update Availability"
     assert_select "h1", text: /Welcome David/, count: 0
-    assert_select "h4", text: "What is your availability for the next year?", count: 0
+    assert_select "h4", text: "What Is Your Availability For The Next Year?", count: 0
   end
 end

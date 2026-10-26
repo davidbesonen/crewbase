@@ -11,7 +11,7 @@
           %i.bi.bi-building-check{ aria: { hidden: true } }
         %div
           %p.text-muted.small.text-uppercase.fw-semibold.mb-1 Current access
-          %h2.h4.mb-1= current_plan&.name || "No active plan"
+          %h2.h4.mb-1= current_plan&.name || "No Active Plan"
           - if current_plan
             %p.text-muted.mb-0= current_plan.free? ? "Free · no card required" : "#{current_plan.monthly_price}/month or #{current_plan.annual_price}/year"
         - if current_plan
@@ -57,7 +57,7 @@
                 = form_with url: usr_company_billing_checkout_path(company), method: :post, class: "mt-auto", data: { turbo: false } do |form|
                   = form.hidden_field :plan_id, value: plan.id
                   %fieldset.mb-3
-                    %legend.h6 Billing interval
+                    %legend.h6 Billing Interval
                     - if plan.checkout_available?("monthly")
                       .form-check
                         = form.radio_button :billing_interval, "monthly", checked: true, class: "form-check-input", id: "plan_#{plan.id}_monthly"
@@ -73,7 +73,7 @@
   - elsif current_plan
     .card.border-0.shadow-sm
       .card-body.p-4
-        %h2.h4 Your plan is ready for work
+        %h2.h4 Your Plan Is Ready For Work
         %p.text-muted.mb-3 Manage jobs and applications from your company workspace.
         = link_to "Go to company", usr_company_path(company), class: "btn btn-primary"
 

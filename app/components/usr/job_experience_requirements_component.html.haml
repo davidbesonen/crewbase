@@ -1,10 +1,10 @@
 .card.border-0.shadow-sm.mb-4{ data: { job_experience_requirements: true } }
   .card-body.p-4
-    %h4.fw-semibold.mb-3 Experience for this job
+    %h4.fw-semibold.mb-3 Experience For This Job
     .row.g-3
       - groups.each do |group|
         .col-sm-6
-          %h5.fs-6= group[:label]
+          %h5.fs-6= ui_title(group[:label])
           %ul.mb-0
             - group[:names].each do |name|
               %li= name

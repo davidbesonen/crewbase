@@ -56,7 +56,7 @@ class OpenJobDiscoveryTest < ActionDispatch::IntegrationTest
 
   test "filtered directories explain no matches and provide a reset" do
     get usr_jobs_path, params: { q: { title_cont: "NoSuchRole" } }
-    assert_select "h5", text: "No matching jobs"
+    assert_select "h5", text: "No Matching Jobs"
     assert_select ".empty-state a[href='#{usr_jobs_path}']", text: "Clear filters"
 
     get usr_profiles_path, params: { q: { user_first_name_or_user_last_name_cont: "NoSuchPerson" } }

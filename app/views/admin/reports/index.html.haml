@@ -1,4 +1,4 @@
-%h1.h3 Moderation queue
+%h1.h3 Moderation Queue
 %nav.d-flex.gap-2.mb-4{ aria: { label: "Report status" } }
   - SafetyReport.statuses.each_key do |status|
     = link_to "#{status.humanize} (#{@counts.fetch(status, 0)})", admin_reports_path(status: status), class: "btn #{@status == status ? 'btn-primary' : 'btn-outline-secondary'}"

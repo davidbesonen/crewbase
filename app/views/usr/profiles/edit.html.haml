@@ -2,10 +2,10 @@
   .col-lg-10.mx-auto
     - if @completed_profile_mode
       %h1.fw-bold.text-center.mb-1 Edit Your Profile
-      %h4.fw-semibold.text-center.mb-5 Update your information and save when you're done.
+      %p.h4.fw-semibold.text-center.mb-5 Update your information and save when you're done.
     - else
       %h1.fw-bold.text-center.mb-1="Welcome #{current_user.first_name} 👋"
-      %h4.fw-semibold.text-center.mb-5 Tell us about yourself...
+      %p.h4.fw-semibold.text-center.mb-5 Tell us about yourself...
 
     - visible_form = @current_page
     .row{ id: "profile_information_card" }

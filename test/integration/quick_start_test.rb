@@ -15,7 +15,7 @@ class QuickStartTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
     assert_redirected_to "/usr/onboarding"
     follow_redirect!
-    assert_select "h1", text: "What brings you to KnowShow?"
+    assert_select "h1", text: "What Brings You To KnowShow?"
     assert_select "input[name='onboarding[intent]']", count: 3
   end
 
@@ -26,7 +26,7 @@ class QuickStartTest < ActionDispatch::IntegrationTest
     assert_equal [ occupation ], @profile.reload.occupations
     get usr_dashboards_path
     assert_response :success
-    assert_select "[data-quick-start]", text: /Find your next role/
+    assert_select "[data-quick-start]", text: /Find Your Next Role/
     assert_select ".workspace-sidenav a[href='#{usr_jobs_path}']"
     assert_select "a[href='#{usr_job_offers_path}']", text: "Offers & bookings"
     assert_nil @profile.completed_at
@@ -37,7 +37,7 @@ class QuickStartTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_usr_company_path
     get usr_dashboards_path
     assert_response :success
-    assert_select "[data-quick-start]", text: /Post your first role/
+    assert_select "[data-quick-start]", text: /Post Your First Role/
   end
 
   test "invalid intent does not finish onboarding" do

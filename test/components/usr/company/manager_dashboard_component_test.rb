@@ -26,7 +26,7 @@ class Usr::Company::ManagerDashboardComponentTest < ViewComponent::TestCase
 
     assert_selector "[data-studio-benefit]", count: 0
     assert_no_text "Upgrade to Studio"
-    assert_text "Next steps"
+    assert_text "Next Steps"
   end
 
   private

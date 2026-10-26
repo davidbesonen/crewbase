@@ -1,4 +1,4 @@
-%h1 Product outcomes
+%h1 Product Outcomes
 %p.text-muted Last 30 days. Counts start when tracking was enabled; historical actions are not backfilled. Impressions record recommendations rendered on the dashboard, not proof someone read them.
 .card.mb-4
   .card-body
@@ -17,11 +17,11 @@
               %td= metrics[:members].fetch(name, 0)
 .card.mb-4
   .card-body
-    %h2.h5 Recommendation outcomes
+    %h2.h5 Recommendation Outcomes
     %p These actions followed a recommendation for the same member and job within 30 days. This shows an association, not proof that the recommendation caused the outcome.
     %p= "Applications: #{metrics[:recommended_applications]}"
     %p= "Confirmed bookings: #{metrics[:recommended_bookings]}"
-    %h3.h6 Reasons people hide recommendations
+    %h3.h6 Reasons People Hide Recommendations
     - if metrics[:dismissal_reasons].empty?
       %p.text-muted No feedback yet.
     - metrics[:dismissal_reasons].each do |reason, count|

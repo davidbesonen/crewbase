@@ -48,7 +48,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "body.vh-100", count: 0
     assert_select "#userSidenav", count: 0
     assert_select "nav.navbar", count: 0
-    assert_select "h1", text: /Know your gigs/
+    assert_select "h1", text: /Know Your Gigs/
     assert_select "a[href='#{new_user_registration_path}']", text: /Start staffing/
     assert_select "a[href='#{new_user_session_path}']", text: /Sign in/
     assert_select "#how-it-works"
@@ -56,7 +56,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "#for-companies"
     assert_select "#platform"
     assert_select "*", text: /Availability/
-    assert_select "*", text: /Broad experience, specific strengths/
+    assert_select "*", text: /Broad Experience, Specific Strengths/
     assert_select "*", text: /job.*match|match.*job/i
     assert_select "*", text: /projects?/i
     assert_select "*", text: /applications?/i
@@ -73,7 +73,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".marketing-hero", text: /production company/
     assert_select ".marketing-hero a[href='#for-crew']", text: "Looking for gigs?"
-    assert_select "#how-it-works h3", text: "Create your company"
+    assert_select "#how-it-works h3", text: "Create Your Company"
     assert_select "#how-it-works ~ #for-companies ~ #for-crew"
     assert_select "#for-crew a[href='#{new_user_registration_path}']", text: "Create your free profile"
     labels = css_select(".marketing-nav__links a").map(&:text)
@@ -118,7 +118,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "main[data-marketing-team-page]"
-    assert_select "h1", text: "Meet the Team"
+    assert_select "h1", text: "Meet The Team"
     assert_select "article[data-team-member='david-besonen']" do
       assert_select "img[alt='David Besonen playing saxophone on tour']"
       assert_select "h2", text: "David Besonen"

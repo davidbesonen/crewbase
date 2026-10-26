@@ -1,15 +1,15 @@
-%h1.h3 Billing support
+%h1.h3 Billing Support
 %p.text-muted Review company subscription state and follow up on payment issues. Refunds, cancellations, and payment changes are managed in your payment provider.
 .row.g-3.mb-4
   .col-sm-6
     .card.h-100
       .card-body
-        %h2.h6 Subscriptions needing attention
+        %h2.h6 Subscriptions Needing Attention
         %p.h3.mb-0= @attention_count
   .col-sm-6
     .card.h-100
       .card-body
-        %h2.h6 Unprocessed billing events
+        %h2.h6 Unprocessed Billing Events
         %p.h3.mb-0= @unprocessed_count
 = form_with url: admin_billing_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mb-4" do |form|
   = form.search_field :q, value: params[:q], placeholder: "Company, email, or subscription ID", class: "form-control w-auto", aria: { label: "Search subscriptions" }

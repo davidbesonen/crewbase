@@ -2,7 +2,7 @@
   .col-12.col-lg-8
     .card.border-0.shadow-sm
       .card-body.p-4.p-lg-5
-        %h1.fw-bold.mb-3 Offer job
+        %h1.fw-bold.mb-3 Offer Job
         %p.text-muted Confirm the terms for #{@application.profile.user.full_name}. This is a booking confirmation, not a signed contract or payment.
         %p.small.text-muted Pending offers do not reserve a position. Availability and capacity are checked when the worker accepts.
         - if @offer.errors.any?

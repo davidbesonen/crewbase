@@ -8,19 +8,19 @@ class Users::AccountPageAuditTest < ActionDispatch::IntegrationTest
   test "public authentication pages render" do
     get new_user_session_path
     assert_response :success
-    assert_select "h2", text: "Log in"
+    assert_select "h2", text: "Log In"
 
     get new_user_registration_path
     assert_response :success
-    assert_select "h2", text: "Sign up"
+    assert_select "h2", text: "Sign Up"
 
     get new_user_password_path
     assert_response :success
-    assert_select "h2", text: "Forgot your password?"
+    assert_select "h2", text: "Forgot Your Password?"
 
     get edit_user_password_path(reset_password_token: "invalid-token")
     assert_response :success
-    assert_select "h2", text: "Change your password"
+    assert_select "h2", text: "Change Your Password"
   end
 
   test "account edit page renders for a signed in user" do

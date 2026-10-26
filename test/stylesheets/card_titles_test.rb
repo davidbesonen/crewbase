@@ -14,7 +14,7 @@ class CardTitlesTest < ActiveSupport::TestCase
     assert_includes stylesheet, "padding: 0;"
 
     assert_includes profile_show, "%h5.card-section-title.fw-bold About"
-    assert_includes profile_show, "%h5.card-section-title.fw-bold Skills & services"
+    assert_includes profile_show, "%h5.card-section-title.fw-bold Skills & Services"
     assert_includes profile_show, "%h5.card-section-title.fw-bold Recent Feedback"
   end
 end

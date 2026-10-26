@@ -34,7 +34,7 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     assert_no_selector "trix-editor progress"
     find("[data-additional-experience] > summary").click
     assert_selector "details[data-category-picker]:not([open])", count: 4
-    within("fieldset", text: "Required capabilities") do
+    within("fieldset", text: "Required Capabilities") do
       find("[data-category-picker] > summary").click
       fill_in "Search required capabilities", with: "coordination"
       assert_text "matching choices"

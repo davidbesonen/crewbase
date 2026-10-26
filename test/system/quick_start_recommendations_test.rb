@@ -14,12 +14,12 @@ class QuickStartRecommendationsTest < ApplicationSystemTestCase
     login_as worker, scope: :user
     page.driver.browser.manage.window.resize_to(390, 1000)
     visit usr_dashboards_path
-    assert_text "What brings you to KnowShow?"
+    assert_text "What Brings You To KnowShow?"
     choose "Find work"
     find("summary", text: "Choose your roles").click
     check "FOH Engineer"
     click_button "Get started"
-    assert_text "Find your next role"
+    assert_text "Find Your Next Role"
     within "[data-worker-job-recommendation]" do
       assert_text "Tour audio engineer"
       find("summary", text: "Not interested?").click

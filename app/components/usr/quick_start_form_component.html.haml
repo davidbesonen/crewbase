@@ -2,13 +2,13 @@
   .col-12.col-lg-9.col-xl-8
     .card.border-0.shadow-sm
       .card-body.p-4.p-lg-5
-        %h1.fw-bold What brings you to KnowShow?
+        %h1.fw-bold What Brings You To KnowShow?
         %p.text-muted Find work or hire crew and musicians in live music touring. Start with what you need today; add more profile details later.
         - if quick_start.errors.any?
           .alert.alert-danger{ role: "alert" }= quick_start.errors.full_messages.to_sentence
         = form_with url: usr_onboarding_path, method: :patch, scope: :onboarding, builder: ActionView::Helpers::FormBuilder do |form|
           %fieldset.mb-4
-            %legend.h5 I’m here to…
+            %legend.h5 I’m Here To…
             .row.g-3
               - CompleteQuickStart::INTENTS.each do |value, label|
                 .col-md-4
@@ -17,9 +17,9 @@
                     %span.fw-semibold= label
           .mb-4
             %details
-              %summary.fw-semibold.py-2 Choose your roles (optional)
+              %summary.fw-semibold.py-2 Choose Your Roles (Optional)
               %fieldset.quick-start-roles.border.rounded.p-3.mt-2{ aria: { describedby: "quick-start-roles-help" } }
-                %legend.visually-hidden What roles do you do?
+                %legend.visually-hidden What Roles Do You Do?
                 .row.g-2
                   - occupations.each do |occupation|
                     .col-sm-6

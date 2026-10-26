@@ -5,7 +5,7 @@
       = f.input :name, label: "Project name", placeholder: "e.g. Summer tour or festival weekend", input_html: { autofocus: true }
       %p.text-muted.small Group related job postings under a tour, event, or production. Only the project name is required.
       %details.staffing-form__options.mt-4{ open: options_expanded?, data: { project_options: true } }
-        %summary.fw-semibold Project details (optional)
+        %summary.fw-semibold Project Details (Optional)
         .row.g-3.mt-1
           .col-12
             = f.input :description, as: :text, input_html: { rows: 3 }, hint: "A short overview for your company. Project details are private."

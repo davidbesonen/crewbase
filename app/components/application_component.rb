@@ -1,5 +1,6 @@
 class ApplicationComponent < ViewComponent::Base
   extend Dry::Initializer
+  delegate :ui_title, to: :helpers
   delegate :current_user, to: :helpers
   delegate :rich_text_area, to: :helpers
   delegate :rich_textarea_tag, to: :helpers

@@ -32,8 +32,8 @@ class Usr::BillingControllerTest < ActionDispatch::IntegrationTest
     get usr_settings_billing_path
 
     assert_response :success
-    assert_select "h1", text: "Billing & plans"
-    assert_select "h2", text: "Free for crew"
+    assert_select "h1", text: "Billing & Plans"
+    assert_select "h2", text: "Free For Crew"
     assert_select "form[action='#{subscription_checkout_usr_settings_billing_path}']", count: 0
     assert_select "p", text: /profiles, applications, messages, invitations, saved jobs, and availability remain free/i
   end

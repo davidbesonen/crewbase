@@ -20,7 +20,7 @@ class Admin::OperationsControllerTest < ActionDispatch::IntegrationTest
     get "/admin/operations"
     assert_response :success
     assert_select "h1", text: "Operations"
-    assert_select "h2", text: "Notification delivery"
-    assert_select "body", text: /Backup restoration/
+    assert_select "h2", text: "Notification Delivery"
+    assert_select "body", text: /Backup Restoration/
   end
 end

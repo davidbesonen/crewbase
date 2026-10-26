@@ -163,7 +163,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
     get usr_company_jobs_path(@company)
 
     assert_response :success
-    assert_select "h1", text: "Jobs for #{@company.name}"
+    assert_select "h1", text: "Jobs For #{@company.name}"
     assert_select "a[href='#{edit_usr_company_job_path(@company, @job)}']", text: "Edit"
   end
 
@@ -269,7 +269,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "fieldset[data-posting-type-choice]" do
-      assert_select "legend", text: "What are you posting?"
+      assert_select "legend", text: "What Are You Posting?"
       assert_select "input[type='radio'][name='job[posting_type]'][value='single_role'][required][checked]"
       assert_select "label", text: /Single job posting/
       assert_select "*", text: /one person for one role/

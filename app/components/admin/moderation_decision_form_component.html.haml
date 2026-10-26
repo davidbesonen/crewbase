@@ -1,6 +1,6 @@
 .card
   .card-body
-    %h2.h5 Record a decision
+    %h2.h5 Record A Decision
     %p.text-muted Record investigation findings and any correction or follow-up completed. Status changes do not delete or edit the reported content. Internal notes are visible only to administrators.
     = form_with model: decision, url: helpers.admin_report_path(report), method: :patch, builder: ActionView::Helpers::FormBuilder do |form|
       - if decision.errors.any?

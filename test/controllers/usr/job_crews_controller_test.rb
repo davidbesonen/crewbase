@@ -121,7 +121,7 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
       assert_select "label", text: "Profile", count: 0
     end
     assert_select "[data-open-crew-spot]" do
-      assert_select "h6", text: "Fill open spot"
+      assert_select "h6", text: "Fill Open Spot"
       assert_select "p", text: /applicants and shortlisted people/i
       assert_select "button[data-bs-toggle='modal']", text: "Choose Crew Member"
       assert_select "select[name='crew_assignment[profile_id]']", count: 0

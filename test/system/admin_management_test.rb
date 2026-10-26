@@ -41,7 +41,7 @@ class AdminManagementSystemTest < ApplicationSystemTestCase
     assert job.reload.accepting_applications?
     find("button[aria-label='Toggle admin navigation']").click
     click_link "Audit log", exact: true
-    assert_selector "h1", text: "Audit log"
+    assert_selector "h1", text: "Audit Log"
     assert_text "The listing was corrected and verified."
     assert_text "Investigating a misleading posting report."
     page.save_screenshot("/private/tmp/crewbase-admin-audit-mobile.png")

@@ -22,21 +22,21 @@
     .col-12.col-xl-8
       .card.h-100.border-0.shadow-sm
         .card-body
-          %h2.h5 Staffing activity
+          %h2.h5 Staffing Activity
           %p.text-muted.small Daily applications and invitations over the last 30 days.
           .admin-chart-container
             %canvas{ data: { controller: "admin-chart", admin_chart_data_value: chart_data }, aria: { label: "Applications and invitations over the last 30 days", role: "img" } }
     .col-12.col-xl-4
       .card.h-100.border-0.shadow-sm
         .card-body
-          %h2.h5 Conversion health
+          %h2.h5 Conversion Health
           .d-flex.justify-content-between.py-3.border-bottom
             %span Application acceptance
             %strong= percentage(dashboard[:rates][:application_acceptance])
           .d-flex.justify-content-between.py-3
             %span Invitation acceptance
             %strong= percentage(dashboard[:rates][:invitation_acceptance])
-          %h3.h6.mt-4 Application pipeline
+          %h3.h6.mt-4 Application Pipeline
           - dashboard[:pipeline_counts].each do |status, count|
             .d-flex.justify-content-between.py-1
               %span.text-muted= status.to_s.humanize
@@ -46,7 +46,7 @@
     .col-12.col-xl-7
       .card.h-100.border-0.shadow-sm
         .card-body
-          %h2.h5 Upcoming staffing needs
+          %h2.h5 Upcoming Staffing Needs
           - if dashboard[:upcoming_jobs].any?
             .list-group.list-group-flush
               - dashboard[:upcoming_jobs].each do |job|
@@ -60,7 +60,7 @@
     .col-12.col-xl-5
       .card.h-100.border-0.shadow-sm
         .card-body
-          %h2.h5 Next steps
+          %h2.h5 Next Steps
           %p.text-muted.mb-3 Keep applications moving and prepare your next posting.
           .d-grid.gap-2
             = link_to usr_company_applications_path(company), class: "btn btn-primary" do

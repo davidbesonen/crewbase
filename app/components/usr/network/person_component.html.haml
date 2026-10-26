@@ -19,7 +19,7 @@
               %span.text-muted= "#{credit.role} · #{credit.display_dates}"
         - if credits.size > 3
           %details
-            %summary.small= "#{credits.size - 3} more shared gigs"
+            %summary.small= "#{credits.size - 3} More Shared Gigs"
             %ul.list-unstyled.small.mt-2.mb-0
               - credits.drop(3).each do |credit|
                 %li.mb-2

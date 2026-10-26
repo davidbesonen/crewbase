@@ -1,4 +1,4 @@
-%h1.h3 Audit log
+%h1.h3 Audit Log
 %p.text-muted Administrative changes, reasons, and before-and-after values. Times use the application time zone.
 = form_with url: admin_audit_events_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mb-4" do |form|
   = form.search_field :q, value: params[:q], placeholder: "Search reasons", aria: { label: "Search reasons" }, class: "form-control w-auto"

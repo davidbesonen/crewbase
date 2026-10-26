@@ -180,7 +180,7 @@
     - if @job.editable_by?(current_user) && @job.accepting_applications?
       .card.border-0.shadow-sm.mt-4.card-accent.card-accent-cyan{ data: { job_invitation_tools: true } }
         .card-body.p-4
-          %h5.fw-semibold.mb-2 Invite someone
+          %h5.fw-semibold.mb-2 Invite Someone
           %p.text-muted.small Send a personal invitation by email, or copy the public posting link and share it anywhere.
           = form_with url: usr_job_job_invitations_path(@job), scope: :job_invitation, class: "mb-3" do |form|
             .input-group

@@ -74,7 +74,7 @@ class Usr::UserSidenavProjectsTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
 
     assert_select "#userSidenav[aria-labelledby='userSidenavLabel']" do
-      assert_select "#userSidenavLabel", text: "Your workspace"
+      assert_select "#userSidenavLabel", text: "Your Workspace"
       assert_select "button[aria-label='Close navigation']"
     end
   end

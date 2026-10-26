@@ -1,6 +1,6 @@
 .card.border-0.shadow-sm
   .card-body.p-4
-    %h1.h3 Report a concern
+    %h1.h3 Report A Concern
     %p.text-muted Reports are reviewed by KnowShow administrators. Reporting does not automatically remove content or notify the person reported.
     = form_with model: report, scope: :report, url: helpers.usr_reports_path, builder: ActionView::Helpers::FormBuilder do |form|
       - if report.errors.any?

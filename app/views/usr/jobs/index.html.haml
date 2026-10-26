@@ -32,7 +32,7 @@
                 = f.label :workplace_type_eq, "Workplace", class: "form-label"
                 = f.select :workplace_type_eq, Job.workplace_types.map { |label, value| [label.humanize, value] }, { include_blank: "Any" }, class: "form-select"
               %details.discovery-advanced{ open: @filtered }
-                %summary.fw-semibold Pay, dates & more
+                %summary.fw-semibold Pay, Dates & More
                 .d-flex.flex-column.gap-3.mt-3
                   %div
                     = f.label :pay_period_eq, "Pay Period", class: "form-label"
@@ -137,7 +137,7 @@
             .card.border-0.shadow-sm
               .card-body.p-4.empty-state.empty-state-sky
                 - if @filtered
-                  %h5.fw-semibold.mb-2 No matching jobs
+                  %h5.fw-semibold.mb-2 No Matching Jobs
                   %p.text-muted.mb-3 Try fewer filters or a broader search.
                   = link_to "Clear filters", usr_jobs_path, class: "btn btn-outline-primary"
                 - else

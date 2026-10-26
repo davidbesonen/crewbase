@@ -9,7 +9,7 @@
 
     - if owner
       .border.rounded-3.p-3.mb-4.bg-light-subtle{ data: { contract_upload: true } }
-        %h5.fw-semibold.mb-1 Add a document
+        %h5.fw-semibold.mb-1 Add A Document
         %p.text-muted.small.mb-3 Share agreements, call sheets, schedules, and reference files. Up to 35 MB per file.
         = form_with model: new_contract, url: usr_job_contracts_path(job), class: "row g-3 align-items-end" do |form|
           .col-12.col-md-5

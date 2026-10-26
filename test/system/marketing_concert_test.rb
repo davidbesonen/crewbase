@@ -9,7 +9,7 @@ class MarketingConcertTest < ApplicationSystemTestCase
     visit welcome_path
 
     assert_selector ".marketing-nav img[src*='knowshow-drive-on-dark']"
-    assert_selector "h1", text: "Know your gigs."
+    assert_selector "h1", text: "Know Your Gigs."
     assert_link "Start staffing", href: new_user_registration_path
     assert_selector ".concert-scene img[alt*='saxophonist']"
     assert page.evaluate_script("document.querySelector('.concert-scene img').complete && document.querySelector('.concert-scene img').naturalWidth > 0")
@@ -19,14 +19,14 @@ class MarketingConcertTest < ApplicationSystemTestCase
     page.save_screenshot("/private/tmp/knowshow-company-marketing-desktop.png")
 
     within(".marketing-hero") { click_link "Looking for gigs?" }
-    assert_selector "#for-crew h2", text: "Looking for your next gig?"
+    assert_selector "#for-crew h2", text: "Looking For Your Next Gig?"
     within("#for-crew") { click_link "Create your free profile" }
     assert_current_path new_user_registration_path
     assert_selector "form input[type='email']"
 
     page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 390, height: 900, deviceScaleFactor: 1, mobile: true)
     visit welcome_path
-    assert_selector "h1", text: "Know your gigs."
+    assert_selector "h1", text: "Know Your Gigs."
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, 390
     page.execute_script("document.querySelector('.concert-scene').scrollIntoView({block: 'center', behavior: 'instant'})")
     assert_equal 0, scene_animation_count

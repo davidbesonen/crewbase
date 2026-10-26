@@ -95,7 +95,7 @@
       .col-12.mt-3
         .card.profile-invitation.border-0.shadow-sm
           .card-body
-            %h5.card-section-title.fw-bold Invite to Apply
+            %h5.card-section-title.fw-bold Invite To Apply
             = form_with url: usr_profile_job_invitations_path(@profile), scope: :job_invitation, class: "d-flex flex-column flex-md-row gap-2" do |form|
               = form.collection_select :job_id, @invitable_jobs, :id, ->(job) { "#{job.title} — #{job.company.name}" }, { prompt: "Choose an active job", label: false }, { class: "form-select", required: true, aria: { label: "Job to invite this person to" } }
               = form.button type: "submit", class: "btn btn-primary flex-shrink-0" do
@@ -160,7 +160,7 @@
         .card-body
           .row
             .col-lg-6
-              %h5.card-section-title.fw-bold Skills & services
+              %h5.card-section-title.fw-bold Skills & Services
               - if @capability_names.any?
                 %p.text-muted.small.mb-2 Capabilities confirmed by this member
                 .d-flex.flex-wrap.mb-2
@@ -173,7 +173,7 @@
               - else
                 %p.text-muted.mb-0 No skills listed yet.
             .col-lg-6.mt-3.mt-lg-0
-              %h5.card-section-title.fw-bold Equipment & software
+              %h5.card-section-title.fw-bold Equipment & Software
               - if @equipment_family_names.any?
                 %p.text-muted.small.mb-2 Equipment families confirmed by this member
                 .d-flex.flex-wrap.mb-2
@@ -190,7 +190,7 @@
       .col-12.mt-3
         .card.border-0.shadow-sm{ id: "profile-work-examples" }
           .card-body
-            %h5.card-section-title.fw-bold Specialties & experience examples
+            %h5.card-section-title.fw-bold Specialties & Experience Examples
             %p.text-muted.small Specific experience shared by this member. Experience entries describe reported familiarity; employers verify role-specific qualifications.
             = simple_format(@profile.work_examples)
 

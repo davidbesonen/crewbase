@@ -37,21 +37,21 @@
   .empty-state.empty-state-cyan
     %i.bi.bi-people.fs-2{ aria: { hidden: "true" } }
     - if @query.present?
-      %h2.h5.mt-3 No matching people
+      %h2.h5.mt-3 No Matching People
       %p.text-muted Try a different name, role, or city.
     - elsif @tab == "worked_together"
-      %h2.h5.mt-3 Your shared work history starts here
+      %h2.h5.mt-3 Your Shared Work History Starts Here
       %p.text-muted Crew members will appear after a shared gig is completed and verified credits are recorded. Hidden credits stay hidden.
     - elsif @tab == "requests"
-      %h2.h5.mt-3 No pending requests
+      %h2.h5.mt-3 No Pending Requests
       %p.text-muted Incoming and outgoing connection requests will appear here.
     - else
-      %h2.h5.mt-3 Keep your crew close
+      %h2.h5.mt-3 Keep Your Crew Close
       %p.text-muted Visit someone’s profile and select Connect to invite them to your network.
       = link_to "Browse people", usr_profiles_path, class: "btn btn-outline-primary"
 - if @tab == "connections" && @shared_jobs.any?
   %section.mt-5{ aria: { labelledby: "shared-jobs-heading" } }
-    %h2.h4.mb-3#shared-jobs-heading Recently shared with you
+    %h2.h4.mb-3#shared-jobs-heading Recently Shared With You
     .d-flex.flex-column.gap-3
       - @shared_jobs.each do |share|
         = render Usr::Network::SharedJobComponent.new(share: share, viewer: current_user)

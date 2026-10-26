@@ -4,7 +4,7 @@
       %span.icon-orb.icon-orb-sky
         %i.bi.bi-calendar-check{ aria: { hidden: true } }
       %div
-        %h1.fw-bold.mb-1 Offers & bookings
+        %h1.fw-bold.mb-1 Offers & Bookings
         %p.text-muted.mb-0 Review terms, keep track of replies, and plan confirmed work.
     = link_to "View applications", usr_job_applications_path, class: "btn btn-outline-primary"
 %nav.d-flex.flex-wrap.gap-2.mb-4{ aria: { label: "Filter offers" } }
@@ -26,7 +26,7 @@
 - if @summaries.empty?
   .empty-state.empty-state-sky
     %i.bi.bi-calendar-check.fs-2.text-primary.mb-3{ aria: { hidden: true } }
-    %h2.h4.fw-semibold= empty_title
+    %h2.h4.fw-semibold= ui_title(empty_title)
     %p.text-muted.mb-3 Offers appear here when an employer proposes dates and terms. A booking is confirmed once the worker accepts.
     = link_to "Browse jobs", usr_jobs_path, class: "btn btn-outline-primary"
 - else

@@ -1,6 +1,6 @@
 .card.network-form
   .card-body.p-4
-    %h1.h3.mb-2= "Connect with #{profile.user.full_name}"
+    %h1.h3.mb-2= "Connect With #{profile.user.full_name}"
     %p.text-muted Keep in touch for future gigs and share relevant jobs. Your connections are private.
     - if connection.errors.any?
       .alert.alert-danger{ role: "alert" }= connection.errors.full_messages.to_sentence

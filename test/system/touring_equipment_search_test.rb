@@ -17,7 +17,7 @@ class TouringEquipmentSearchTest < ApplicationSystemTestCase
 
     login_as programmer, scope: :user
     visit edit_usr_profile_path(profile, source: "completed_profile")
-    assert_text "What do you do on tour?"
+    assert_text "What Do You Do On Tour?"
     assert_no_selector "[role='option']", text: "Actor", visible: :all
     assert_no_selector "input[value='learning_platforms']", visible: :all
     assert_text "Company owners can search these names when hiring"

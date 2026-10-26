@@ -6,7 +6,7 @@
       %li.border-bottom.py-3
         .row.g-3
           .col-md-4
-            %h3.h6.mb-1= event.action.humanize
+            %h3.h6.mb-1= ui_title(event.action.humanize)
             %div.small.mb-2
               - if subject_path(event)
                 = link_to "#{event.subject_type} ##{event.subject_id}", subject_path(event)

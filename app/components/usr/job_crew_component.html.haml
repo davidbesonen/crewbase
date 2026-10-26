@@ -1,6 +1,6 @@
 .d-flex.flex-wrap.align-items-start.justify-content-between.gap-3.mb-4
   %div
-    %h1.fw-bold.mb-1 Crew for #{job.title}
+    %h1.fw-bold.mb-1 Crew For #{job.title}
     %p.text-muted.mb-0 Define the roles you need, staff them, and check availability for the job dates.
   .d-flex.flex-wrap.gap-2
     = link_to "Review Applications", usr_company_applications_path(job.company, job_id: job.id, return_to: "staffing"), class: "btn btn-primary"
@@ -65,13 +65,13 @@
                 - if position.crew_assignments.size < position.headcount
                   - if available_candidates(position).any?
                     .border-top.pt-3{ data: { open_crew_spot: true } }
-                      %h6.fw-semibold.mb-1 Fill open spot
+                      %h6.fw-semibold.mb-1 Fill Open Spot
                       %p.text-muted.small.mb-3 Choose from applicants and shortlisted people connected to this job.
                       %button.btn.btn-primary{ type: "button", data: { bs_toggle: "modal", bs_target: "##{assignment_modal_id(position)}" } }
                         Choose Crew Member
                   - else
                     .border-top.pt-3{ data: { open_crew_spot: true } }
-                      %h6.fw-semibold.mb-1 Fill open spot
+                      %h6.fw-semibold.mb-1 Fill Open Spot
                       %p.text-muted.small.mb-0 Add applicants or people from a company shortlist before staffing this position.
         - else
           %p.text-muted.mb-0 No required positions have been added.

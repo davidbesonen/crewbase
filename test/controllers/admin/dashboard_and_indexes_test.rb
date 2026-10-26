@@ -28,7 +28,7 @@ class Admin::DashboardAndIndexesTest < ActionDispatch::IntegrationTest
     assert_select "[data-metric='companies'] .display-6"
     assert_select "[data-metric='jobs'] .display-6"
     assert_select "canvas[data-controller='admin-chart']"
-    assert_select "h2", text: /Sign-ins over time/
+    assert_select "h2", text: /Sign-Ins Over Time/
   end
 
   test "admin can browse paginated users companies and jobs" do

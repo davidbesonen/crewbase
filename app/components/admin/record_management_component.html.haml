@@ -18,7 +18,7 @@
     - if @details.fetch(:links).any?
       .card.mb-4
         .card-body
-          %h2.h5 Linked records
+          %h2.h5 Linked Records
           %p.small.text-muted Recent records, up to 20 of each type. Use the indexes for the full history.
           %ul.list-group.list-group-flush
             - @details.fetch(:links).each do |label, record|
@@ -26,7 +26,7 @@
     - if @details.fetch(:subscriptions).any?
       .card.mb-4
         .card-body
-          %h2.h5 Subscription history
+          %h2.h5 Subscription History
           %p.small.text-muted Read-only billing records. Suspension does not cancel subscriptions or issue refunds.
           - @details.fetch(:subscriptions).each do |subscription|
             .border-top.py-3
@@ -36,13 +36,13 @@
     - if @details.fetch(:reports).any?
       .card.mb-4
         .card-body
-          %h2.h5 Related reports
+          %h2.h5 Related Reports
           - @details.fetch(:reports).each do |report|
             %p= link_to "#{report.subject_label} · #{report.status.humanize}", admin_report_path(report)
   .col-lg-5
     .card.border-primary
       .card-body
-        %h2.h5 Manage this record
+        %h2.h5 Manage This Record
         %p.small.text-muted Every change requires a reason and is recorded with your name. Details are changed only when you choose “Correct details”.
         - if @record.is_a?(User)
           %p.small Suspension blocks sign-in and hides profiles. Existing records are retained. Staff accounts are protected from suspension.
@@ -53,7 +53,7 @@
             = form.label :action, "Action", class: "form-label"
             = form.select :action, action_options, { selected: @submitted[:action] }, class: "form-select"
           %fieldset.border.rounded.p-3.mb-3
-            %legend.float-none.w-auto.fs-6.px-1 Correctable details
+            %legend.float-none.w-auto.fs-6.px-1 Correctable Details
             - @details.fetch(:fields).each do |field|
               .mb-3
                 = form.label field, class: "form-label"

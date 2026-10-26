@@ -73,7 +73,7 @@
         .text-center.py-5.empty-state.empty-state-sky{ data: { project_empty_state: true } }
           %span.icon-orb.icon-orb-sky
             %i.bi.bi-briefcase{ aria: { hidden: true } }
-          %h3.h5.fw-semibold.mt-3 Create the first job posting
+          %h3.h5.fw-semibold.mt-3 Create The First Job Posting
           %p.text-muted.mx-auto No job postings yet. Add a role to start recruiting and tracking applicants for this project.
           - unless project.archived?
             = link_to "Add Job Posting", add_job_path, class: "btn btn-primary"

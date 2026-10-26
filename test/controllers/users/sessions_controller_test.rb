@@ -20,6 +20,6 @@ class Users::SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "h2", text: "Log in"
+    assert_select "h2", text: "Log In"
   end
 end

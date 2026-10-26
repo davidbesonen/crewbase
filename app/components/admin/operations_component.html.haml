@@ -7,7 +7,7 @@
   .col-xl-6
     .card.border-0.shadow-sm.h-100
       .card-body.p-4
-        %h2.h5 Notification delivery
+        %h2.h5 Notification Delivery
         %p.text-muted.small Emails marked sent were accepted by the mail transport; this does not confirm inbox placement. Failed or interrupted sends require provider-log review before replay.
         .d-flex.flex-wrap.gap-2.mb-3
           - NotificationDelivery.statuses.each_key do |status|
@@ -16,7 +16,7 @@
   .col-xl-6
     .card.border-0.shadow-sm.h-100
       .card-body.p-4
-        %h2.h5 Background work and billing
+        %h2.h5 Background Work And Billing
         - if operations[:queue][:available]
           %p= "Workers with a recent heartbeat: #{operations[:queue][:workers]}"
           %p= "Schedulers with a recent heartbeat: #{operations[:queue][:schedulers]}"
@@ -27,18 +27,18 @@
   .col-12
     .card.border-0.shadow-sm
       .card-body.p-4
-        %h2.h5 Deployment readiness
+        %h2.h5 Deployment Readiness
         %p.text-muted Configuration checks are separate from live verification. Use the operations runbook for delivery, billing recovery, and restoration drills.
         - operations[:checks].each do |check|
           .border-top.py-3
             .d-flex.flex-wrap.align-items-center.gap-2.mb-1
-              %h3.h6.mb-0= check.name
+              %h3.h6.mb-0= ui_title(check.name)
               %span.badge{ class: check.ready? ? "bg-success" : "bg-warning text-dark" }= check.ready? ? "Configured" : "Needs verification"
             %p.text-muted.mb-0= check.detail
   .col-12
     .card.border-0.shadow-sm
       .card-body.p-4
-        %h2.h5 Recent email activity
+        %h2.h5 Recent Email Activity
         - if operations[:recent_deliveries].empty?
           %p.text-muted.mb-0 No scheduled notification deliveries yet.
         - else

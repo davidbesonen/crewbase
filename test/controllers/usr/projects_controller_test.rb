@@ -341,7 +341,7 @@ class Usr::ProjectsControllerTest < ActionDispatch::IntegrationTest
     get usr_project_path(project)
 
     assert_response :success
-    assert_select "[data-project-empty-state].empty-state.empty-state-sky", text: /Create the first job posting/
+    assert_select "[data-project-empty-state].empty-state.empty-state-sky", text: /Create The First Job Posting/
     assert_select "[data-project-empty-state] a[href='#{new_usr_company_job_path(@company, project_id: project.id)}']", text: "Add Job Posting"
   end
 
