@@ -4,7 +4,9 @@ class OccupationCatalog
   end
 
   def records(selected_ids: [])
-    selected_ids = Array(selected_ids) + @selected.map(&:id)
-    Occupation.where(category_key: nil).or(Occupation.where(id: selected_ids)).order(:name)
+    # Only explicitly saved selections may expose retired occupations. A URL or
+    # submitted ID must not reintroduce an occupation from another market.
+    Occupation.touring
+      .or(Occupation.where(id: @selected.map(&:id))).order(:name)
   end
 end

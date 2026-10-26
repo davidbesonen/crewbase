@@ -36,12 +36,12 @@ class JobCrewSearch
   def taxonomy_filters_match?(profile)
     association_includes?(profile.occupations, occupation_id) &&
       legacy_entry_matches?(skill_names(profile), skill_id, @legacy_skill_name) &&
-      legacy_entry_matches?(equipment_names(profile), equipment_id, @legacy_equipment_name)
+      legacy_entry_matches?(equipment_names(profile), equipment_id, @legacy_equipment_name, terms: EquipmentTerms)
   end
 
   def personal_filters_match?(profile)
     (@skill_query.blank? || ExperienceTerms.new(skill_names(profile)).include?(@skill_query)) &&
-      (@equipment_query.blank? || ExperienceTerms.new(equipment_names(profile)).include?(@equipment_query))
+      (@equipment_query.blank? || EquipmentTerms.new(equipment_names(profile)).include?(@equipment_query))
   end
 
   def skill_names(profile)
@@ -52,8 +52,8 @@ class JobCrewSearch
     ExperienceCategories.matching_names("Equipment", profile.equipment_family_keys) + profile.reported_equipment
   end
 
-  def legacy_entry_matches?(values, requested_id, name)
-    requested_id.blank? || (name.present? && ExperienceTerms.new(values).include?(name))
+  def legacy_entry_matches?(values, requested_id, name, terms: ExperienceTerms)
+    requested_id.blank? || (name.present? && terms.new(values).include?(name))
   end
 
   def association_includes?(records, requested_id)

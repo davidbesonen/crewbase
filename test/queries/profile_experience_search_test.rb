@@ -3,6 +3,20 @@ require "test_helper"
 class ProfileExperienceSearchTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
+  test "MA3 search finds named aliases and legacy entries without treating a family as specific experience" do
+    user = User.create!(first_name: "MA", last_name: "Search", email: "ma-search@example.com", password: "password123")
+    named = user.profiles.create!(profile_type: "user", equipment_text: "grand MA 3 full-size")
+    previous = user.profiles.create!(profile_type: "company_owner")
+    previous.equipment << Equipment.create!(name: "grandMA3")
+    family = user.profiles.create!(profile_type: "company_employee", equipment_family_keys: [ "lighting_consoles" ], equipment_text: "grandMA2\nMA30")
+    scope = Profile.where(id: [ named.id, previous.id, family.id ])
+    [ "MA3", "grandMA3", "MA 3" ].each do |query|
+      assert_equal [ named.id, previous.id ].sort, ProfileExperienceSearch.new(scope:, equipment_query: query).results.ids.sort
+    end
+    previous.update!(equipment_text: "")
+    assert_equal [ named.id ], ProfileExperienceSearch.new(scope:, equipment_query: "MA3").results.ids
+  end
+
   test "search finds core work through occupations without inferring tools or other specialties" do
     user = User.create!(first_name: "Core", last_name: "Search", email: "core-search@example.com", password: "password123")
     profile = user.profiles.create!(profile_type: "user", occupations: [ Occupation.create!(name: "FOH Engineer") ])

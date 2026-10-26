@@ -7,14 +7,13 @@ class OccupationExperienceCategoriesTest < ActiveSupport::TestCase
       "FOH Engineer" => [ "system_tuning", "mastering" ],
       "Monitor Engineer" => [ "rf_coordination", "mastering" ],
       "Audio Systems Engineer" => [ "rf_coordination", "studio_recording" ],
-      "Mastering Engineer" => [ "audio_editing", "monitor_mixing" ],
-      "First Assistant Camera" => [ "camera_operation", "color_grading" ],
-      "Digital Imaging Technician" => [ "camera_shading", "motion_graphics" ],
-      "Graphics Operator" => [ "motion_graphics", "scenic_design" ],
-      "Key Grip" => [ "staging", "suspended_rigging" ],
+      "Lighting Programmer" => [ "lighting_design", "lighting_programming" ],
+      "Camera Operator" => [ "camera_shading", "color_grading" ],
+      "Musical Director" => [ "live_playback", "mastering" ],
+      "Rigger" => [ "staging", "suspended_rigging" ],
       "Show Caller" => [ "rehearsal_management", "lighting_programming" ],
-      "Catalog Manager" => [ "rights_administration", "studio_recording" ],
-      "Instructor" => [ "instructional_design", "show_calling" ]
+      "Tour Accountant" => [ "tour_logistics", "rights_administration" ],
+      "Merchandise Manager" => [ "tour_logistics", "show_calling" ]
     }
     examples.each do |name, (relevant, irrelevant)|
       keys = OccupationExperienceCategories.new([ Occupation.new(name:) ]).keys.fetch("Skill")
@@ -29,14 +28,14 @@ class OccupationExperienceCategoriesTest < ActiveSupport::TestCase
     assert_not_includes keys.fetch("Skill"), "audio"
     assert_not_includes keys.fetch("Skill"), "foh_mixing"
     assert_includes keys.fetch("Equipment"), "mixing_consoles"
-    assert_not_includes keys.fetch("Equipment"), "cinema_cameras"
+    assert_not_includes keys.fetch("Equipment"), "broadcast_cameras"
     combined = OccupationExperienceCategories.new([ audio, camera ]).keys
-    assert_includes combined.fetch("Equipment"), "cinema_cameras"
+    assert_includes combined.fetch("Equipment"), "broadcast_cameras"
     assert_includes combined.fetch("Equipment"), "mixing_consoles"
   end
 
   test "maintained occupations have valid guidance without classifying unknown roles" do
-    OccupationsV2::BY_INDUSTRY.values.flatten.uniq.each do |name|
+    TouringCatalog.occupation_names.each do |name|
       keys = OccupationExperienceCategories.new([ Occupation.new(name:) ]).keys
       keys.each do |type, values|
         assert values.any?, "Missing #{type} guidance for #{name}"

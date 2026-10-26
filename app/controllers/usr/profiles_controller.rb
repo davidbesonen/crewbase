@@ -16,7 +16,7 @@ class Usr::ProfilesController < ApplicationController
     )
     @recommendations_available = recommendations.active_jobs?
     @recommended_people = @recommendations_available && params[:recommended] == "1"
-    profiles_scope = Profile.network_visible.includes(:user, :occupations, :locations)
+    profiles_scope = TouringMarketplace.profiles(Profile.network_visible).includes(:user, :occupations, :locations)
     recommendation_profile_ids = recommendations.results.map { |result| result.profile.id } if @recommended_people
     profiles_scope = profiles_scope.where(id: recommendation_profile_ids) if @recommended_people
 
@@ -117,7 +117,7 @@ class Usr::ProfilesController < ApplicationController
   def toggle_occupation_selection
     @source = params[:source].presence
     @completed_profile_mode = completed_profile_mode?
-    occupation = Occupation.find(params[:occupation_id])
+    occupation = OccupationCatalog.new(selected: @profile.occupations).records.find(params[:occupation_id])
     if @profile.occupations.include?(occupation)
       @profile.occupations.delete(occupation)
     else
@@ -328,6 +328,10 @@ class Usr::ProfilesController < ApplicationController
 
   def personal_experience_params
     attributes = profile_params
+    if attributes.key?(:occupation_ids)
+      ids = Array(attributes[:occupation_ids]).compact_blank.uniq
+      attributes[:occupation_ids] = OccupationCatalog.new(selected: @profile.occupations).records.find(ids).map(&:id)
+    end
     { skill_ids: [ Skill, :skills_text ], equipment_ids: [ Equipment, :equipment_text ] }.each do |ids_key, (model, text_key)|
       next unless attributes.key?(ids_key)
 

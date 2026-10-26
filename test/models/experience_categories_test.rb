@@ -2,6 +2,17 @@ require "test_helper"
 require Rails.root.join("db/catalogs/experience_v1")
 
 class ExperienceCategoriesTest < ActiveSupport::TestCase
+  test "new choices are limited to touring work and production equipment" do
+    skills = ExperienceCategories.selectable("Skill").map(&:key)
+    tools = ExperienceCategories.selectable("Equipment").map(&:key)
+    assert_includes skills, "lighting_programming"
+    assert_includes skills, "tour_logistics"
+    assert_includes tools, "lighting_consoles"
+    assert_includes tools, "instruments"
+    assert_empty skills & %w[acting_voice instructional_design mastering rights_administration]
+    assert_empty tools & %w[learning_platforms music_business_software color_grading_software]
+    assert_includes ExperienceCategories.all("Skill").map(&:key), "acting_voice", "Saved experience remains readable"
+  end
   test "offers practical work specialties without losing any existing category" do
     assert_includes ExperienceCategories.all("Skill").map(&:key), "monitor_mixing"
     assert_includes ExperienceCategories.all("Equipment").map(&:key), "color_grading_software"

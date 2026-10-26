@@ -20,7 +20,7 @@ class QuickStartTest < ActionDispatch::IntegrationTest
   end
 
   test "workers can find jobs before filling optional profile details" do
-    occupation = Occupation.create!(name: "Quick Audio Engineer")
+    occupation = Occupation.find_or_create_by!(name: "Audio Engineer")
     patch "/usr/onboarding", params: { onboarding: { intent: "find_work", occupation_ids: [ occupation.id ] } }
     assert_redirected_to usr_dashboards_path
     assert_equal [ occupation ], @profile.reload.occupations

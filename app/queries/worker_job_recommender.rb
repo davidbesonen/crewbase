@@ -28,7 +28,7 @@ class WorkerJobRecommender
   private
 
   def candidate_jobs
-    scope = Job.accepting_applications
+    scope = TouringMarketplace.jobs(Job.accepting_applications)
       .where.not(id: RecommendationFeedback.where(user: @profile.user).select(:job_id))
       .where.not(company_id: owned_company_ids)
       .includes(

@@ -1,5 +1,7 @@
 class Occupation < ApplicationRecord
   scope :categories, -> { where.not(category_key: nil) }
+  scope :touring, -> { where(category_key: nil, name: TouringCatalog.occupation_names) }
+  scope :retired, -> { where(name: TouringCatalog.retired_occupation_names) }
 
   has_many :occupation_assignments, dependent: :destroy
   has_many :profile_occupation_assignments, -> { where(assignable_type: "Profile") }, class_name: "OccupationAssignment"

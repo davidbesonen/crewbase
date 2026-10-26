@@ -21,7 +21,7 @@ class ExperienceCategories
 
   # Retired umbrellas remain valid for saved profiles and job requirements.
   def self.selectable(type)
-    all(type).reject { |category| CATALOG.fetch(type).fetch(category.key)["selectable"] == false }
+    all(type).select { |category| TouringCatalog.category_keys(type).include?(category.key) && CATALOG.fetch(type).fetch(category.key)["selectable"] != false }
   end
 
   # Directional: monitor mixing is audio experience; audio alone is not monitor mixing.

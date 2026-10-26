@@ -40,9 +40,9 @@ class Usr::CompaniesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".card-accent.card-accent-cyan", minimum: 1
   end
 
-  test "index filters companies by selected industry name" do
-    audio = Industry.create!(name: "Audio")
-    lighting = Industry.create!(name: "Lighting")
+  test "index only offers touring companies and ignores the retired industry filter" do
+    audio = Industry.music_touring!
+    lighting = Industry.create!(name: "Film, TV & Commercial Production")
 
     audio_company = Company.create!(
       name: "Signal Sound",
@@ -62,6 +62,7 @@ class Usr::CompaniesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, audio_company.name
     assert_not_includes response.body, "Beam Works"
+    assert_select "select[name='q[industries_name_eq]']", count: 0
   end
 
   test "search returns matching companies as json" do
@@ -79,16 +80,12 @@ class Usr::CompaniesControllerTest < ActionDispatch::IntegrationTest
     assert body.any? { |result| result["id"] == company.id && result["name"] == company.name }
   end
 
-  test "new company form renders industries as a searchable tokenized combobox" do
+  test "new company form explains the fixed touring industry" do
     get new_usr_company_path
 
     assert_response :success
-    assert_select "#company_industry_ids_combobox[data-controller='taxonomy-multiselect']", count: 1
-    assert_select "label[for='company_industry_ids_search']", text: "Industries"
-    assert_select "input#company_industry_ids_search[type='search'][role='combobox'][aria-autocomplete='list']", count: 1
-    assert_select "#company_industry_ids_options[role='listbox'][aria-multiselectable='true']", count: 1
-    assert_select "select[name='company[industry_ids][]'][multiple][data-taxonomy-multiselect-target='select']", visible: false, count: 1
-    assert_select "label", text: "Industry ids", count: 0
+    assert_select "[data-touring-industry]", text: "Live Music & Touring"
+    assert_select "#company_industry_ids_combobox", count: 0
   end
 
   test "new company form uses a date-only Founded field" do

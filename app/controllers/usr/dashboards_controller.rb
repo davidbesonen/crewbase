@@ -103,7 +103,7 @@ class Usr::DashboardsController < ApplicationController
   def owned_job_postings
     return Job.none if @owned_companies.empty?
 
-    Job.accepting_applications.includes(:locations, :company)
+    TouringMarketplace.jobs(Job.accepting_applications).includes(:locations, :company)
       .where(company: @owned_companies)
       .order(created_at: :desc, id: :desc)
       .limit(3)

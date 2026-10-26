@@ -21,7 +21,7 @@ class CompleteQuickStart
   private
 
   def occupations
-    @occupations ||= Occupation.where(id: Array(occupation_ids).compact_blank).to_a
+    @occupations ||= OccupationCatalog.new(selected: user.user_profile&.occupations || []).records.where(id: Array(occupation_ids).compact_blank).to_a
   end
 
   def known_occupations

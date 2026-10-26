@@ -11,8 +11,8 @@ class Usr::ProfileConfig::SkillEquipmentFormComponent < ApplicationComponent
 
   def entry_fields
     [
-      { attribute: :skills_text, label: "Skills & services", value: profile.reported_skills.join("\n"), placeholder: "RF coordination\nLive sound mixing\nTour advancing" },
-      { attribute: :equipment_text, label: "Equipment & software", value: profile.reported_equipment.join("\n"), placeholder: "Yamaha CL5\nPro Tools\nYour own tools or systems" }
+      { attribute: :skills_text, label: "Skills & services", value: profile.reported_skills.join("\n"), placeholder: "RF coordination\nElectric guitar\nBacking vocals" },
+      { attribute: :equipment_text, label: "Equipment & software", value: profile.reported_equipment.join("\n"), placeholder: "grandMA3\nDiGiCo SD12\nAbleton Live" }
     ]
   end
 end

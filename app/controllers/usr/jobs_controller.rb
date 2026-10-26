@@ -2,10 +2,9 @@ class Usr::JobsController < ApplicationController
   before_action :set_job, only: [ :show ]
 
   def index
-    jobs_scope = Job.accepting_applications.includes(:locations, company: :industries)
+    jobs_scope = TouringMarketplace.jobs(Job.accepting_applications).includes(:locations, company: :industries)
 
-    @industries = Industry.order(:name)
-    @q = jobs_scope.ransack(params[:q])
+    @q = jobs_scope.ransack(params.fetch(:q, {}).except(:company_industries_name_eq))
     @filtered = @q.conditions.any?
     @pagy, @jobs = pagy(@q.result(distinct: true)
       .order(published_at: :desc, created_at: :desc)

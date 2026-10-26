@@ -23,7 +23,8 @@ class JobExperienceRequirements
     type, importance = TEXT_FIELDS.fetch(field)
     value = @job.public_send(field)
     value = legacy.select { |entry| entry.requirement_type == type && entry.importance == importance }.map { |entry| entry.requirement.name } if value.nil?
-    ExperienceTerms.new(value).values
+    terms = type == "Equipment" ? EquipmentTerms : ExperienceTerms
+    terms.new(value).values
   end
 
   private

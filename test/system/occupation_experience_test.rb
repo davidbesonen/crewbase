@@ -15,20 +15,20 @@ class OccupationExperienceTest < ApplicationSystemTestCase
     visit edit_usr_profile_path(profile, source: "completed_profile")
     assert_no_selector "input[value='camera_operation']"
     assert_selector "[data-category-core-summary]", text: "Camera operation & composition"
-    assert_selector "[data-category-primary] input[value='cinematic_lighting']"
+    assert_selector "[data-category-primary] input[value='live_switching']"
     fill_in "profile_skills_text", with: "Unsaved camera setup notes"
-    check "profile_capability_keys_cinematic_lighting"
+    check "profile_capability_keys_live_switching"
     fill_in "occupation_search", with: "FOH Engineer"
     find("[role='option']", text: "FOH Engineer").click
     assert_selector "[data-category-core-summary]", text: "Front-of-house mixing"
     assert_no_selector "input[value='foh_mixing']"
     fill_in "occupation_search", with: "Camera Operator"
     find("[role='option']", text: "Camera Operator").click
-    assert_selector "[data-category-primary] input[value='cinematic_lighting']:checked"
+    assert_selector "[data-category-primary] input[value='live_switching']:checked"
     assert_no_selector "[data-category-core-summary]", text: "Camera operation & composition"
     assert_field "profile_skills_text", with: "Unsaved camera setup notes"
     assert_selector "[data-category-primary] input[value='mixing_consoles']"
-    assert_selector "[data-category-other] input[value='cinema_cameras']", visible: :all
+    assert_selector "[data-category-other] input[value='broadcast_cameras']", visible: :all
     assert_empty profile.reload.capability_keys
     assert_equal [ audio.id ], profile.occupation_ids
   ensure

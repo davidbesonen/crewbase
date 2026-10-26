@@ -27,7 +27,7 @@ class DashboardQuickSearch
   end
 
   def company_results
-    Company.visible_to(user)
+    TouringMarketplace.companies(Company.visible_to(user))
       .where("name ILIKE ?", pattern)
       .order(Arel.sql("LOWER(name) ASC"))
       .limit(RESULTS_PER_TYPE)
@@ -38,7 +38,7 @@ class DashboardQuickSearch
   end
 
   def job_results
-    scope = Job.accepting_applications
+    scope = TouringMarketplace.jobs(Job.accepting_applications)
       .left_joins(:company)
       .where("jobs.title ILIKE ?", pattern)
       .order(Arel.sql("LOWER(jobs.title) ASC"))
@@ -62,7 +62,7 @@ class DashboardQuickSearch
   end
 
   def person_results
-    Profile.network_visible
+    TouringMarketplace.profiles(Profile.network_visible)
       .joins(:user)
       .where(
         "COALESCE(users.first_name, '') || ' ' || COALESCE(users.last_name, '') ILIKE ?",

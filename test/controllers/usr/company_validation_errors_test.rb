@@ -62,6 +62,18 @@ class Usr::CompanyValidationErrorsTest < ActionDispatch::IntegrationTest
     assert_redirected_to usr_company_path(company)
   end
 
+  test "industry is fixed to music touring without asking the owner to choose" do
+    get new_usr_company_path, params: { current_page: "company_details_form" }
+    assert_response :success
+    assert_select "#company_industry_ids_combobox", count: 0
+    assert_select "[data-touring-industry]", text: "Live Music & Touring"
+    outside = Industry.create!(name: "Film, TV & Commercial Production")
+    post usr_companies_path, params: { company: { name: "Touring Only", contact_email: "touring-only@example.com", industry_ids: [ outside.id ] } }
+    company = Company.find_by!(name: "Touring Only")
+    assert_redirected_to usr_company_path(company)
+    assert_equal [ "Live Music & Touring" ], company.industries.pluck(:name)
+  end
+
   test "local mock company creation activates its selected plan without Stripe" do
     existing = Company.create!(name: "Existing Owner Company", contact_email: "existing-owner@example.com", industries: [ @industry ])
     existing.company_assignments.create!(user: @user, role: "owner")
@@ -120,10 +132,9 @@ class Usr::CompanyValidationErrorsTest < ActionDispatch::IntegrationTest
     assert_select "#company-validation-errors" do
       assert_select "li", text: "Name can't be blank"
       assert_select "li", text: "Contact email can't be blank"
-      assert_select "li", text: "Industries can't be blank"
     end
     assert_select "#company_name.is-invalid"
     assert_select "#company_contact_email.is-invalid"
-    assert_select "#company-industry-errors", text: "Industries can't be blank"
+    assert_select "[data-touring-industry]", text: "Live Music & Touring"
   end
 end

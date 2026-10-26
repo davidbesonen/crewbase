@@ -27,21 +27,7 @@ class SeedEngine
   end
 
   def create_industries
-    Industry.destroy_all
-    industries = [
-      "Broadcast & Live Streaming",
-      "Corporate & Special Events",
-      "Education & Training",
-      "Film, TV & Commercial Production",
-      "Live Music & Touring",
-      "Music Recording & Production",
-      "Theater & Performing Arts",
-      "Post-Production & Creative Services"
-    ]
-
-    industries.each do |industry_name|
-      Industry.find_or_create_by(name: industry_name)
-    end
+    Industry.music_touring!
   end
 
   def create_plans

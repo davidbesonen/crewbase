@@ -37,7 +37,7 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
       password: "password123"
     )
     profile = user.profiles.create!(profile_type: "user")
-    occupation = Occupation.create!(name: "Workflow Occupation")
+    occupation = Occupation.find_or_create_by!(name: "Audio Engineer")
     skill = Skill.create!(name: "Workflow Skill", occupations: [ occupation ])
     equipment = Equipment.create!(name: "Workflow Equipment", occupations: [ occupation ])
     sign_in user, scope: :user

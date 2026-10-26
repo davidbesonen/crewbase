@@ -8,7 +8,7 @@
       .card.shadow-sm.bg-light.user-sidenav-card
         .card-body.d-flex.flex-column.pt-4.pb-4
           %h6.text-muted.fw-bold.mb-1 Search Companies
-          %p.text-muted.small.mb-4 Narrow company results by name, industry, or visibility.
+          %p.text-muted.small.mb-4 Find companies working in live music touring.
           %button.btn.btn-outline-primary.d-xl-none.mb-3{ type: "button", data: { bs_toggle: "collapse", bs_target: "#companies-filters" }, aria: { expanded: "false", controls: "companies-filters" } }
             %i.bi.bi-sliders.me-1{ aria: { hidden: true } }
             Search & filters
@@ -17,9 +17,6 @@
               %div
                 = f.label :name_cont, "Company Name", class: "form-label"
                 = f.search_field :name_cont, class: "form-control", placeholder: "Search by company name"
-              %div
-                = f.label :industries_name_eq, "Industry", class: "form-label"
-                = f.select :industries_name_eq, @industries.map { |industry| [industry.name, industry.name] }, { include_blank: "Any" }, class: "form-select"
               %div
                 = f.label :is_public_eq, "Visibility", class: "form-label"
                 = f.select :is_public_eq, [["Any", nil], ["Public", true], ["Private", false]], {}, class: "form-select"
@@ -52,7 +49,7 @@
                         - if company.industries.any?
                           = company.industry_names_text
                         - else
-                          Industry not listed
+                          Live Music & Touring
                       .d-flex.flex-wrap.align-items-center.gap-2.text-muted.small
                         - if company.formatted_location.present?
                           %span

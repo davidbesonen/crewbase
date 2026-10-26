@@ -42,7 +42,6 @@ class InstallDemoMarketplace
   private
 
   def install_catalogs
-    OccupationsV2::BY_INDUSTRY.each_key { |name| Industry.find_or_create_by!(name: name) }
     engine = SeedEngine.new
     engine.create_roles
     engine.create_occupations
@@ -60,10 +59,10 @@ class InstallDemoMarketplace
   end
 
   def create_company_and_jobs(owner)
-    industry = Industry.find_by!(name: "Broadcast & Live Streaming")
+    industry = Industry.music_touring!
     company = Company.create!(name: "Demo Live Productions", contact_email: "team@crewbase-demo.example",
       industries: [ industry ], is_public: true,
-      description: "A fictional production company. These sample jobs are for trying Crewbase, not real openings.")
+      description: "A fictional live music touring company. These sample jobs are for trying Crewbase, not real openings.")
     company.company_plans.create!(plan: Plan.find_by!(key: "team_2026"), status: "active")
     company.company_assignments.create!(user: owner, profile: owner.user_profile, role: "owner")
     company.locations.create!(city: "Chicago", state: "IL", country: "United States")

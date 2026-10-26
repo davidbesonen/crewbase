@@ -12,7 +12,7 @@ class ProfileFormCatalogTest < ActiveSupport::TestCase
     )
     profile = user.profiles.create!(profile_type: "user")
     occupation = Occupation.create!(name: "Catalog Audio Engineer")
-    other_occupation = Occupation.create!(name: "Catalog Lighting Designer")
+    other_occupation = Occupation.find_or_create_by!(name: "Lighting Designer")
     matching_skill = Skill.create!(name: "Catalog Mixing")
     Skill.create!(name: "Catalog Rigging").occupations << other_occupation
     matching_equipment = Equipment.create!(name: "Catalog Console")

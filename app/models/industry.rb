@@ -1,4 +1,10 @@
 class Industry < ApplicationRecord
+  scope :music_touring, -> { where(name: TouringCatalog.industry_name) }
+
+  def self.music_touring!
+    find_or_create_by!(name: TouringCatalog.industry_name)
+  end
+
   # 11/19/2025: NOT CREATED YET
   has_many :industry_assignments, dependent: :destroy
   has_many :companies, -> { distinct }, through: :industry_assignments, source: :assignable, source_type: "Company"

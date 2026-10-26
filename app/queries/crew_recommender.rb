@@ -49,7 +49,7 @@ class CrewRecommender
   end
 
   def active_jobs
-    @active_jobs ||= Job.accepting_applications
+    @active_jobs ||= TouringMarketplace.jobs(Job.accepting_applications)
       .where(id: requested_job_ids)
       .includes(:locations, :rich_text_description, { job_requirements: :requirement }, company: :locations)
       .order(starts_at: :asc, published_at: :desc)
@@ -63,7 +63,7 @@ class CrewRecommender
   end
 
   def candidate_profiles
-    @candidate_profiles ||= Profile.network_visible
+    @candidate_profiles ||= TouringMarketplace.profiles(Profile.network_visible)
       .where.not(user_id: @user.id)
       .where.not(completed_at: nil)
       .includes(

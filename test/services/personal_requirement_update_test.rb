@@ -1,6 +1,14 @@
 require "test_helper"
 
 class PersonalRequirementUpdateTest < ActiveSupport::TestCase
+  test "new job requirements cannot reintroduce retired occupations through submitted ids" do
+    job = jobs(:one)
+    actor = Occupation.create!(name: "Actor")
+    assert_raises ActiveRecord::RecordInvalid do
+      JobRequirementsUpdater.new(job:, selections: { required_occupation_ids: [ actor.id ] }).call
+    end
+    assert_not_includes job.reload.required_occupations, actor
+  end
   test "old requirement submissions remain effective after a job has personal entries" do
     job = jobs(:one)
     job.update!(company: companies(:one), description: "Production job", required_skills_text: "Old migrated entry")

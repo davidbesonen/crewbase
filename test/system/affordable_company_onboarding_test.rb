@@ -6,7 +6,6 @@ class AffordableCompanyOnboardingTest < ApplicationSystemTestCase
 
   test "a company can start free and review its plan without payment or mobile overflow" do
     InstallPricingCatalog.new.call
-    industry = Industry.create!(name: "Live event test industry")
     user = User.create!(first_name: "Pricing", last_name: "Tester", email: "pricing-system@example.com", password: "password123")
     user.profiles.create!(profile_type: "user", completed_at: Time.current)
     user.visits.create!
@@ -27,11 +26,12 @@ class AffordableCompanyOnboardingTest < ApplicationSystemTestCase
     fill_in "Contact email", with: "producer@example.com"
     fill_in "City", with: "Austin"
     select "United States", from: "Country"
-    fill_in "Industries", with: industry.name
-    find("[role='option']", text: industry.name).click
+    assert_text "Live Music & Touring"
+    assert_no_selector "#company_industry_ids_combobox"
     click_button "Create Company", exact: true
     assert_text "Company created successfully!"
     company = user.owned_companies.find_by!(name: "Affordable Test Productions")
+    assert_equal [ "Live Music & Touring" ], company.industries.pluck(:name)
     assert_equal "free", CompanyPlanEntitlement.new(company).tier
     visit usr_company_applications_path(company)
     assert_text "Application Pipeline"

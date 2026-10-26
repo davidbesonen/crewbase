@@ -152,7 +152,7 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "owner searches matched crew within the job staffing resource and can invite them" do
-    occupation = Occupation.create!(name: "Arena Technician")
+    occupation = Occupation.find_or_create_by!(name: "Audio Technician")
     @candidate.occupations << occupation
     @candidate.calendar_events.create!(
       event_type: "blockout",
@@ -183,7 +183,7 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_select "#crew_filter_occupation_id_search[value='#{occupation.name}']"
     assert_select "input[name='skill_query'][placeholder='Exact skill name']"
-    assert_select "input[name='equipment_query'][placeholder='Exact equipment name']"
+    assert_select "input[name='equipment_query'][placeholder='e.g. MA3 or grandMA3']"
     assert_select "#crew_filter_availability_state_search[value='No known conflict']"
     assert_select "[data-crew-search-result]", text: /#{@candidate.user.full_name}/
     assert_select "[data-crew-search-result]", text: /No known conflict/

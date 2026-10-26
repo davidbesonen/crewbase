@@ -1,48 +1,48 @@
-live_music:
+live_audio:
   industry: Live Music & Touring
   occupation: FOH Engineer
   role: Tour front-of-house engineer
   capability: foh_mixing
   equipment: mixing_consoles
-film:
-  industry: Film, TV & Commercial Production
-  occupation: Camera Operator
-  role: Commercial camera operator
-  capability: camera_operation
-  equipment: cinema_cameras
-post_production:
-  industry: Post-Production & Creative Services
-  occupation: Editor
-  role: Documentary picture editor
-  capability: picture_editing
-  equipment: editing_software
-recording:
-  industry: Music Recording & Production
-  occupation: Music Producer
-  role: Artist recording producer
-  capability: music_programming
-  equipment: audio_workstations
-theater:
-  industry: Theater & Performing Arts
-  occupation: Stage Manager
-  role: Repertory stage manager
-  capability: show_calling
-  equipment: intercom_systems
-events:
-  industry: Corporate & Special Events
-  occupation: Event Producer
-  role: Conference producer
-  capability: production_coordination
-  equipment: production_software
-broadcast:
-  industry: Broadcast & Live Streaming
-  occupation: Broadcast Engineer
-  role: Live broadcast engineer
+lighting:
+  industry: Live Music & Touring
+  occupation: Lighting Programmer
+  role: Touring lighting programmer
+  capability: lighting_programming
+  equipment: lighting_consoles
+monitors:
+  industry: Live Music & Touring
+  occupation: Monitor Engineer
+  role: Arena monitor engineer
+  capability: monitor_mixing
+  equipment: stage_monitors
+rigging:
+  industry: Live Music & Touring
+  occupation: Rigger
+  role: Touring rigger
+  capability: suspended_rigging
+  equipment: rigging_hoists
+backline:
+  industry: Live Music & Touring
+  occupation: Backline Technician
+  role: Touring backline technician
+  capability: stage_changeovers
+  equipment: instruments
+video:
+  industry: Live Music & Touring
+  occupation: Video Engineer
+  role: Concert video engineer
   capability: signal_routing
   equipment: video_switchers
-education:
-  industry: Education & Training
-  occupation: Instructor
-  role: Production workshop instructor
-  capability: workshop_instruction
-  equipment: learning_platforms
+musician:
+  industry: Live Music & Touring
+  occupation: Musician
+  role: Touring band musician
+  capability: live_performance
+  equipment: instruments
+playback:
+  industry: Live Music & Touring
+  occupation: Playback Technician
+  role: Touring playback technician
+  capability: live_playback
+  equipment: playback_systems

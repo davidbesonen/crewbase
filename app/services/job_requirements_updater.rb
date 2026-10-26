@@ -41,12 +41,22 @@ class JobRequirementsUpdater
     SELECTIONS.flat_map do |parameter, (model, importance)|
       next [] unless selections.key?(parameter)
       ids = Array(selections[parameter]).compact_blank.map(&:to_i).uniq
-      model.where(id: ids).map do |requirement|
+      selected_records(model, ids).map do |requirement|
         job.job_requirements.find_or_initialize_by(requirement:, importance:).tap do |record|
           record.source = :employer
           record.confirmed_at ||= Time.current
         end
       end
     end
+  end
+
+  def selected_records(model, ids)
+    scope = model == Occupation ? OccupationCatalog.new(selected: job.required_occupations.to_a).records : model.all
+    records = scope.where(id: ids).to_a
+    if model == Occupation && records.map(&:id).sort != ids.sort
+      job.errors.add(:base, "Choose occupations in live music touring.")
+      raise ActiveRecord::RecordInvalid, job
+    end
+    records
   end
 end

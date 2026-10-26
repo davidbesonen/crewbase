@@ -16,6 +16,18 @@ class Usr::ProfilesControllerTest < ActionDispatch::IntegrationTest
     @user.visits.create!
   end
 
+  test "retired occupations cannot be added through picker or profile parameters" do
+    sign_in @user, scope: :user
+    actor = Occupation.create!(name: "Actor")
+    profile = @user.user_profile
+    post toggle_occupation_selection_usr_profile_path(profile), params: { occupation_id: actor.id }, as: :turbo_stream
+    assert_response :not_found
+    sign_in @user, scope: :user
+    patch usr_profile_path(profile), params: { source: "completed_profile", profile: { occupation_ids: [ actor.id ] } }
+    assert_response :not_found
+    assert_empty profile.reload.occupations
+  end
+
   test "stores confirmed broad experience separately from personal details" do
     sign_in @user, scope: :user
     profile = @user.user_profile

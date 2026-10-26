@@ -10,4 +10,4 @@
         -# - form.with_plan_form do
         -#   = render Usr::Company::CompanyPlanFormComponent.new(plans: @plans, visible_form: @current_page)
         - form.with_details_form do
-          = render Usr::Company::CompanyDetailsFormComponent.new(f: f, industries: @industries, selected_industry_ids: @selected_industry_ids, plan: @plan, visible_form: @current_page, source_action: "edit")
+          = render Usr::Company::CompanyDetailsFormComponent.new(f: f, plan: @plan, visible_form: @current_page, source_action: "edit")

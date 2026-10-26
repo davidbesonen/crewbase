@@ -50,7 +50,8 @@
                 = search_field_tag :skill_query, @skill_query, class: "form-control", placeholder: "Search reported skills"
               %div
                 = label_tag :equipment_query, "Equipment or software", class: "form-label"
-                = search_field_tag :equipment_query, params[:equipment_query], class: "form-control", placeholder: "Search reported equipment"
+                = search_field_tag :equipment_query, params[:equipment_query], class: "form-control", placeholder: "e.g. MA3, DiGiCo, Ableton Live"
+                %p.form-text Search named experience. MA3 also finds grandMA3; broad tool families do not imply a specific console.
               %div
                 = f.label :locations_city_or_locations_state_or_locations_country_cont, "Location", class: "form-label"
                 = f.search_field :locations_city_or_locations_state_or_locations_country_cont, class: "form-control", placeholder: "Search by location"

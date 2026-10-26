@@ -22,4 +22,25 @@ class OccupationCatalogTest < ActiveSupport::TestCase
     assert_includes options, previous
     assert_not_includes options, hidden
   end
+
+  test "only touring roles are offered while saved out of scope roles stay removable" do
+    touring = Occupation.create!(name: "Lighting Technician")
+    actor = Occupation.create!(name: "Actor")
+    instructor = Occupation.create!(name: "Instructor")
+    assert_includes OccupationCatalog.new.records, touring
+    assert_not_includes OccupationCatalog.new.records, actor
+    assert_not_includes OccupationCatalog.new.records, instructor
+    assert_includes OccupationCatalog.new(selected: [ actor ]).records, actor
+    assert_not_includes OccupationCatalog.new.records(selected_ids: [ instructor.id ]), instructor
+  end
+
+  test "installation maintains only music touring occupations and industry" do
+    previous_names = Industry.pluck(:name)
+    InstallOccupationCatalog.new.call
+    assert_equal [ "Live Music & Touring" ], Industry.pluck(:name) - previous_names
+    assert_includes Occupation.pluck(:name), "Lighting Programmer"
+    assert_includes Occupation.pluck(:name), "Musician"
+    assert_not_includes Occupation.pluck(:name), "Actor"
+    assert_not_includes Occupation.pluck(:name), "Mastering Engineer"
+  end
 end

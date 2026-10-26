@@ -1,0 +1,125 @@
+# Active product scope. Historical catalogs remain readable for saved records.
+industry: Live Music & Touring
+retired_industries:
+  - Broadcast & Live Streaming
+  - Corporate & Special Events
+  - Education & Training
+  - Film, TV & Commercial Production
+  - Music Recording & Production
+  - Theater & Performing Arts
+  - Post-Production & Creative Services
+occupations:
+  - Audio Engineer
+  - Audio Systems Engineer
+  - Audio Technician
+  - Backline Technician
+  - Camera Operator
+  - FOH Engineer
+  - LED Technician
+  - Lighting Designer
+  - Lighting Director
+  - Lighting Programmer
+  - Lighting Technician
+  - Merchandise Manager
+  - Monitor Engineer
+  - Musical Director
+  - Musician
+  - Playback Technician
+  - Production Assistant
+  - Production Coordinator
+  - Production Manager
+  - RF Technician
+  - Rigger
+  - Show Caller
+  - Stage Manager
+  - Stagehand
+  - Tour Accountant
+  - Tour Bus Driver
+  - Tour Manager
+  - Truck Driver
+  - Video Engineer
+  - Vocalist
+  - Wardrobe Technician
+Skill:
+  - planning
+  - leadership
+  - coordination
+  - budgeting
+  - setup
+  - troubleshooting
+  - audio
+  - lighting
+  - video
+  - fabrication
+  - power
+  - networking
+  - logistics
+  - service
+  - safety
+  - documentation
+  - foh_mixing
+  - monitor_mixing
+  - system_tuning
+  - stage_patching
+  - rf_coordination
+  - audio_editing
+  - live_playback
+  - lighting_design
+  - lighting_programming
+  - lighting_installation
+  - camera_operation
+  - camera_shading
+  - live_switching
+  - signal_routing
+  - led_processing
+  - projection
+  - media_playback
+  - technical_drafting
+  - production_advancing
+  - show_calling
+  - rehearsal_management
+  - production_coordination
+  - tour_logistics
+  - venue_operations
+  - suspended_rigging
+  - staging
+  - stage_changeovers
+  - wardrobe
+  - music_arrangement
+  - music_programming
+  - live_performance
+Equipment:
+  - network_systems
+  - power_systems
+  - shop_tools
+  - vehicles
+  - instruments
+  - measurement
+  - mixing_consoles
+  - pa_systems
+  - stage_monitors
+  - wireless_audio
+  - microphones_recorders
+  - audio_interfaces
+  - audio_measurement
+  - rf_software
+  - audio_networks
+  - playback_systems
+  - lighting_consoles
+  - lighting_fixtures
+  - lighting_visualization
+  - lighting_networks
+  - broadcast_cameras
+  - camera_support
+  - image_monitoring
+  - video_switchers
+  - led_walls
+  - projection_systems
+  - media_servers
+  - intercom_systems
+  - cad_software
+  - production_software
+  - rigging_hoists
+  - stage_decks
+  - wardrobe_tools
+  - audio_workstations

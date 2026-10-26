@@ -3,7 +3,7 @@
     .card.border-0.shadow-sm
       .card-body.p-4.p-lg-5
         %h1.fw-bold What brings you to Crewbase?
-        %p.text-muted Start with what you need today. You can build out your profile later.
+        %p.text-muted Find work or hire crew and musicians in live music touring. Start with what you need today; add more profile details later.
         - if quick_start.errors.any?
           .alert.alert-danger{ role: "alert" }= quick_start.errors.full_messages.to_sentence
         = form_with url: usr_onboarding_path, method: :patch, scope: :onboarding, builder: ActionView::Helpers::FormBuilder do |form|

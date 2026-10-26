@@ -60,7 +60,8 @@
         = search_field_tag :skill_query, filters[:skill_query], class: "form-control", placeholder: "Exact skill name"
       .col-md-3
         = form.label :equipment_query, "Equipment or software", class: "form-label"
-        = search_field_tag :equipment_query, filters[:equipment_query], class: "form-control", placeholder: "Exact equipment name"
+        = search_field_tag :equipment_query, filters[:equipment_query], class: "form-control", placeholder: "e.g. MA3 or grandMA3"
+        %p.form-text MA3 also finds reported grandMA3 experience.
       .col-12.d-flex.gap-2
         = form.submit "Search Crew", class: "btn btn-primary"
         = link_to "Clear", helpers.usr_job_crew_path(job), class: "btn btn-quiet"

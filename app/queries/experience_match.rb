@@ -56,7 +56,8 @@ class ExperienceMatch
     return @profile.occupations.include?(entry.record) if entry.type == "Occupation"
     return ExperienceCategories.covers?(entry.type, ExperienceCategories.profile_keys(@profile, entry.type), entry.category_key) if entry.category_key
 
-    ExperienceTerms.new(reported_names(entry.type)).include?(entry.name)
+    terms = entry.type == "Equipment" ? EquipmentTerms : ExperienceTerms
+    terms.new(reported_names(entry.type)).include?(entry.name)
   end
 
   def reported_names(type)

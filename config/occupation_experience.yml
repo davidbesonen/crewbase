@@ -34,8 +34,8 @@ Broadcast Engineer:
   Equipment: [video_switchers, streaming_encoders, broadcast_cameras, network_systems, intercom_systems, image_monitoring]
 Camera Operator:
   Core: [camera_operation, setup]
-  Skill: [cinematic_lighting, camera_shading, documentation]
-  Equipment: [cinema_cameras, broadcast_cameras, camera_support, lens_control, image_monitoring, intercom_systems]
+  Skill: [camera_shading, live_switching, signal_routing, troubleshooting]
+  Equipment: [broadcast_cameras, camera_support, image_monitoring, intercom_systems]
 Catalog Manager:
   Core: [music_metadata, documentation]
   Skill: [rights_administration, release_coordination, media_management]
@@ -137,9 +137,9 @@ Music Producer:
   Skill: [studio_recording, studio_mixing, music_arrangement, artist_development]
   Equipment: [audio_workstations, audio_interfaces, microphones_recorders, instruments, notation_software]
 Musician:
-  Core: [performance]
-  Skill: [live_performance, session_performance, music_arrangement, composition, music_programming]
-  Equipment: [instruments, stage_monitors, audio_workstations, notation_software, audio_interfaces]
+  Core: [live_performance]
+  Skill: [music_arrangement, music_programming, live_playback]
+  Equipment: [instruments, stage_monitors, playback_systems, audio_interfaces]
 Playback Technician:
   Core: [live_playback]
   Skill: [audio_editing, music_programming, networking, troubleshooting]
@@ -170,7 +170,7 @@ Production Designer:
   Equipment: [cad_software, review_software, shop_tools]
 Production Manager:
   Core: [production_advancing, production_coordination, budgeting, leadership]
-  Skill: [venue_operations, safety, post_supervision]
+  Skill: [venue_operations, safety, tour_logistics]
   Equipment: [production_software, cad_software, intercom_systems]
 Production Sound Mixer:
   Core: [location_sound, documentation]
@@ -223,15 +223,15 @@ Technical Director:
 Tour Manager:
   Core: [tour_logistics, production_advancing, budgeting, coordination, leadership]
   Skill: [production_coordination]
-  Equipment: [production_software, music_business_software, intercom_systems]
+  Equipment: [production_software, intercom_systems]
 Venue Manager:
   Core: [venue_operations, coordination, budgeting, leadership]
   Skill: [production_advancing, production_coordination, safety]
   Equipment: [production_software, intercom_systems, hospitality_tools]
 Video Engineer:
   Core: [signal_routing, troubleshooting]
-  Skill: [camera_shading, streaming, led_processing, projection, networking]
-  Equipment: [video_switchers, image_monitoring, broadcast_cameras, network_systems, led_walls, projection_systems, streaming_encoders]
+  Skill: [camera_shading, live_switching, led_processing, projection, networking]
+  Equipment: [video_switchers, image_monitoring, broadcast_cameras, network_systems, led_walls, projection_systems, media_servers]
 Videographer:
   Core: [camera_operation]
   Skill: [cinematic_lighting, location_sound, picture_editing, media_management]
@@ -244,3 +244,40 @@ Wardrobe Stylist:
   Core: [wardrobe, documentation]
   Skill: [hair_makeup, coordination, budgeting]
   Equipment: [wardrobe_tools, review_software]
+
+Lighting Director:
+  Core: [lighting_programming, leadership]
+  Skill: [lighting_design, production_advancing, show_calling]
+  Equipment: [lighting_consoles, lighting_visualization, lighting_networks, intercom_systems]
+Lighting Programmer:
+  Core: [lighting_programming]
+  Skill: [lighting_design, networking, production_advancing]
+  Equipment: [lighting_consoles, lighting_visualization, lighting_networks, lighting_fixtures]
+Musical Director:
+  Core: [live_performance, music_arrangement, leadership]
+  Skill: [rehearsal_management, live_playback, production_advancing]
+  Equipment: [instruments, stage_monitors, playback_systems, audio_workstations]
+Vocalist:
+  Core: [live_performance]
+  Skill: [music_arrangement, live_playback]
+  Equipment: [microphones_recorders, stage_monitors, playback_systems]
+Merchandise Manager:
+  Core: [service, budgeting]
+  Skill: [logistics, coordination, tour_logistics]
+  Equipment: [production_software, vehicles]
+Tour Accountant:
+  Core: [budgeting, documentation]
+  Skill: [tour_logistics, coordination]
+  Equipment: [production_software]
+Tour Bus Driver:
+  Core: [logistics, safety]
+  Skill: [tour_logistics, coordination]
+  Equipment: [vehicles, intercom_systems]
+Truck Driver:
+  Core: [logistics, safety]
+  Skill: [tour_logistics, staging]
+  Equipment: [vehicles, shop_tools, intercom_systems]
+Wardrobe Technician:
+  Core: [wardrobe, documentation]
+  Skill: [coordination, production_advancing]
+  Equipment: [wardrobe_tools, production_software]

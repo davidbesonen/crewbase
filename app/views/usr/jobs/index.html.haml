@@ -16,7 +16,7 @@
       .card.shadow-sm.bg-light.user-sidenav-card
         .card-body.d-flex.flex-column.pt-4.pb-4
           %h6.text-muted.fw-bold.mb-1 Search Jobs
-          %p.text-muted.small.mb-4 Narrow roles by title, industry, schedule, and compensation.
+          %p.text-muted.small.mb-4 Find live music touring roles by title, schedule and compensation.
           %button.btn.btn-outline-primary.d-xl-none.mb-3{ type: "button", data: { bs_toggle: "collapse", bs_target: "#jobs-filters" }, aria: { expanded: "false", controls: "jobs-filters" } }
             %i.bi.bi-sliders.me-1{ aria: { hidden: true } }
             Search & filters
@@ -25,9 +25,6 @@
               %div
                 = f.label :title_cont, "Job Title", class: "form-label"
                 = f.search_field :title_cont, class: "form-control", placeholder: "Search by title"
-              %div
-                = f.label :company_industries_name_eq, "Industry", class: "form-label"
-                = f.select :company_industries_name_eq, @industries.map { |industry| [industry.name, industry.name] }, { include_blank: "Any" }, class: "form-select"
               %div
                 = f.label :employment_type_eq, "Employment", class: "form-label"
                 = f.select :employment_type_eq, Job.employment_types.map { |label, value| [label.humanize, value] }, { include_blank: "Any" }, class: "form-select"

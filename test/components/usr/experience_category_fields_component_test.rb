@@ -2,13 +2,13 @@ require "test_helper"
 
 class Usr::ExperienceCategoryFieldsComponentTest < ViewComponent::TestCase
   test "occupation core work is explained instead of offered as another selection" do
-    actor = Occupation.new(id: 99, name: "Actor")
+    musician = Occupation.new(id: 99, name: "Musician")
     render_inline Usr::ExperienceCategoryFieldsComponent.new(record: Profile.new, scope: :profile,
-      occupations: [ actor ], selected_occupation_ids: [ actor.id ])
+      occupations: [ musician ], selected_occupation_ids: [ musician.id ])
     assert_selector "[data-category-core-summary]", text: "Included through occupations"
-    assert_selector "[data-category-row][hidden] input[value='performance'][disabled]", visible: :all
-    assert_selector "[data-category-row][hidden] input[value='acting_voice'][disabled]", visible: :all
-    assert_selector "[data-category-primary] input[value='rehearsal_management']:not([disabled])"
+    assert_selector "[data-category-row][hidden] input[value='live_performance'][disabled]", visible: :all
+    assert_no_selector "input[value='acting_voice']", visible: :all
+    assert_selector "[data-category-primary] input[value='music_arrangement']:not([disabled])"
   end
 
   test "umbrella equipment choices are retired while saved selections remain removable" do
@@ -22,13 +22,13 @@ class Usr::ExperienceCategoryFieldsComponentTest < ViewComponent::TestCase
   end
 
   test "saved core choices remain removable and job requirements use the same core guidance" do
-    actor = Occupation.new(id: 99, name: "Actor")
-    render_inline Usr::ExperienceCategoryFieldsComponent.new(record: Profile.new(capability_keys: [ "performance" ]), scope: :profile,
-      occupations: [ actor ], selected_occupation_ids: [ actor.id ])
-    assert_selector "input[value='performance'][checked]:not([disabled])"
+    musician = Occupation.new(id: 99, name: "Musician")
+    render_inline Usr::ExperienceCategoryFieldsComponent.new(record: Profile.new(capability_keys: [ "live_performance" ]), scope: :profile,
+      occupations: [ musician ], selected_occupation_ids: [ musician.id ])
+    assert_selector "input[value='live_performance'][checked]:not([disabled])"
     render_inline Usr::ExperienceCategoryFieldsComponent.new(record: Job.new, scope: :job,
-      occupations: [ actor ], selected_occupation_ids: [ actor.id ])
-    assert_selector "input[value='performance'][disabled]", count: 2, visible: :all
+      occupations: [ musician ], selected_occupation_ids: [ musician.id ])
+    assert_selector "input[value='live_performance'][disabled]", count: 2, visible: :all
   end
 
   test "prioritizes occupation relevant and selected categories while keeping other choices" do
@@ -36,11 +36,11 @@ class Usr::ExperienceCategoryFieldsComponentTest < ViewComponent::TestCase
     profile = Profile.new(capability_keys: [ "audio" ])
     render_inline Usr::ExperienceCategoryFieldsComponent.new(record: profile, scope: :profile,
       occupations: [ occupation ], selected_occupation_ids: [ 99 ])
-    assert_selector "[data-category-row][hidden] input[value='camera'][disabled]", visible: :all
+    assert_selector "[data-category-row][hidden] input[value='camera_operation'][disabled]", visible: :all
     assert_selector "[data-category-primary] input[value='audio'][checked]"
     assert_selector "[data-category-other] input[value='lighting']", visible: :all
     assert_no_selector "[data-category-primary] input[value='lighting']"
-    assert_selector "[data-category-primary] .form-check:first-child input[value='cinematic_lighting']"
+    assert_selector "[data-category-primary] .form-check:first-child input[value='camera_shading']"
     assert_selector "input[type='search'][id='profile_capability_keys_search']"
     assert_selector "input[type='checkbox']", count: ExperienceCategories.selectable("Skill").size + ExperienceCategories.selectable("Equipment").size, visible: :all
   end

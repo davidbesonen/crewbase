@@ -28,7 +28,8 @@ class Usr::Company::JobFormComponentTest < ViewComponent::TestCase
     assert_no_selector "textarea[name='job[required_skills_text]']"
     assert_selector "[data-specific-requirements]", text: "Required entries filter job recommendations", visible: :all
     assert_selector "[data-specific-requirements]", text: "Preferred entries improve ranking", visible: :all
-    assert_selector "[data-specific-requirements]", text: "Alternate names and spellings are not matched automatically", visible: :all
+    assert_selector "[data-specific-requirements]", text: "Other alternate names and spellings are not matched automatically", visible: :all
+    assert_selector "[data-specific-requirements]", text: "MA3 and grandMA3 are recognized as the same console family; MA2 is separate", visible: :all
   end
 
   test "existing or invalid specific requirements are expanded" do

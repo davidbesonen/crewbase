@@ -47,38 +47,38 @@ module SeedEngineMockData
   COMPANY_BLUEPRINTS = [
     {
       name: "David Besonen Music",
-      industry: "Music Recording & Production",
+      industry: "Live Music & Touring",
       city: "Nashville",
       state: "TN",
-      description: "Independent music production company focused on artist development, recording sessions, live captures, and release support."
+      description: "Live music touring company supporting musicians, touring productions and concert crews."
     },
     {
-      name: "Northstar Broadcast",
-      industry: "Broadcast & Live Streaming",
+      name: "Northstar Touring",
+      industry: "Live Music & Touring",
       city: "Chicago",
       state: "IL",
-      description: "Broadcast crew provider for live streams, remote productions, sports coverage, and branded content."
+      description: "Touring audio, lighting and video crew for concerts and music festivals."
     },
     {
-      name: "Summit Event Group",
-      industry: "Corporate & Special Events",
+      name: "Summit Concert Production",
+      industry: "Live Music & Touring",
       city: "Austin",
       state: "TX",
-      description: "Live event company producing conferences, activations, touring corporate events, and premium private shows."
+      description: "Concert production company supporting festival stages and touring artists."
     },
     {
-      name: "Framehouse Studios",
-      industry: "Film, TV & Commercial Production",
+      name: "Roadhouse Touring",
+      industry: "Live Music & Touring",
       city: "Los Angeles",
       state: "CA",
-      description: "Production studio delivering commercial shoots, branded campaigns, documentary work, and fast-turn field production."
+      description: "Tour production team handling advancing, travel, backline and show-day logistics."
     },
     {
-      name: "Cue Light Post",
-      industry: "Post-Production & Creative Services",
+      name: "Cue Light Touring",
+      industry: "Live Music & Touring",
       city: "New York",
       state: "NY",
-      description: "Post-production team handling editorial, finishing, motion design, sound, and delivery for agency and studio clients."
+      description: "Touring lighting and stage production company supporting concert runs."
     }
   ].freeze
 
@@ -106,14 +106,14 @@ module SeedEngineMockData
       duration_days: 0
     },
     {
-      project_name: "Brand Launch Livestream",
-      description: "A short-form live production with technical rehearsal and broadcast delivery.",
+      project_name: "Arena Tour Weekend",
+      description: "Arena concert production with technical rehearsals and touring crew.",
       months_ago: 8,
       duration_days: 2
     },
     {
-      project_name: "Studio Session Weekend",
-      description: "Two days of session prep, production support, and wrap.",
+      project_name: "Tour Rehearsal Weekend",
+      description: "Two days of tour rehearsals, playback preparation and production support.",
       months_ago: 13,
       duration_days: 1
     }
@@ -251,11 +251,11 @@ module SeedEngineMockData
     profile.location_assignments.destroy_all
     profile.locations << location
     profile.occupations = occupations
-    # Synthetic demo members explicitly exercise the category confirmation flow.
-    suggestions = ExperienceCategorySuggestions.new(profile: profile).results
+    # These are synthetic demonstration members, with explicit touring specialties.
+    guidance = OccupationExperienceCategories.new(occupations).keys
     profile.update!(
-      capability_keys: suggestions.select { |item| item.field == :capability_keys }.map { |item| item.category.key },
-      equipment_family_keys: suggestions.select { |item| item.field == :equipment_family_keys }.map { |item| item.category.key }
+      capability_keys: guidance.fetch("Skill").first(1),
+      equipment_family_keys: guidance.fetch("Equipment").first(2)
     )
   end
 
@@ -322,7 +322,7 @@ module SeedEngineMockData
     project_names = [
       "Summer Festival Weekend",
       "Fall Corporate Tour",
-      "Live Broadcast Series"
+      "Live Music Tour"
     ]
 
     companies.each_with_object({}) do |company, projects_by_company|
@@ -400,9 +400,7 @@ module SeedEngineMockData
       confirmed_at: Time.current
     )
 
-    demonstration_profile = Profile.new(occupations: [ occupation ])
-    categories = ExperienceCategorySuggestions.new(profile: demonstration_profile).results
-      .select { |item| item.field == :capability_keys }.map { |item| item.category.key }
+    categories = OccupationExperienceCategories.new([ occupation ]).keys.fetch("Skill")
     job.update!(required_capability_keys: categories.first(1), required_skills_text: "", preferred_skills_text: "Crew communication", preferred_equipment_text: "Two-way radios")
   end
 
@@ -663,7 +661,7 @@ module SeedEngineMockData
   end
 
   def seeded_occupations(index)
-    industries = Industry.includes(:occupations).order(:name).to_a
+    industries = Industry.music_touring.includes(:occupations).to_a
     industry = industries[index % industries.length]
     occupation_count = [ 1, 2, 3 ][index % 3]
     industry.occupations.where(category_key: nil).order(:name).sample(occupation_count)
@@ -686,14 +684,14 @@ module SeedEngineMockData
   end
 
   def seeded_headline(occupations)
-    "#{occupations.map(&:name).to_sentence} available for production, touring, and creative work"
+    "#{occupations.map(&:name).to_sentence} available for live music touring and concert production"
   end
 
   def seeded_bio(user, occupations, skills)
     focus = occupations.map(&:name).to_sentence
     skill_text = skills.presence&.first(3)&.to_sentence || "cross-functional production skills"
 
-    "#{user.first_name} #{user.last_name} is a #{focus.downcase} with experience across live events, studio sessions, and fast-moving client work. Known for clear communication, organized prep, and #{skill_text.downcase}."
+    "#{user.first_name} #{user.last_name} is a #{focus.downcase} with experience across concerts, music festivals and touring productions. Known for clear communication, organized prep, and #{skill_text.downcase}."
   end
 
   def seeded_phone_number(index)
@@ -710,7 +708,7 @@ module SeedEngineMockData
 
   def seeded_job_title(occupation, index, company)
     prefixes = [ "Lead", "Senior", "Freelance", "Touring", "Assistant", "On-Call", "Contract" ]
-    suffixes = [ nil, "for Live Productions", "for Client Projects", "for Touring Season", "for Studio Sessions" ]
+    suffixes = [ nil, "for Live Productions", "for Concerts", "for Touring Season", "for Tour Rehearsals" ]
 
     [ prefixes[index % prefixes.length], occupation.name, suffixes[index % suffixes.length] ].compact.join(" ")
   end
@@ -718,9 +716,9 @@ module SeedEngineMockData
   def seeded_gig_title(index)
     [
       "Summer Festival Crew Call",
-      "Corporate Tour Production Crew",
-      "Live Broadcast Crew Call",
-      "Studio Session Production Crew"
+      "Arena Tour Production Crew",
+      "Concert Video Crew Call",
+      "Tour Rehearsal Crew Call"
     ][index % 4]
   end
 

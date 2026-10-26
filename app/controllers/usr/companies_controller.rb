@@ -2,10 +2,9 @@ class Usr::CompaniesController < ApplicationController
   before_action :set_owned_company, only: [ :edit, :update, :destroy ]
 
   def index
-    companies_scope = visible_companies.includes(:industries, :open_jobs, :locations)
+    companies_scope = TouringMarketplace.companies(visible_companies).includes(:industries, :open_jobs, :locations)
 
-    @industries = Industry.order(:name)
-    @q = companies_scope.ransack(params[:q])
+    @q = companies_scope.ransack(params.fetch(:q, {}).permit(:name_cont, :is_public_eq))
     @filtered = @q.conditions.any?
     @pagy, @companies = pagy(@q.result(distinct: true).order(created_at: :desc, name: :asc))
   end
@@ -13,7 +12,7 @@ class Usr::CompaniesController < ApplicationController
   def search
     query = params[:q].to_s.strip
     companies = if query.present?
-      visible_companies
+      TouringMarketplace.companies(visible_companies)
         .where("name ILIKE ?", "%#{Company.sanitize_sql_like(query)}%")
         .order(:name)
         .limit(8)
@@ -36,10 +35,8 @@ class Usr::CompaniesController < ApplicationController
     @company.locations.build if @company.locations.empty?
     @current_page = params[:current_page].presence_in(%w[company_plan_selection company_details_form]) || "company_plan_selection"
     @plans = Plan.active
-    @industries = Industry.order(:name)
     @selected_plan_id = params[:plan_id]
     @plan = @plans.find_by(id: @selected_plan_id) if @selected_plan_id.present?
-    @selected_industry_ids = []
     @can_fill_mock_company_data = current_user.owned_companies.exists?
   end
 
@@ -73,9 +70,7 @@ class Usr::CompaniesController < ApplicationController
     # @company.locations.build if @company.locations.empty?
     @current_page = "company_details_form"
     @plans = Plan.active
-    @industries = Industry.order(:name)
     @selected_plan_id = params[:plan_id]
-    @selected_industry_ids = @company.industry_ids
   end
 
   def update
@@ -86,8 +81,6 @@ class Usr::CompaniesController < ApplicationController
     else
       @current_page = "company_details_form"
       @plan = @company.plans.first
-      @industries = Industry.order(:name)
-      @selected_industry_ids = @company.industry_ids
       render :edit, status: :unprocessable_entity
     end
   end
@@ -142,10 +135,8 @@ class Usr::CompaniesController < ApplicationController
     @company.locations.build if @company.locations.empty?
     @current_page = "company_details_form"
     @plans = Plan.active
-    @industries = Industry.order(:name)
     @selected_plan_id = selected_plan_id
     @plan = Plan.find_by(id: @selected_plan_id) if @selected_plan_id.present?
-    @selected_industry_ids = @company.industry_ids
     @can_fill_mock_company_data = current_user.owned_companies.exists?
   end
 
@@ -174,9 +165,8 @@ class Usr::CompaniesController < ApplicationController
       :is_public,
       :file,
       :image,
-      industry_ids: [],
       locations_attributes: [ :id, :address_line_1, :address_line_2, :city, :state, :zip_code, :country ]
-    )
+    ).merge(industry_ids: [ Industry.music_touring!.id ])
   end
 
   def find_or_create_location

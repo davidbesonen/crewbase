@@ -1,8 +1,10 @@
 # Occupations, confirmed categories, and specific experience
 
-Crewbase keeps specific occupations and a bounded vocabulary of 94 work
-capabilities/services plus 52 selectable equipment/software families. Twelve older
-equipment umbrellas remain valid for existing selections and requirements. Brands, products, models, and
+Crewbase currently focuses on **live music touring**: crew, musicians and engineers.
+`config/touring.yml` defines the active occupations, work capabilities and tool
+families. Company setup assigns Live Music & Touring automatically; there is no
+industry selector. Older categories remain valid for saved selections and
+requirements. Brands, products, models and
 individual techniques are optional personal entries, not global catalog records.
 
 ## Profile configuration
@@ -16,12 +18,13 @@ verified qualifications or ownership of equipment.
 
 Profile and job forms prioritize categories relevant to the selected occupations.
 `OccupationExperienceCategories` reads `config/occupation_experience.yml`,
-which separates each of the 61 maintained occupations' core duties from additional
+which separates each maintained occupation's core duties from additional
 work specialties and tool families. Core duties (and their broader categories)
 appear in an “Included through occupations” note instead of selectable extras.
 Multiple occupations combine their core duties and guidance. Other categories remain available for work
-across disciplines, and saved selections always stay visible and removable. Unknown roles
-fall back to all categories. Changing occupations updates guidance without
+across disciplines, and saved selections always stay visible and removable. Unknown saved roles
+fall back to active touring categories. New roles must come from the touring
+catalog, while historical selections remain removable. Changing occupations updates guidance without
 checking boxes, removing selections, or replacing unsaved personal details.
 The core mapping supplies matching evidence without writing extra category keys.
 Removing an occupation removes that inferred evidence, unless the member also
@@ -62,17 +65,19 @@ reverse or a neighboring specialty. For example, monitor mixing is audio
 experience; Audio production alone does not satisfy Monitor mixing. Overlapping
 family/specialty matches count once in scoring, including unstructured postings.
 FOH Engineer supplies front-of-house mixing, but not monitor mixing or console
-familiarity. Technical Director supplies leadership, but not broadcast switching
-or theatre staging; these remain explicit specialties. A broad acting category
-does not satisfy a specifically named voiceover requirement.
+familiarity. Lighting Programmer supplies lighting programming, but never familiarity with
+a specific console unless the member reports that named experience.
 For example,
 “live sound mixing” and “live audio mixing” can both accompany the confirmed
 Audio production category. A category does not substitute for a named product:
 Audio systems cannot satisfy a DiGiCo SD7 requirement.
 
-Specific entries still use normalized whole-entry comparisons: case, Unicode
+Specific entries generally use normalized whole-entry comparisons: case, Unicode
 width, and whitespace are ignored; punctuation and product identities remain
-significant. No synonym or product equivalence is inferred. Optional examples
+significant. `EquipmentTerms` recognizes MA2/grandMA2 and MA3/grandMA3 spellings, including
+spaced names and reported models such as “grandMA3 full-size”. MA2 and MA30
+cannot satisfy MA3. This small alias rule is not a selectable product inventory,
+and broad console familiarity never implies experience with a named board. Optional examples
 and prose do not fulfill requirements. Duplicate required/preferred matches of
 the same type and name do not inflate scores.
 
@@ -86,7 +91,8 @@ selected category labels and named experience in their title/description.
 
 The people directory supports partial searches over personal entries and category
 labels, including occupation core duties. Job-specific crew search filters recommendations by normalized category
-labels or whole personal entries.
+labels or whole personal entries, with the same console alias rule. Directory
+search applies this rule in SQL and honors explicitly cleared legacy entries.
 
 ## Existing data and rollout
 
@@ -103,7 +109,12 @@ Original assignments and requirements remain available. Rollbacks refuse to
 discard new personal entries or confirmations.
 
 Historical migrations/catalogs remain versioned. New choices of occupation use
-`db/catalogs/occupations_v2.rb` and `InstallOccupationCatalog`. Category keys stay
+`config/touring.yml` and `InstallOccupationCatalog`. `TouringMarketplace` keeps
+explicitly retired industries and occupations out of discovery and recommendations.
+Saved records are not deleted. Crossover profiles with a touring role remain
+eligible; unclassified historical records and admin/owner history stay accessible.
+The migration installs the new catalog and corrects only the original fictional
+demo company’s previous industry. Category keys stay
 stable; expand the vocabulary only for meaningfully distinct transferable work,
 not individual products. Demo seeds illustrate confirmed categories and optional
 details without expanding Skill or Equipment catalogs.

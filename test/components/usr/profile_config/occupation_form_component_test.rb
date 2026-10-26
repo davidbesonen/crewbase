@@ -23,7 +23,7 @@ class Usr::ProfileConfig::OccupationFormComponentTest < ViewComponent::TestCase
       )
     )
 
-    assert_includes result.text, "What occupations do you work in?"
+    assert_includes result.text, "What do you do on tour?"
     occupation_button_texts = result.css("a[id^='occupation_button_id_']").map { |node| node.text.strip }
     selected_occupation_texts = result.css(".selected-occupation-pill").map { |node| node.text.strip }
 

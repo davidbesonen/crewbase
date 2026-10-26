@@ -30,7 +30,7 @@ class Usr::CompanyJobRequirementsTest < ActionDispatch::IntegrationTest
       data: { "seats_limit" => 8, "active_jobs_limit" => 15, "projects_limit" => "unlimited" }
     )
     @company.company_plans.create!(plan: team)
-    @occupation = Occupation.create!(name: "A1 Audio Engineer")
+    @occupation = Occupation.find_or_create_by!(name: "FOH Engineer")
     @required_skill = Skill.create!(name: "Dante")
     @preferred_skill = Skill.create!(name: "Yamaha CL")
     @equipment = Equipment.create!(name: "QL5")

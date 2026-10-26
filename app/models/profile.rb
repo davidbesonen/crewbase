@@ -62,7 +62,7 @@ class Profile < ApplicationRecord
   end
 
   def reported_equipment
-    ExperienceTerms.new(equipment_text.nil? ? equipment.map(&:name) : equipment_text).values
+    EquipmentTerms.new(equipment_text.nil? ? equipment.map(&:name) : equipment_text).values
   end
 
   def normalized_ical_feed_url

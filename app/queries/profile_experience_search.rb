@@ -17,8 +17,11 @@ class ProfileExperienceSearch
 
     pattern = "%#{ActiveRecord::Base.sanitize_sql_like(query.to_s.strip)}%"
     table = association == :skill ? "skills" : "equipment"
-    legacy_ids = assignments.joins(association).where("#{table}.name ILIKE ?", pattern).select(:profile_id)
-    matching = scope.where("profiles.#{field} ILIKE ?", pattern)
+    alias_pattern = EquipmentTerms.search_pattern(query) if association == :equipment
+    operator = alias_pattern ? "~*" : "ILIKE"
+    pattern = alias_pattern || pattern
+    legacy_ids = assignments.joins(association).where("#{table}.name #{operator} ?", pattern).select(:profile_id)
+    matching = scope.where("profiles.#{field} #{operator} ?", pattern)
       .or(scope.where(field => nil).where(id: legacy_ids))
     type = association == :skill ? "Skill" : "Equipment"
     category_field = ExperienceCategories::PROFILE_FIELDS.key(type)
