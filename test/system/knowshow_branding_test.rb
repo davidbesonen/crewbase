@@ -18,6 +18,18 @@ class KnowshowBrandingTest < ApplicationSystemTestCase
     assert_selector "main[data-brand-concept='afterhours']"
     assert_selector "h1", text: "Know your crew."
     assert_selector ".marketing-nav img[src*='knowshow-afterhours-on-dark']"
+    page.driver.browser.manage.window.resize_to(1890, 1000)
+    page.evaluate_async_script("document.fonts.ready.then(() => arguments[0](true))")
+    assert_equal 1, page.evaluate_script(<<~JS)
+      (() => {
+        const heading = document.querySelector('.marketing-hero h1');
+        const text = Array.from(heading.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        return Array.from(range.getClientRects()).filter(rect => rect.width > 0).length;
+      })()
+    JS
+    page.driver.browser.manage.window.resize_to(1440, 1000)
     select "Light", from: "Appearance"
     assert_selector "html[data-bs-theme='light']"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth")
