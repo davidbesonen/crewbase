@@ -17,16 +17,22 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "logo review presents four portable directions and a real site preview" do
+  test "logo review focuses on three hybrids between Signal and Afterhours" do
     get "/brand"
     assert_response :success
-    assert_select "[data-brand-direction]", count: 4
-    assert_select "a[href*='/welcome?concept=']", count: 4
-    assert_select "a[download][href$='.svg']", minimum: 4
-    get "/welcome", params: { concept: "afterhours" }
+    assert_select "[data-brand-direction]", count: 3
+    assert_select "a[href*='/welcome?concept=']", count: 5
+    assert_select "a[download][href$='.svg']", count: 6
+    %w[tempo momentum drive].each do |key|
+      assert_select "[data-brand-direction='#{key}']" do
+        assert_select "img[src*='knowshow-#{key}-on-dark']"
+        assert_select "img[src*='knowshow-#{key}-on-light']"
+      end
+    end
+    get "/welcome", params: { concept: "momentum" }
     assert_response :success
-    assert_select "main[data-brand-concept='afterhours']"
-    assert_select "img[src*='knowshow-afterhours-on-dark']", minimum: 1
+    assert_select "main[data-brand-concept='momentum']"
+    assert_select "img[src*='knowshow-momentum-on-dark']", minimum: 1
   end
 
   test "homepage explains KnowShow to visitors and offers clear account actions" do

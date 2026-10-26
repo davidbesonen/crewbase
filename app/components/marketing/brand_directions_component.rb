@@ -1,5 +1,5 @@
 class Marketing::BrandDirectionsComponent < ApplicationComponent
   renders_many :wordmarks
 
-  def concepts = BrandIdentity::CONCEPTS
+  def concepts = BrandIdentity.refinements
 end

@@ -1,5 +1,5 @@
 - content_for :hide_default_footer, "true"
 = render Marketing::BrandDirectionsComponent.new do |board|
-  - BrandIdentity::CONCEPTS.each do |concept|
+  - board.concepts.each do |concept|
     - board.with_wordmark do
       = render Shared::BrandWordmarkComponent.new(concept: concept.key)
