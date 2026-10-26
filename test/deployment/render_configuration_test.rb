@@ -26,6 +26,11 @@ class RenderConfigurationTest < ActiveSupport::TestCase
     config.fetch("production").each_value { |database| assert_equal false, database.fetch("seeds", true) }
   end
 
+  test "the threaded queue has enough database connections for workers and supervision" do
+    config = YAML.safe_load(ERB.new(Rails.root.join("config/database.yml").read).result, aliases: true)
+    assert_operator config.fetch("production").fetch("queue").fetch("pool"), :>=, 10
+  end
+
   test "render blueprint uses a free web service and generated demo secrets" do
     path = Rails.root.join("render.yaml")
     assert path.exist?, "Render deployment blueprint is missing"

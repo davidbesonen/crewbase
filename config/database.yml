@@ -98,6 +98,8 @@ production:
   queue:
     <<: *primary_production
     database: crewbase_production_queue
+    # Async workers share this pool with dispatch, supervision, and web enqueues.
+    pool: <%= ENV.fetch("QUEUE_DB_POOL", 10) %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production

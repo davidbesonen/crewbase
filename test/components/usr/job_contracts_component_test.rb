@@ -34,7 +34,7 @@ class Usr::JobContractsComponentTest < ViewComponent::TestCase
     assert_text "Production agreement"
     assert_text "Uploaded by Contract Owner"
     assert_selector "form[action='#{usr_job_contracts_path(@job)}']"
-    assert_selector "a[href='#{download_usr_job_contract_path(@job, @contract)}']", text: /Download/
+    assert_selector "a[href='#{download_usr_job_contract_path(@job, @contract)}'][data-turbo='false']", text: /Download/
     assert_selector "form[action='#{usr_job_contract_path(@job, @contract)}']", text: /Remove/
   end
 
