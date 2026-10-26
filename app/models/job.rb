@@ -8,6 +8,7 @@ class Job < ApplicationRecord
   validates(*JobExperienceRequirements::TEXT_FIELDS.keys, experience_terms: true)
 
   include Compensated
+  include JobScheduling
 
   belongs_to :company, optional: true
   belongs_to :project, optional: true
@@ -153,7 +154,6 @@ class Job < ApplicationRecord
         filled_at
         id
         is_active
-        is_visa_sponsorship_available
         pay_max
         pay_min
         pay_period

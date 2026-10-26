@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -429,6 +429,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_120000) do
     t.text "required_skills_text"
     t.boolean "requires_travel"
     t.datetime "restricted_at"
+    t.boolean "schedule_has_times", default: true, null: false
     t.datetime "starts_at"
     t.integer "status", default: 1
     t.string "title"

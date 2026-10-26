@@ -49,6 +49,13 @@ class PublicJobPostingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='sign_in']", text: /sign in/i
   end
 
+  test "public postings show the same optional schedule as signed-in postings" do
+    @job.update!(schedule_has_times: false, starts_at: 2.days.from_now, ends_at: 3.days.from_now)
+    get public_job_posting_path(@job)
+    assert_response :success
+    assert_select "[data-job-schedule]", text: /#{I18n.l(@job.starts_at.to_date, format: :long)}/
+  end
+
   test "public postings display personally entered requirements" do
     @job.update!(required_skills_text: "Lighting programming", preferred_equipment_text: "grandMA3")
     get public_job_posting_path(@job)

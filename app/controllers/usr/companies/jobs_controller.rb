@@ -11,7 +11,7 @@ class Usr::Companies::JobsController < ApplicationController
 
   def new
     @entitlement = CompanyPlanEntitlement.new(@company)
-    @job = @company.jobs.new
+    @job = @company.jobs.new(schedule_has_times: false)
     @job.posting_type = nil
     @job.crew_positions.build
     @job.project = @company.projects.active.find(params[:project_id]) if params[:project_id].present?
@@ -101,7 +101,6 @@ class Usr::Companies::JobsController < ApplicationController
       :employment_type,
       :posting_type,
       :requires_travel,
-      :is_visa_sponsorship_available,
       :is_active,
       :status,
       :description,
@@ -112,6 +111,7 @@ class Usr::Companies::JobsController < ApplicationController
       :published_at,
       :starts_at,
       :ends_at,
+      :schedule_has_times,
       :archived_at,
       :closed_at,
       :filled_at,

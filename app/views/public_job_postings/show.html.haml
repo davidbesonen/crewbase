@@ -16,6 +16,9 @@
             %span.badge.text-bg-light.border= @job.compensation_range
         %h2.h5 About this job
         .text-muted.mb-4= @job.description
+        .mb-4
+          %h2.h5 Schedule
+          = render Usr::JobScheduleComponent.new(job: @job)
         - if !@job.accepting_applications?
           %p.mb-3.text-muted{ data: { applications_closed: true } } Applications closed. This posting is no longer accepting applications.
           = link_to "Browse open jobs", usr_jobs_path, class: "btn btn-primary"

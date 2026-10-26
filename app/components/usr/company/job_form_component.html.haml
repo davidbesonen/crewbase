@@ -1,4 +1,4 @@
-= helpers.simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields" } do |f|
+= helpers.simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields job-schedule" } do |f|
   - if job.errors[:base].any?
     .alert.alert-warning{ data: { plan_limit_message: true } }= job.errors[:base].to_sentence
   .card.border-0.shadow-sm
@@ -200,11 +200,14 @@
         .col-sm-12
           %p.text-muted.mb-0.mt-2 
             %i.bi.bi-info-circle.me-1
-            Start and end dates are especially useful for tours, short-term contracts, and project-based roles. If this position is ongoing or the timing is still flexible, you can leave one or both blank for now.
+            Dates are optional for ongoing roles or flexible schedules. For gigs, tours, and short-term work, add the dates you know. Include exact times only when a call time or shift matters.
+        .col-12
+          = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { job_schedule_target: "toggle", action: "job-schedule#change" } }
+          %p.form-text.mb-0 Times use #{Time.zone.name}. Confirm final work hours in the booking offer.
         .col-md-4.mt-1
-          = f.input :starts_at, as: :string, input_html: { type: "datetime-local" }
+          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { job_schedule_target: "field" } }
         .col-md-4.mt-1
-          = f.input :ends_at, as: :string, input_html: { type: "datetime-local" }
+          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field" } }
         .col-md-4.mt-1
           = f.input :application_deadline, as: :string, input_html: { type: "datetime-local" }
         .col-12.mt-1
@@ -229,8 +232,6 @@
                   %i.bi.bi-trash
         .col-md-3
           = f.input :requires_travel
-        .col-md-3
-          = f.input :is_visa_sponsorship_available, label: "Visa sponsorship available"
         .col-md-3
           = f.input :is_active
         .col-md-3

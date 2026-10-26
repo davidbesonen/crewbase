@@ -28,6 +28,44 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
     )
   end
 
+  test "new postings default to optional date-only schedules without visa sponsorship" do
+    sign_in @owner, scope: :user
+    get new_usr_company_job_path(@company)
+    assert_response :success
+    assert_select "input[name='job[starts_at]'][type='date']"
+    assert_select "input[name='job[ends_at]'][type='date']"
+    assert_select "input[name='job[starts_at]'][required]", count: 0
+    assert_select "input[name='job[schedule_has_times]'][type='checkbox']:not([checked])"
+    assert_select "input[name='job[is_visa_sponsorship_available]']", count: 0
+  end
+
+  test "date-only jobs save an inclusive end day and cannot set visa sponsorship through posting parameters" do
+    sign_in @owner, scope: :user
+    post usr_company_jobs_path(@company), params: {
+      job: valid_job_attributes(title: "Date-only posting").merge(schedule_has_times: "0",
+        starts_at: "2026-11-09", ends_at: "2026-11-09", is_visa_sponsorship_available: "1")
+    }
+    assert_response :redirect
+    job = @company.jobs.order(:id).last
+    assert_not job.schedule_has_times?
+    assert_equal Time.zone.parse("2026-11-09").end_of_day.to_i, job.ends_at.to_i
+    assert_not job.is_visa_sponsorship_available?
+    travel_to Time.zone.parse("2026-11-09 14:00") do
+      assert Job.not_ended.exists?(job.id), "Date-only jobs must remain open throughout their final day"
+    end
+    get usr_job_path(job)
+    assert_response :success
+    assert_select "[data-job-schedule]", text: /November 09, 2026/
+    assert_no_match(/Visa Sponsorship/, response.body)
+  end
+
+  test "discovery no longer offers a visa sponsorship filter" do
+    sign_in @owner, scope: :user
+    get usr_jobs_path
+    assert_response :success
+    assert_select "select[name='q[is_visa_sponsorship_available_eq]']", count: 0
+  end
+
   test "non-owner cannot edit update or destroy a company" do
     sign_in @outsider, scope: :user
 

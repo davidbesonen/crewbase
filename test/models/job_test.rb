@@ -3,6 +3,34 @@ require "test_helper"
 class JobTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
+  test "date-only schedules cover the entire selected days" do
+    job = build_job(schedule_has_times: false, starts_at: "2026-11-09", ends_at: "2026-11-09")
+    assert job.valid?, job.errors.full_messages.to_sentence
+    assert_equal Time.zone.parse("2026-11-09").end_of_day.to_i, job.ends_at.to_i
+    assert_equal Time.zone.parse("2026-11-09").beginning_of_day, job.starts_at
+  end
+
+  test "ongoing positions may omit either or both dates" do
+    [ {}, { starts_at: "2026-11-09" }, { ends_at: "2026-11-09" } ].each do |dates|
+      assert build_job(schedule_has_times: false, employment_type: :full_time, **dates).valid?
+    end
+  end
+
+  test "rejects reversed dates and exact time ranges" do
+    job = build_job(schedule_has_times: false, starts_at: "2026-11-10", ends_at: "2026-11-09")
+    assert_not job.valid?
+    assert_includes job.errors[:ends_at], "must be after the start"
+    job.assign_attributes(schedule_has_times: true, starts_at: "2026-11-09 18:00", ends_at: "2026-11-09 09:00")
+    assert_not job.valid?
+  end
+
+  test "exact gig times are preserved" do
+    job = build_job(schedule_has_times: true, starts_at: "2026-11-09 09:30", ends_at: "2026-11-09 18:45")
+    assert job.valid?
+    assert_equal "09:30", job.starts_at.strftime("%H:%M")
+    assert_equal "18:45", job.ends_at.strftime("%H:%M")
+  end
+
   test "requires an owner to choose a posting type" do
     job = build_job(posting_type: nil)
 

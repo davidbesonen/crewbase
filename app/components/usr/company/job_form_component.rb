@@ -40,6 +40,14 @@ class Usr::Company::JobFormComponent < ApplicationComponent
     entitlement.allowed?(:multi_position_gigs)
   end
 
+  def schedule_input_type
+    job.schedule_has_times? ? "datetime-local" : "date"
+  end
+
+  def schedule_input_value(value)
+    value&.strftime(job.schedule_has_times? ? "%Y-%m-%dT%H:%M" : "%Y-%m-%d")
+  end
+
   def taxonomy_requirement_fields
     [ taxonomy_requirement_field(:occupation, :required, "Required occupations", occupations) ]
   end

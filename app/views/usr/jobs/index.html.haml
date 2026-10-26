@@ -44,9 +44,6 @@
                     = f.label :requires_travel_eq, "Travel", class: "form-label"
                     = f.select :requires_travel_eq, [["Any", nil], ["Required", true], ["Not required", false]], {}, class: "form-select"
                   %div
-                    = f.label :is_visa_sponsorship_available_eq, "Visa Sponsorship", class: "form-label"
-                    = f.select :is_visa_sponsorship_available_eq, [["Any", nil], ["Available", true], ["Not listed", false]], {}, class: "form-select"
-                  %div
                     = f.label :pay_min_gteq, "Minimum Pay", class: "form-label"
                     .input-group
                       %span.input-group-text $

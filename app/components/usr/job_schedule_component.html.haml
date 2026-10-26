@@ -1,0 +1,5 @@
+.row.g-3{ data: { job_schedule: true } }
+  - entries.each do |entry|
+    .col-sm-6
+      %div.text-muted.small= entry[:label]
+      %div.fw-semibold= entry[:text]

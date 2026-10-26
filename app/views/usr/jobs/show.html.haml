@@ -110,21 +110,14 @@
           .col-sm-6
             %div.text-muted.small Pay Period
             %div.fw-semibold= @job.pay_period&.humanize || "N/A"
-          .col-sm-6
-            %div.text-muted.small Starts
-            %div.fw-semibold= @job.starts_at ? l(@job.starts_at.to_date, format: :long) : "Flexible / Not listed"
-          .col-sm-6
-            %div.text-muted.small Ends
-            %div.fw-semibold= @job.ends_at ? l(@job.ends_at.to_date, format: :long) : "Flexible / Not listed"
+          .col-12
+            = render Usr::JobScheduleComponent.new(job: @job)
           - if @job.work_dates.any?
             .col-12{ data: { job_work_dates: true } }
               %div.text-muted.small Specific Work Dates
               .d-flex.flex-wrap.gap-2.mt-1
                 - @job.work_dates.each do |work_date|
                   %span.badge.rounded-pill.text-bg-light.border= l(work_date, format: :long)
-          .col-sm-6
-            %div.text-muted.small Visa Sponsorship
-            %div.fw-semibold= @job.is_visa_sponsorship_available? ? "Available" : "Not listed"
           .col-sm-6
             %div.text-muted.small Travel
             %div.fw-semibold= @job.requires_travel? ? "Required" : "Not required"
