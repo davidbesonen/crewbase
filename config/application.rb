@@ -12,6 +12,9 @@ module Crewbase
     config.load_defaults 8.0
     config.x.demo_mode = ENV["CREWBASE_DEMO"] == "true"
     config.active_storage.draw_routes = false
+    # Devise can load routes during production eager loading, before Active
+    # Storage applies its configuration. Disable its public routes beforehand.
+    config.before_initialize { ActiveStorage.draw_routes = false }
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
