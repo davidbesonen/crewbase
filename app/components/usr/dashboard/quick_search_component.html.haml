@@ -1,0 +1,34 @@
+.dashboard-quick-search.position-relative{
+  role: "search",
+  aria: { label: "Quick search" },
+  data: {
+    controller: "quick-search",
+    quick_search_url_value: search_path,
+    quick_search_min_length_value: 2,
+    quick_search_debounce_value: 250,
+    action: "click@window->quick-search#clickOutside"
+  }
+}
+  .dashboard-search-field
+    %i.bi.bi-search.dashboard-search-icon{ aria: { hidden: true } }
+    %input.form-control{
+      type: "search",
+      placeholder: "Search people, jobs, and companies...",
+      autocomplete: "off",
+      role: "combobox",
+      aria: {
+        autocomplete: "list",
+        expanded: "false",
+        controls: "dashboard-quick-search-results",
+        label: "Search people, jobs, and companies"
+      },
+      data: {
+        quick_search_target: "input",
+        action: "input->quick-search#search keydown->quick-search#navigate focus->quick-search#showResults"
+      }
+    }
+  #dashboard-quick-search-results.list-group.position-absolute.w-100.shadow-sm.d-none{
+    role: "listbox",
+    data: { quick_search_target: "results" }
+  }
+  %p.visually-hidden.mb-0{ role: "status", aria: { live: "polite" }, data: { quick_search_target: "status" } }

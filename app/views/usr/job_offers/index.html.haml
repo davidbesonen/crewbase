@@ -1,0 +1,4 @@
+= render Usr::JobOffer::InboxComponent.new(summaries: @offer_summaries, counts: @inbox.counts, view: @inbox.view, query: @inbox.query)
+- if @pagy.pages > 1
+  .d-flex.justify-content-center.mt-4
+    = bootstrap_pagy_nav(@pagy)

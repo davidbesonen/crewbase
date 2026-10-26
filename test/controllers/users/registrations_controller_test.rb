@@ -9,7 +9,7 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     Role.find_or_create_by!(name: "user")
   end
 
-  test "new account starts profile configuration" do
+  test "new account starts quick onboarding" do
     assert_difference [ "User.count", "Profile.count" ], 1 do
       post user_registration_path, params: {
         user: {
@@ -25,7 +25,7 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     user = User.find_by!(email: "new-member@example.com")
     profile = user.profiles.find_by!(profile_type: "user")
 
-    assert_redirected_to edit_usr_profile_path(profile)
+    assert_redirected_to usr_onboarding_path
     assert user.has_role?("user")
   end
 
@@ -44,7 +44,7 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
 
     get edit_usr_profile_path(profile)
     assert_response :success
-    assert_select "button", text: /Industry & Occupation/
+    assert_select "button", text: /Occupations/
 
     patch usr_profile_path(profile), params: {
       current_page: "location_form",
@@ -57,7 +57,7 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'target="occupation_form"'
 
-    get toggle_occupation_selection_usr_profile_path(profile),
+    post toggle_occupation_selection_usr_profile_path(profile),
       params: { occupation_id: occupation.id },
       as: :turbo_stream
     assert_response :success
@@ -68,12 +68,12 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'target="skill_equipment_form"'
 
-    get toggle_skill_selection_usr_profile_path(profile),
+    post toggle_skill_selection_usr_profile_path(profile),
       params: { skill_id: skill.id },
       as: :turbo_stream
     assert_response :success
 
-    get toggle_equipment_selection_usr_profile_path(profile),
+    post toggle_equipment_selection_usr_profile_path(profile),
       params: { equipment_id: equipment.id },
       as: :turbo_stream
     assert_response :success
@@ -86,7 +86,7 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'target="availability_form"'
 
     blockout_date = 1.week.from_now.to_date
-    get toggle_date_selection_usr_profile_calendar_events_path(profile),
+    post toggle_date_selection_usr_profile_calendar_events_path(profile),
       params: {
         date: blockout_date.iso8601,
         month: blockout_date.beginning_of_month.iso8601,

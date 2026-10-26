@@ -1,0 +1,30 @@
+%article.card.h-100.network-person{ data: { network_connection: connection&.id } }
+  .card-body.d-flex.flex-column
+    .d-flex.align-items-start.gap-3
+      .network-person__avatar{ aria: { hidden: "true" } }= profile.user.initials
+      .min-width-0
+        %h2.h6.mb-1= link_to profile.user.full_name, helpers.usr_profile_path(profile), class: "text-decoration-none"
+        %p.small.text-muted.mb-1= subtitle
+        - if location.present?
+          %p.small.text-muted.mb-0
+            %i.bi.bi-geo-alt.me-1{ aria: { hidden: "true" } }
+            = location
+    - if credits.any?
+      .network-person__history.mt-3
+        %p.small.fw-semibold.mb-2= "On the same crew · #{helpers.pluralize(credits.size, 'gig')}"
+        %ul.list-unstyled.small.mb-0
+          - credits.first(3).each do |credit|
+            %li.mb-2
+              %strong.d-block= credit.project_name
+              %span.text-muted= "#{credit.role} · #{credit.display_dates}"
+        - if credits.size > 3
+          %details
+            %summary.small= "#{credits.size - 3} more shared gigs"
+            %ul.list-unstyled.small.mt-2.mb-0
+              - credits.drop(3).each do |credit|
+                %li.mb-2
+                  %strong.d-block= credit.project_name
+                  %span.text-muted= "#{credit.role} · #{credit.display_dates}"
+    - if connection&.pending? && connection.introduction.present?
+      %p.network-person__note.small.mt-3.mb-0= connection.introduction
+    .mt-auto.pt-3= actions

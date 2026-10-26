@@ -16,6 +16,11 @@ class User < ApplicationRecord
     source: :company
 
   has_many :profiles, dependent: :destroy
+  has_many :sent_network_connections, class_name: "NetworkConnection", foreign_key: :sender_id, dependent: :destroy
+  has_many :received_network_connections, class_name: "NetworkConnection", foreign_key: :recipient_id, dependent: :destroy
+  has_many :sent_network_job_shares, class_name: "NetworkJobShare", foreign_key: :sender_id, dependent: :destroy
+  has_many :received_network_job_shares, class_name: "NetworkJobShare", foreign_key: :recipient_id, dependent: :destroy
+  has_many :notification_deliveries, foreign_key: :recipient_id, dependent: :destroy, inverse_of: :recipient
   has_many :notifications, foreign_key: :recipient_id, dependent: :destroy, inverse_of: :recipient
   has_many :conversation_memberships, dependent: :destroy
   has_many :conversations, through: :conversation_memberships
@@ -23,6 +28,8 @@ class User < ApplicationRecord
   has_many :sent_job_invitations, class_name: "JobInvitation", foreign_key: :invited_by_id, dependent: :restrict_with_error
 
   has_many :visits, dependent: :destroy
+  has_many :product_events, dependent: :delete_all
+  has_many :recommendation_feedbacks, dependent: :delete_all
   has_many :saved_jobs, dependent: :destroy
   has_many :user_subscriptions, dependent: :destroy
   has_many :user_plans, through: :user_subscriptions
@@ -86,6 +93,18 @@ class User < ApplicationRecord
 
   def has_role?(role_name)
     roles.exists?(name: role_name)
+  end
+
+  def site_admin?
+    roles.exists?(name: %w[admin app_owner])
+  end
+
+  def active_for_authentication?
+    super && !restricted_at?
+  end
+
+  def inactive_message
+    restricted_at? ? :suspended : super
   end
 
   def user_profile

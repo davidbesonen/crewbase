@@ -8,6 +8,7 @@ class SubmitJobApplication
     JobApplication.transaction do
       application.save!
       invitation&.accept!
+      ProductEvent.record(user: application.profile.user, name: "application_submitted", subject: application, event_key: application.id)
     end
 
     true

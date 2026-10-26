@@ -5,6 +5,28 @@ class Usr::ProfileShowLayoutTest < ActionDispatch::IntegrationTest
 
   self.fixture_table_names = []
 
+  test "invitation job selector has an accessible name without a stray visible label" do
+    owner = create_profile_user("invitation-layout-owner@example.com")
+    subject = create_profile_user("invitation-layout-subject@example.com")
+    company = Company.create!(name: "Invitation Layout", contact_email: "invitation-layout@example.com",
+      industries: [ Industry.create!(name: "Invitation Layout Industry") ])
+    company.company_assignments.create!(user: owner, role: "owner")
+    job = company.jobs.create!(title: "Camera crew", description: "Camera work", workplace_type: :on_site,
+      employment_type: :contract, status: :published, is_active: true)
+    sign_in owner, scope: :user
+
+    get usr_profile_path(subject.user_profile)
+
+    assert_response :success
+    assert_select "form[action='#{usr_profile_job_invitations_path(subject.user_profile)}']" do
+      assert_select "label[for='job_invitation_job_id']", count: 0
+      assert_select "select[name='job_invitation[job_id]'][required][aria-label='Job to invite this person to']" do
+        assert_select "option[value='#{job.id}']", text: "Camera crew — Invitation Layout"
+      end
+      assert_select "button[type='submit']", text: "Send Invitation"
+    end
+  end
+
   test "regular users cannot see reviews on their own or another profile" do
     viewer = create_profile_user("viewer-review-visibility@example.com")
     other = create_profile_user("other-review-visibility@example.com")
@@ -130,7 +152,7 @@ class Usr::ProfileShowLayoutTest < ActionDispatch::IntegrationTest
     end
     assert_select "#profile-experience h5", text: "Experience"
     assert_select "#profile-skills", text: /No skills listed yet/
-    assert_select "#profile-skills", text: /No equipment or tools listed yet/
+    assert_select "#profile-skills", text: /No equipment or software listed yet/
     assert_select "h5", text: "Additional Sections", count: 0
     assert_select "*", text: /Placeholder/, count: 0
     assert_select ".app-hero.app-hero-cyan", count: 1

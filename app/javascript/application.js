@@ -13,4 +13,4 @@ Turbo.StreamActions.show = function () {
 }
 
 import "trix"
-import "@rails/actiontext"
+// Rich text uploads use the authenticated multipart endpoint in upload-limit.

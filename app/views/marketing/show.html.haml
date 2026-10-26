@@ -2,3 +2,5 @@
 = render Marketing::HomepageComponent.new(primary_cta_label: @primary_cta_label, primary_cta_path: @primary_cta_path, show_auth_links: current_user.blank?) do |homepage|
   - homepage.with_brand do
     = render Shared::CrewbaseLogoTextComponent.new
+  - homepage.with_appearance do
+    = render Shared::ThemePickerComponent.new

@@ -1,13 +1,14 @@
 class ProfileJobAvailability
   Result = Data.define(:state, :label, :conflict_dates)
 
-  def initialize(profile:, job:)
+  def initialize(profile:, job:, bookings: nil)
     @profile = profile
     @job = job
+    @bookings = bookings
   end
 
   def result
-    conflict_dates = JobAvailability.new(job:).conflict_dates(events:)
+    conflict_dates = profile.persisted? ? BookingConflicts.new(profile:, schedule: job, bookings: @bookings, excluding_job_id: job.respond_to?(:job_application) ? job.job_application.job_id : job.id).dates : JobAvailability.new(job:).conflict_dates(events:)
 
     if conflict_dates.any?
       Result.new(
@@ -35,7 +36,9 @@ class ProfileJobAvailability
   end
 
   def availability_evidence?
-    profile.ical_feed_url.present? || events.any?
+    return profile.ical_sync_error.blank? && profile.ical_last_synced_at.present? && profile.ical_last_synced_at >= 24.hours.ago if profile.ical_feed_url.present?
+
+    events.any? { |event| event.provider == "manual" }
   end
 
   def formatted_dates(dates)

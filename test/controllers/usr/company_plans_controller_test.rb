@@ -35,6 +35,7 @@ class Usr::CompanyPlansControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "selecting a paid upgrade does not activate it before Stripe confirms payment" do
+    @team.update!(stripe_monthly_price_id: nil)
     assert_no_changes -> { CompanyPlanEntitlement.new(@company).current_plan } do
       post usr_company_billing_checkout_path(@company), params: { plan_id: @team.id, billing_interval: "monthly" }
     end
@@ -61,7 +62,7 @@ class Usr::CompanyPlansControllerTest < ActionDispatch::IntegrationTest
 
   def create_plan(key, position)
     Plan.find_or_initialize_by(key:).tap do |plan|
-      plan.update!(name: key.titleize, position:, active: true, monthly_price_cents: 1_900 * position, annual_price_cents: 19_000 * position, data: {})
+      plan.update!(name: key.titleize, position:, active: true, monthly_price_cents: 1_900 * position, annual_price_cents: 19_000 * position, stripe_monthly_price_id: "price_#{key}", data: {})
     end
   end
 end

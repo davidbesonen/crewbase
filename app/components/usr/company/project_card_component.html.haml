@@ -1,0 +1,35 @@
+.card.h-100.company-project-card{ data: { project_company: company.id } }
+  .card-body.d-flex.flex-column.p-4
+    .d-flex.align-items-start.gap-3.mb-4
+      .company-project-card__icon{ aria: { hidden: true } }
+        %i.bi.bi-building
+      %div
+        %h2.company-project-card__title= company.name
+        %p.small.text-muted.mb-1{ data: { company_industries: true } }= industries
+        %p.small.text-muted.mb-0{ data: { company_location: true } }
+          %i.bi.bi-geo-alt.me-1{ aria: { hidden: true } }
+          = location
+    .d-flex.flex-wrap.align-items-center.justify-content-between.gap-2.mb-3
+      %h3.h6.fw-semibold.mb-0 Recent Projects
+      %span.small.text-muted= helpers.pluralize(projects.length, "project")
+    .flex-grow-1{ data: { company_projects: true } }
+      - if recent_projects.any?
+        .d-flex.flex-column.gap-3
+          - recent_projects.each do |project|
+            .company-project-card__project
+              .d-flex.flex-wrap.align-items-start.justify-content-between.gap-2.mb-2
+                = link_to project.name, helpers.usr_project_path(project), class: "fw-semibold text-dark text-decoration-none company-project-card__project-name"
+                %span{ class: helpers.project_status_badge_class(project.status) }= project.status.humanize
+              - if project.description.present?
+                %p.small.text-muted.mb-2= helpers.truncate(project.description, length: 140, separator: " ")
+              - if project.starts_on || project.ends_on
+                .small.text-muted
+                  %i.bi.bi-calendar3.me-1{ aria: { hidden: true } }
+                  = dates(project)
+      - else
+        .company-project-card__empty
+          %p.fw-semibold.mb-1 No projects yet
+          %p.small.text-muted.mb-0 Start a project to organize your schedule, job postings, and crew in one place.
+    .d-flex.flex-wrap.align-items-center.gap-3.border-top.pt-3.mt-4
+      = link_to "Start Project", helpers.new_usr_company_project_path(company), class: "btn btn-primary btn-sm"
+      = link_to "View All Projects", helpers.usr_company_projects_path(company), class: "small fw-semibold text-decoration-none"

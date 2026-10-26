@@ -86,6 +86,8 @@ test:
 production:
   primary: &primary_production
     <<: *default
+    # Development seeds reset records; hosted databases are initialized explicitly.
+    seeds: false
     database: crewbase_production
     username: crewbase
     password: <%= ENV["CREWBASE_DATABASE_PASSWORD"] %>

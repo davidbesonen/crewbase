@@ -1,3 +1,4 @@
+@import "theme_variables";
 @import "bootstrap";
 @import "colors";
 @import "color_accents";
@@ -6,7 +7,7 @@
 @import "marketing";
 
 :root {
-  --app-shell-padding-x: clamp(1.25rem, 6vw, 5rem);
+  --app-shell-padding-x: clamp(1rem, 3vw, 3rem);
   --app-top-nav-height: 4rem;
 }
 
@@ -25,7 +26,9 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--bs-tertiary-bg);
+  background: radial-gradient(ellipse at 85% 0%, #dfeefa 0%, transparent 55%),
+    linear-gradient(155deg, #f5f9fe 0%, #edf4fb 48%, #f7f9fc 100%);
+  background-attachment: fixed;
 }
 
 .container {
@@ -45,7 +48,8 @@ body {
 
 /* ---------- Form Labels ---------- */
 .form-label {
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.875rem;
   color: var(--bs-secondary-color);
 }
 
@@ -71,10 +75,11 @@ body {
 .card-body > h3:first-child,
 .card-body > h4:first-child,
 .card-body > h5:first-child {
-  font-size: 1.3rem;
-  line-height: 1.35;
-  margin-bottom: 1rem !important;
-  padding: 0.125rem;
+  font-size: 1.025rem;
+  line-height: 1.5;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.25rem !important;
+  padding: 0;
 }
 
 /* ---------- Availability Calendar ---------- */
@@ -110,7 +115,7 @@ body {
   align-items: center;
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  background-color: #f1f1f1;
+  background-color: var(--bs-tertiary-bg);
   color: $text-dark;
 }
 
@@ -133,7 +138,8 @@ body {
 }
 
 .availability-date-pill {
-  width: 75px;
+  width: 2.75rem;
+  padding-inline: 0 !important;
   justify-content: center;
 }
 
@@ -418,21 +424,21 @@ body {
 }
 
 .table-responsive::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: #edf3f9;
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-  background-color: #555;
+  background-color: #b6c8d9;
   border-radius: 4px;
 }
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
-  background-color: #777;
+  background-color: #8ca8c1;
 }
 
 .table-responsive {
   scrollbar-width: thin;
-  scrollbar-color: #555 #1e1e1e;
+  scrollbar-color: #b6c8d9 #edf3f9;
 }
 /* User sidenav responsiveness */
 .user-sidenav-card {
@@ -501,17 +507,6 @@ body {
 }
 
 /* ---------- Dashboard Quick Search ---------- */
-.dashboard-quick-search-card {
-  overflow: visible;
-}
-
-.dashboard-quick-search .list-group {
-  top: calc(100% + 0.35rem);
-  z-index: 1020;
-  max-height: 24rem;
-  overflow-y: auto;
-}
-
 .quick-search-result-icon {
   width: 2rem;
   height: 2rem;
@@ -591,34 +586,14 @@ body {
   font-size: 0.68rem;
 }
 
-/* ---------- Dashboard company tools ---------- */
-.company-tools-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-
-  @media (min-width: 576px) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  &__item {
-    min-width: 0;
-
-    .small {
-      line-height: 1.25;
-      overflow-wrap: anywhere;
-    }
-  }
-}
-
 /* ---------- Notifications ---------- */
 .notification-card {
-  border-radius: 0.85rem;
+  border-radius: var(--bs-border-radius-lg);
 
-  &--read {
-    background-color: var(--bs-gray-200);
+  &.notification-card--read {
+    background-color: #edf3f8;
     box-shadow: none !important;
-    opacity: 0.78;
+    opacity: 1;
   }
 
   &__content {
@@ -686,9 +661,9 @@ body {
 }
 
 .company-plan-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   border-color: rgba(var(--plan-accent-rgb), 0.45) !important;
-  box-shadow: 0 1rem 2.25rem rgba(var(--plan-accent-rgb), 0.16) !important;
+  box-shadow: 0 8px 28px rgba(var(--plan-accent-rgb), 0.08) !important;
 }
 
 .company-plan-card--starter {
@@ -722,7 +697,7 @@ body {
 .company-plan-card--featured {
   border-width: 2px !important;
   border-color: var(--plan-accent) !important;
-  box-shadow: 0 1.1rem 2.5rem rgba(var(--plan-accent-rgb), 0.2) !important;
+  box-shadow: 0 8px 28px rgba(var(--plan-accent-rgb), 0.08) !important;
 }
 
 .company-plan-card__accent {
@@ -830,3 +805,25 @@ body {
 .company-plan-card--team .company-plan-card__button {
   box-shadow: 0 0.4rem 1rem rgba(var(--bs-primary-rgb), 0.2);
 }
+
+@import "app_theme";
+@import "sidenavs";
+@import "network";
+@import "company_projects";
+@import "application_review";
+@import "application_pipeline";
+@import "dashboard";
+@import "profile_show";
+@import "discovery";
+
+@import "messaging";
+
+// Keep every admin destination reachable on short mobile screens.
+@media (max-width: 1199.98px) {
+  .admin-navigation .navbar-collapse {
+    max-height: calc(100dvh - var(--app-top-nav-height));
+    overflow-y: auto;
+  }
+}
+
+@import "dark_mode";

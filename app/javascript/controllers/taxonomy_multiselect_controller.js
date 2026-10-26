@@ -9,6 +9,7 @@ export default class extends Controller {
     this.visibleOptions = this.optionTargets
     this.syncOptions()
     this.updateStatus()
+    this.notifySelection()
   }
 
   search() {
@@ -87,6 +88,7 @@ export default class extends Controller {
     this.inputTarget.value = ""
     this.search()
     this.inputTarget.focus()
+    this.notifySelection()
   }
 
   remove(event) {
@@ -103,6 +105,14 @@ export default class extends Controller {
 
     this.removeChip(value)
     this.updateStatus()
+    this.notifySelection()
+  }
+
+  notifySelection() {
+    if (this.kindValue !== "occupations") return
+    const ids = this.optionTargets.filter((option) => option.getAttribute("aria-selected") === "true")
+      .map((option) => option.dataset.taxonomyValue || option.dataset.occupationId)
+    this.dispatch("selection-change", { detail: { ids } })
   }
 
   syncOptions() {

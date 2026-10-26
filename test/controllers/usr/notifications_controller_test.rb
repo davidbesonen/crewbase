@@ -33,7 +33,7 @@ class Usr::NotificationsControllerTest < ActionDispatch::IntegrationTest
     get usr_notifications_path
 
     assert_response :success
-    assert_select ".app-hero.app-hero-cyan", text: "Notifications"
+    assert_select ".app-hero.app-hero-cyan h1", text: "Notifications"
     assert_select "[data-notification-id='#{@notification.id}'].notification-card.card-accent.card-accent-cyan" do
       assert_select ".notification-card__message strong", text: "Your profile was viewed."
       assert_select "time.notification-card__timestamp[datetime='#{@notification.created_at.iso8601}']", text: "July 31, 2026 at 3:45 PM"
@@ -107,6 +107,30 @@ class Usr::NotificationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to usr_notifications_path
     assert @notification.reload.read?
+  end
+
+  test "mark all read preserves history and affects only this user's unread notifications" do
+    other = Notification.create!(recipient: @other_user, kind: "system_update", message: "Other unread")
+    read = Notification.create!(recipient: @user, kind: "system_update", message: "Read", read_at: 1.day.ago.change(usec: 0))
+    original_read_at = read.read_at
+    sign_in @user
+    get usr_notifications_path
+    assert_select "button", text: "Mark all as read"
+    assert_no_difference "Notification.count" do
+      patch "/usr/notifications/read_all"
+    end
+    assert_redirected_to usr_notifications_path
+    assert @notification.reload.read?
+    assert other.reload.unread?
+    assert_equal original_read_at, read.reload.read_at
+    get usr_notifications_path
+    assert_select "button", text: "Mark all as read", count: 0
+  end
+
+  test "mark all read requires authentication" do
+    patch "/usr/notifications/read_all"
+    assert_redirected_to new_user_session_path
+    assert @notification.reload.unread?
   end
 
   test "another user cannot mark a notification read" do

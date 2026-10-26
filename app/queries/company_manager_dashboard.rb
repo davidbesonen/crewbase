@@ -37,7 +37,7 @@ class CompanyManagerDashboard
   def summary
     {
       company_users: company.company_assignments.count,
-      active_jobs: jobs.where(is_active: true, status: :published).count,
+      active_jobs: jobs.not_ended.where(is_active: true, status: :published).count,
       active_projects: company.projects.active.where(status: %i[planning active]).count,
       applications: applications.count,
       accepted_hires: applications.accepted.count,

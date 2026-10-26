@@ -1,6 +1,13 @@
 = helpers.simple_form_for form_scope, data: { turbo: false } do |f|
   .card.border-0.shadow-sm
     .card-body.p-4
+      - if job_application.errors.any?
+        .alert.alert-danger{ role: "alert", tabindex: "-1" }
+          %p.fw-semibold.mb-2 Please check your application:
+          %ul.mb-0
+            - job_application.errors.full_messages.each do |message|
+              %li= message
+          %p.small.mt-2.mb-0 If you selected files, choose them again before resubmitting.
       .row.g-4
         .col-12
           %h4.fw-semibold.mb-1= job.title
@@ -20,15 +27,15 @@
               = text_area_tag "job_application[question_answers][#{question}]", answer_for(question), id: "job_application_question_answers_#{question.parameterize}", class: "form-control", rows: 4, placeholder: "Enter your answer"
 
         .col-md-6
-          = f.input :resume, as: :file, input_html: { accept: ".pdf,.doc,.docx" }
+          = f.input :resume, as: :file, hint: "Optional · PDF or Word, up to 35 MB.", input_html: { accept: ".pdf,.doc,.docx" }
         .col-md-6
-          = f.input :cover_letter_file, as: :file, label: "Cover Letter", input_html: { accept: ".pdf,.doc,.docx" }
+          = f.input :cover_letter_file, as: :file, label: "Cover Letter", hint: "Optional · PDF or Word, up to 35 MB.", input_html: { accept: ".pdf,.doc,.docx" }
         .col-12
-          = f.input :attachments, as: :file, input_html: { multiple: true }
+          = f.input :attachments, as: :file, hint: "Optional · Documents or images, up to 35 MB per file.", input_html: { multiple: true, accept: attachment_extensions }
         .col-12
-          %p.form-label Additional Information
+          = f.label :additional_information, "Additional information", class: "form-label"
           = f.rich_text_area :additional_information, placeholder: "Anything else you want the employer to know.", class: "job-application-editor"
 
-      .d-flex.justify-content-between.align-items-center.mt-4
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mt-4
         = link_to "Back to Job", usr_job_path(job), class: "btn btn-quiet"
         = f.submit submit_label, class: "btn btn-primary"

@@ -17,7 +17,7 @@ class CompanyPlanEntitlement
     @current_plan ||= company.company_plans
       .current
       .first
-      &.plan
+      &.plan || Plan.active.find_by(key: "free")
   end
 
   def tier
@@ -25,10 +25,7 @@ class CompanyPlanEntitlement
   end
 
   def allowed?(feature_key)
-    feature = Plan::COMPANY_FEATURES[feature_key.to_sym]
-    return false unless feature && tier
-
-    current_tier_rank >= Plan::TIER_RANKS.fetch(feature.fetch(:minimum_tier))
+    current_plan&.feature_available?(feature_key) || false
   end
 
   def limit(capacity_key)
@@ -58,10 +55,6 @@ class CompanyPlanEntitlement
     CAPACITIES[key.to_sym]
   end
 
-  def current_tier_rank
-    Plan::TIER_RANKS.fetch(tier, -1)
-  end
-
   def normalize_limit(value)
     return Float::INFINITY if value.to_s == "unlimited"
 
@@ -73,7 +66,7 @@ class CompanyPlanEntitlement
   end
 
   def active_jobs_usage
-    company.jobs.where(is_active: true, status: :published).count
+    company.jobs.not_ended.where(is_active: true, status: :published).count
   end
 
   def active_projects_usage

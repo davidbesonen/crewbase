@@ -34,7 +34,10 @@ class CrewRecommender
   end
 
   def results_for(job)
-    ranked_results = candidate_profiles.filter_map { |profile| match(profile, active_job(job)) }
+    eligible_job = active_job(job)
+    return [] unless eligible_job
+
+    ranked_results = candidate_profiles.filter_map { |profile| match(profile, eligible_job) }
       .sort_by { |result| result_sort_key(result) }
     @limit ? ranked_results.first(@limit) : ranked_results
   end
@@ -46,8 +49,8 @@ class CrewRecommender
   end
 
   def active_jobs
-    @active_jobs ||= Job
-      .where(id: requested_job_ids, is_active: true, status: :published)
+    @active_jobs ||= Job.accepting_applications
+      .where(id: requested_job_ids)
       .includes(:locations, :rich_text_description, { job_requirements: :requirement }, company: :locations)
       .order(starts_at: :asc, published_at: :desc)
       .to_a
@@ -60,8 +63,7 @@ class CrewRecommender
   end
 
   def candidate_profiles
-    Profile
-      .where(profile_type: "user")
+    @candidate_profiles ||= Profile.network_visible
       .where.not(user_id: @user.id)
       .where.not(completed_at: nil)
       .includes(
@@ -77,18 +79,24 @@ class CrewRecommender
       .to_a
   end
 
+  def booked_schedules
+    @booked_schedules ||= BookedSchedules.new(profile_ids: candidate_profiles.map(&:id)).results
+  end
+
   def best_match(profile)
     matches = active_jobs.filter_map { |job| match(profile, job) }
     matches.min_by { |result| result_sort_key(result) }
   end
 
   def match(profile, job)
-    availability = ProfileJobAvailability.new(profile:, job:).result
+    availability = ProfileJobAvailability.new(profile:, job:, bookings: booked_schedules.fetch(profile.id, [])).result
     gap_reasons = []
     gap_reasons << availability.label if availability.state == :unavailable
 
-    taxonomy_matches, missing_requirements = taxonomy_match_details(profile, job)
-    gap_reasons.concat(missing_requirements.map { |requirement| "Missing required #{requirement.requirement.name}" })
+    experience_match = ExperienceMatch.new(profile: profile, job: job)
+    taxonomy_matches = experience_match.names
+    missing_requirements = experience_match.missing_requirements
+    gap_reasons.concat(missing_requirements.map { |requirement| "Missing required #{requirement.name}" })
     return if gap_reasons.size > 1
 
     occupation_matches = taxonomy_matches.fetch("Occupation")
@@ -101,8 +109,9 @@ class CrewRecommender
       ((skill_matches.size + equipment_matches.size) * 3) +
       (relevant_years * 10)
     relevance_score += 2 if relevant_experiences.any? && relevant_years.zero?
-    relevance_score += location_score
     return if relevance_score.zero?
+
+    relevance_score += location_score
 
     rating = average_rating(profile)
     score = relevance_score + (rating.to_f * 10)
@@ -112,7 +121,7 @@ class CrewRecommender
       profile:,
       job:,
       match_reason: match_reason(occupation_matches, skills_and_equipment, relevant_experiences.any?),
-      availability_label: availability_label(job),
+      availability_label: availability.label,
       score:,
       rating:,
       relevant_years:,
@@ -124,44 +133,6 @@ class CrewRecommender
 
   def result_sort_key(result)
     [ result.tier == :full ? 0 : 1, -result.score, result.profile.id ]
-  end
-
-  def matching_names(records, job)
-    haystack = "#{job.title} #{job.plain_description}".downcase
-    records.filter_map { |record| record.name if haystack.include?(record.name.downcase) }
-  end
-
-  def taxonomy_match_details(profile, job)
-    requirements = job.job_requirements.to_a
-    return [ legacy_taxonomy_matches(profile, job), [] ] if requirements.empty?
-
-    missing_requirements = requirements.select do |requirement|
-      requirement.required? && !profile_matches?(profile, requirement)
-    end
-
-    matches = requirements.each_with_object(empty_taxonomy_matches) do |requirement, taxonomy_matches|
-      next unless profile_matches?(profile, requirement)
-
-      taxonomy_matches.fetch(requirement.requirement_type) << requirement.requirement.name
-    end
-    [ matches, missing_requirements ]
-  end
-
-  def legacy_taxonomy_matches(profile, job)
-    {
-      "Occupation" => matching_names(profile.occupations, job),
-      "Skill" => matching_names(profile.skills, job),
-      "Equipment" => matching_names(profile.equipment, job)
-    }
-  end
-
-  def empty_taxonomy_matches
-    { "Occupation" => [], "Skill" => [], "Equipment" => [] }
-  end
-
-  def profile_matches?(profile, job_requirement)
-    association = job_requirement.requirement_type.underscore.pluralize
-    profile.public_send(association).include?(job_requirement.requirement)
   end
 
   def relevant_experiences(profile, job)
@@ -221,10 +192,6 @@ class CrewRecommender
     matches = occupations + skills
     matches << "relevant experience" if matches.empty? && experience_match
     "Matches #{matches.to_sentence}"
-  end
-
-  def availability_label(job)
-    job.starts_at.present? ? "Available for job dates" : "Availability not confirmed"
   end
 
   def significant_words(value)

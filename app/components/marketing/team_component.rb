@@ -8,4 +8,5 @@ class Marketing::TeamComponent < ApplicationComponent
   option :show_auth_links
 
   renders_one :brand
+  renders_one :appearance
 end

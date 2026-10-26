@@ -27,11 +27,13 @@ class Usr::Dashboard::JobRecommendationsComponentTest < ViewComponent::TestCase
     render_inline(Usr::Dashboard::JobRecommendationsComponent.new(
       results: [ result ],
       applied_job_ids: Set.new,
-      jobs_path: "/usr/jobs"
+      jobs_path: "/usr/jobs",
+      matching_profile: true,
+      edit_profile_path: "/usr/profiles/1/edit?source=completed_profile#occupation_form"
     ))
 
     assert_selector "[data-worker-job-recommendation]", count: 1
-    assert_selector "a[href='/usr/jobs/12']", text: "Lighting Technician"
+    assert_selector "a[href='/usr/jobs/12?source=recommendation']", text: "Lighting Technician"
     assert_text "Matches Lighting Technician and GrandMA3"
     assert_text "Located in Chicago, IL"
     assert_text "Available for job dates"
@@ -60,20 +62,37 @@ class Usr::Dashboard::JobRecommendationsComponentTest < ViewComponent::TestCase
     render_inline(Usr::Dashboard::JobRecommendationsComponent.new(
       results: [ result ],
       applied_job_ids: Set[12],
-      jobs_path: "/usr/jobs"
+      jobs_path: "/usr/jobs",
+      matching_profile: true,
+      edit_profile_path: "/usr/profiles/1/edit?source=completed_profile#occupation_form"
     ))
 
     assert_selector ".badge", text: "Applied"
   end
 
-  test "renders a useful empty state" do
+  test "renders a useful empty state when matching details are present" do
     render_inline(Usr::Dashboard::JobRecommendationsComponent.new(
       results: [],
       applied_job_ids: Set.new,
-      jobs_path: "/usr/jobs"
+      jobs_path: "/usr/jobs",
+      matching_profile: true,
+      edit_profile_path: "/usr/profiles/1/edit?source=completed_profile#occupation_form"
+    ))
+
+    assert_text "No suitable openings match your profile and availability right now."
+    assert_selector "a[href='/usr/jobs']", text: "Browse Jobs"
+  end
+  test "prompts for matching details only when the profile lacks them" do
+    render_inline(Usr::Dashboard::JobRecommendationsComponent.new(
+      results: [],
+      applied_job_ids: Set.new,
+      jobs_path: "/usr/jobs",
+      matching_profile: false,
+      edit_profile_path: "/usr/profiles/1/edit?source=completed_profile#occupation_form"
     ))
 
     assert_text "Add occupations, skills, or equipment to your profile"
-    assert_selector "a[href='/usr/jobs']", text: "Browse all jobs"
+    assert_selector "a[href='/usr/profiles/1/edit?source=completed_profile#occupation_form']", text: "Add Matching Details"
+    assert_no_text "No suitable openings"
   end
 end

@@ -49,6 +49,14 @@ class PublicJobPostingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='sign_in']", text: /sign in/i
   end
 
+  test "public postings display personally entered requirements" do
+    @job.update!(required_skills_text: "Lighting programming", preferred_equipment_text: "grandMA3")
+    get public_job_posting_path(@job)
+    assert_response :success
+    assert_select "[data-job-experience-requirements]", text: /Lighting programming/
+    assert_select "[data-job-experience-requirements]", text: /grandMA3/
+  end
+
   test "unpublished postings are not public" do
     @job.update!(status: :draft)
 

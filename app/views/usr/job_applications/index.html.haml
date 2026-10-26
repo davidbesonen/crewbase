@@ -2,6 +2,7 @@
   .col-12
     %h1.fw-bold.mb-1 Applications & Invitations
     %p.text-muted.mb-0 Review invitations and track the jobs you have applied to.
+    = link_to "Offers & bookings", usr_job_offers_path, class: "btn btn-outline-primary mt-3"
 
 - if @pending_job_invitations.any?
   %section.mb-4{ data: { pending_invitations: true } }

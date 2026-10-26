@@ -16,46 +16,59 @@
     %meta{name: "twitter:title", content: "Crewbase"}
     %meta{name: "twitter:description", content: @meta_description || "Crewbase helps live event professionals find work, build trusted crews, and manage staffing."}
     -# %meta{name: "twitter:image", content: image_url('campus_clash_logo.png')}
+    %link{ rel: "preconnect", href: "https://fonts.googleapis.com" }
+    %link{ rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" }
+    %link{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" }
     %link{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" }
-    %link{ rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" }
     -# %link{ rel: "apple-touch-icon", sizes: "180x180", href: asset_path('campus_clash_logo.png') }
     -# %link{ rel: "icon", type: "image/png", sizes: "192x192", href: asset_path('campus_clash_logo.png') }
     = csrf_meta_tags
     = csp_meta_tag
+    = javascript_include_tag "theme", nonce: true, "data-turbo-track": "reload", "data-turbo-eval": "false"
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
     = javascript_importmap_tags
     -# = favicon_link_tag asset_path('campus_clash_text_logo.png')
 
-  %body#page-top{ "data-turbo-prefetch" => "false" }
+  %body#page-top{ "data-turbo-prefetch" => "false", data: { controller: "upload-limit", upload_limit_max_value: UploadPolicy::MAX_FILE_SIZE, action: "change->upload-limit#check trix-file-accept->upload-limit#accept trix-attachment-add->upload-limit#upload" } }
+    - if Rails.configuration.x.demo_mode
+      = render Shared::DemoNoticeComponent.new
     - if @marketing_page
+      - unless controller_path == "marketing"
+        .d-flex.justify-content-end.p-3
+          = render Shared::ThemePickerComponent.new
       = render "layouts/flash"
       = yield
-    - elsif current_user&.has_role?(:admin)
-      = render "layouts/admin_navbar"
+    - elsif current_user&.site_admin? && controller_path.start_with?("admin/")
+      = render Admin::NavigationComponent.new(section: controller_name) do |navigation|
+        - navigation.with_appearance do
+          = render Shared::ThemePickerComponent.new
       .app-content
         .container-fluid.p-4
           = render "layouts/flash"
           = yield
-    - elsif current_user&.has_role?(:user)
+    - elsif current_user && (current_user.has_role?(:user) || current_user.site_admin?)
       = render "layouts/user_navbar"
-      - if current_user.has_completed_user_profile?
+      - if workspace_navigation_visible?
         .offcanvas.offcanvas-start{ id: "userSidenav", tabindex: "-1", aria: { labelledby: "userSidenavLabel" } }
           .offcanvas-header
-            -# %h5.offcanvas-title#userSidenavLabel Menu
-            %button.btn-close{ type: "button", data: { bs_dismiss: "offcanvas" }, aria: { label: "Close" } }
+            %h2.offcanvas-title#userSidenavLabel Your workspace
+            %button.btn-close{ type: "button", data: { bs_dismiss: "offcanvas" }, aria: { label: "Close navigation" } }
           .offcanvas-body.p-0
             = render "layouts/user_sidenav"
       .app-content
         .container-fluid
           .user-layout.d-flex.align-items-start.gap-4.mt-4
-            - if current_user.has_completed_user_profile?
+            - if workspace_navigation_visible?
               .d-none.d-lg-block.app-sticky-sidenav
                 = render "layouts/user_sidenav"
             .user-main.flex-grow-1
-              .container-fluid.p-4
+              .container-fluid.user-page-content
                 = render "layouts/flash"
+                #upload-errors{ aria: { live: "assertive" } }
                 = yield
     - else
+      .d-flex.justify-content-end.p-3
+        = render Shared::ThemePickerComponent.new
       .app-content
         = render "layouts/flash"
         = yield

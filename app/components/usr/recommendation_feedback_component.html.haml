@@ -1,0 +1,12 @@
+%h1 Hidden recommendations
+%p.text-muted These jobs are hidden only from your recommendations. You can still find them in job search.
+- if feedback.empty?
+  .empty-state No hidden recommendations.
+- feedback.each do |item|
+  .card.mb-3
+    .card-body.d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+      %div
+        %h2.h5= link_to item.job.title, usr_job_path(item.job)
+        %p.text-muted.mb-0= RecommendationFeedback::REASONS.fetch(item.reason)
+      = button_to "Restore recommendation", usr_job_recommendation_feedback_path(item.job), method: :delete, class: "btn btn-outline-primary"
+= link_to "Back to dashboard", usr_dashboards_path, class: "btn btn-quiet"

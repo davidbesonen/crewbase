@@ -1,5 +1,5 @@
 class Plan < ApplicationRecord
-  TIER_RANKS = { "starter" => 0, "team" => 1, "studio" => 2 }.freeze
+  TIER_RANKS = { "free" => 0, "starter" => 0, "team" => 1, "team_2026" => 1, "studio" => 2 }.freeze
   COMPANY_FEATURES = {
     crew_marketplace: { label: "Full crew marketplace", icon: "bi-globe2", minimum_tier: "starter" },
     applications_invitations: { label: "Applications and invitations", icon: "bi-send-check", minimum_tier: "starter" },
@@ -15,6 +15,8 @@ class Plan < ApplicationRecord
     integrations: { label: "Early access to integrations", icon: "bi-plug", minimum_tier: "studio" }
   }.freeze
 
+  LAUNCH_FEATURES = COMPANY_FEATURES.except(:priority_support, :enhanced_visibility, :integrations).freeze
+
   has_many :company_plans, dependent: :destroy
   has_many :companies, through: :company_plans
   before_validation :set_default_key
@@ -25,6 +27,18 @@ class Plan < ApplicationRecord
   validates :stripe_monthly_price_id, :stripe_annual_price_id, uniqueness: true, allow_nil: true
 
   scope :active, -> { where(active: true).order(:position, :id) }
+
+  def free?
+    monthly_price_cents.zero? && annual_price_cents.zero?
+  end
+
+  def checkout_available?(interval)
+    !free? && interval.in?(%w[monthly annual]) && public_send("stripe_#{interval}_price_id").present?
+  end
+
+  def annual_savings
+    formatted_price([ monthly_price_cents * 12 - annual_price_cents, 0 ].max)
+  end
 
   def monthly_price
     formatted_price(monthly_price_cents)
@@ -52,9 +66,17 @@ class Plan < ApplicationRecord
     ].compact_blank
   end
 
+  def feature_available?(key)
+    feature = COMPANY_FEATURES[key.to_sym]
+    return false unless feature
+    return LAUNCH_FEATURES.key?(key.to_sym) if self.key == "free"
+
+    tier_rank >= TIER_RANKS.fetch(feature.fetch(:minimum_tier))
+  end
+
   def feature_matrix
-    COMPANY_FEATURES.map do |key, feature|
-      feature.merge(key:, included: tier_rank >= TIER_RANKS.fetch(feature.fetch(:minimum_tier)))
+    LAUNCH_FEATURES.map do |key, feature|
+      feature.merge(key:, included: feature_available?(key))
     end
   end
 
@@ -70,7 +92,7 @@ class Plan < ApplicationRecord
   end
 
   def tier_rank
-    TIER_RANKS.fetch(key, 0)
+    TIER_RANKS.fetch(key, -1)
   end
 
   def limit_label(limit, label)

@@ -1,28 +1,27 @@
-%h4.fw-semibold.mb-4 What occupation(s) best describe you?
-.row.g-3
-  .col-md-12
-    .d-flex.flex-wrap.gap-2
-      - occupations.sort_by(&:name).each do |occupation|
+%h4.fw-semibold.mb-2 What occupations do you work in?
+%p.text-muted Select the occupations that describe your work experience. Your skills, equipment and projects can add detail in the next section.
+.position-relative{ data: { controller: "taxonomy-multiselect", taxonomy_multiselect_kind_value: "occupations", action: "click@window->taxonomy-multiselect#clickOutside" } }
+  = label_tag :occupation_search, "Find an occupation", class: "form-label fw-semibold"
+  = search_field_tag :occupation_search, nil, class: "form-control", placeholder: "Search occupations", role: "combobox", autocomplete: "off", aria: { autocomplete: "list", controls: "occupation-search-options", expanded: "true" }, data: { taxonomy_multiselect_target: "input", action: "input->taxonomy-multiselect#search keydown->taxonomy-multiselect#navigate focus->taxonomy-multiselect#show" }
+  #occupation-search-options.list-group.mt-2.taxonomy-multiselect-options{ role: "listbox", aria: { multiselectable: "true", label: "Occupations" }, data: { taxonomy_multiselect_target: "options" } }
+    - occupations.sort_by(&:name).each do |occupation|
+      = link_to toggle_occupation_selection_usr_profile_path(profile, occupation_id: occupation.id, source: source), class: ["list-group-item list-group-item-action d-flex align-items-center justify-content-between", ("active" if profile_occupations.include?(occupation))], id: "occupation_button_id_#{occupation.id}", role: "option", aria: { selected: profile_occupations.include?(occupation).to_s, pressed: profile_occupations.include?(occupation).to_s }, data: { turbo_method: :post, taxonomy_multiselect_target: "option", taxonomy_name: occupation.name, taxonomy_search_text: occupation.name.downcase, occupation_id: occupation.id } do
+        %span= occupation.name
         - if profile_occupations.include?(occupation)
-          = link_to toggle_occupation_selection_usr_profile_path(profile, occupation_id: occupation.id, source: source), method: :post, class: "btn btn-secondary rounded-pill px-3 py-2 fw-normal", id: "occupation_button_id_#{occupation.id}", data: { occupation_id: occupation.id } do
-            = occupation.name
-        - else
-          = link_to toggle_occupation_selection_usr_profile_path(profile, occupation_id: occupation.id, source: source), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal", id: "occupation_button_id_#{occupation.id}", data: { occupation_id: occupation.id } do
-            = occupation.name
-    - if profile_occupations.any?
-      %p.fw-semibold.mt-3.mb-0 Your selected occupation(s):
-      .w-100
-      .d-flex.flex-wrap.gap-2.mt-2
-        - profile_occupations.sort_by(&:name).each do |po|
-          %span.selected-occupation-pill
-            = po.name
-    - if show_navigation
-      .row.mt-3
-        .col-md-6
-          = link_to previous_page_usr_profile_path(profile, current_page: "occupation_form"), class: "btn btn-quiet" do
-            %i.bi.bi-arrow-left-circle
-            Location
-        .col-md-6.d-flex.justify-content-end.align-items-end
-          = link_to next_page_usr_profile_path(profile, current_page: "occupation_form"), class: "btn btn-primary" do
-            %i.bi.bi-arrow-right-circle
-            Skills & Services
+          %i.bi.bi-check-lg{ aria: { hidden: true } }
+  %p.visually-hidden{ role: "status", aria: { live: "polite" }, data: { taxonomy_multiselect_target: "status" } }
+- if profile_occupations.any?
+  %p.fw-semibold.mt-3.mb-0 Your selected occupations:
+  .d-flex.flex-wrap.gap-2.mt-2
+    - profile_occupations.sort_by(&:name).each do |occupation|
+      %span.selected-occupation-pill= occupation.name
+- if show_navigation
+  .row.mt-3
+    .col-md-6
+      = link_to previous_page_usr_profile_path(profile, current_page: "occupation_form"), class: "btn btn-quiet" do
+        %i.bi.bi-arrow-left-circle
+        Location
+    .col-md-6.d-flex.justify-content-end.align-items-end
+      = link_to next_page_usr_profile_path(profile, current_page: "occupation_form"), class: "btn btn-primary" do
+        %i.bi.bi-arrow-right-circle
+        Skills & equipment

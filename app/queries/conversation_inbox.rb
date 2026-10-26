@@ -5,8 +5,9 @@ class ConversationInbox
 
   def results
     user.conversations
-      .includes({ context: :job }, :messages, memberships: :user)
+      .includes({ context: :job }, :latest_message, memberships: :user)
       .order(updated_at: :desc)
+      .select { |conversation| conversation.accessible_to?(user) }
   end
 
   private

@@ -29,7 +29,7 @@ class Usr::CrewShortlistsControllerTest < ActionDispatch::IntegrationTest
       post usr_company_crew_shortlists_path(@company), params: { crew_shortlist: { name: "Locked List" } }
     end
     assert_redirected_to usr_company_path(@company)
-    assert_equal "Shortlists and applicant pipeline requires a Team or Studio plan.", flash[:alert]
+    assert_equal "Shortlists and applicant pipeline requires a Team plan.", flash[:alert]
   end
 
   test "company owner creates a named shortlist and adds and removes a profile" do
@@ -59,6 +59,17 @@ class Usr::CrewShortlistsControllerTest < ActionDispatch::IntegrationTest
     sign_in @outsider, scope: :user
     post usr_crew_shortlist_memberships_path(shortlist), params: { profile_id: @candidate.id }
     assert_response :not_found
+  end
+
+  test "shortlist highlights finding crew and keeps deletion secondary" do
+    shortlist = @company.crew_shortlists.create!(name: "Tour Crew", created_by: @owner)
+    sign_in @owner, scope: :user
+
+    get usr_crew_shortlist_path(shortlist)
+
+    assert_response :success
+    assert_select "a.btn-primary[href='#{usr_profiles_path}']", text: "Find Crew"
+    assert_select "button.btn-outline-danger", text: "Delete List"
   end
 
   test "profile page lets an owner add the person to an owned shortlist" do

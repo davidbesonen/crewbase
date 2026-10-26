@@ -2,17 +2,23 @@ class Usr::JobsController < ApplicationController
   before_action :set_job, only: [ :show ]
 
   def index
-    jobs_scope = Job.includes(:locations, company: :industries)
-      .where(is_active: true, status: :published)
+    jobs_scope = Job.accepting_applications.includes(:locations, company: :industries)
 
     @industries = Industry.order(:name)
     @q = jobs_scope.ransack(params[:q])
+    @filtered = @q.conditions.any?
     @pagy, @jobs = pagy(@q.result(distinct: true)
       .order(published_at: :desc, created_at: :desc)
     )
   end
 
   def show
+    if params[:source] == "recommendation" && ProductEvent.where(user: current_user, job: @job, name: "recommendation_shown", created_at: 30.days.ago..).exists?
+      ProductEvent.record(user: current_user, name: "recommendation_viewed", subject: @job, event_key: "#{Date.current}:#{@job.id}")
+    end
+    @experience_requirements = JobExperienceRequirements.new(@job).entries
+    @documents_visible = @job.documents_visible_to?(current_user)
+    @contracts = @job.contracts.includes(:uploaded_by, file_attachment: :blob) if @documents_visible
     @company_plan = @job.company&.company_plans&.includes(:plan)&.order(created_at: :desc, id: :desc)&.first&.plan
     @job_application = current_user.user_profile&.job_applications&.find_by(job: @job)
     @saved_job = current_user.saved_jobs.find_by(job: @job)
@@ -46,9 +52,9 @@ class Usr::JobsController < ApplicationController
   private
 
   def set_job
-    @job = Job.includes(:locations, company: :industries).find(params[:id])
-    return if @job.is_active? && @job.published?
-    return if @job.editable_by?(current_user)
+    @job = Job.includes(:locations, { job_requirements: :requirement }, company: :industries).find(params[:id])
+    return if @job.publicly_visible?
+    return if @job.editable_by?(current_user) || @job.hired?(current_user)
 
     raise ActiveRecord::RecordNotFound
   end

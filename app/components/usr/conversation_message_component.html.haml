@@ -1,5 +1,20 @@
-.d-flex{ id: dom_id(message), class: (sent_by_current_user? ? "justify-content-end" : "justify-content-start"), data: { message_id: message.id } }
-  .rounded-3.p-3.message-bubble{ class: (sent_by_current_user? ? "bg-primary text-white" : "bg-light") }
-    %div.fw-semibold.small.mb-1= message.sender.full_name
-    %div= simple_format(message.body, {}, wrapper_tag: "div")
-    %div.small.mt-1{ class: (sent_by_current_user? ? "text-white-50" : "text-muted") }= l(message.created_at, format: :short)
+- if message.system?
+  .conversation-event{ id: dom_id(message), data: { message_id: message.id } }
+    %i.bi.bi-check-circle{ aria: { hidden: true } }
+    %span= message.body
+    %time{ datetime: message.created_at.iso8601 }= l(message.created_at, format: :short)
+- else
+  .d-flex{ id: dom_id(message), class: (sent_by_current_user? ? "justify-content-end" : "justify-content-start"), data: { message_id: message.id } }
+    .message-bubble{ class: (sent_by_current_user? ? "message-bubble-sent" : "message-bubble-received") }
+      .message-author= message.sender.full_name
+      - if message.body.present?
+        .message-text= message.body
+      - if message.files.any?
+        .message-files
+          - message.files.each do |file|
+            = link_to rails_service_blob_path(file.blob.signed_id, file.filename), class: "message-file", data: { turbo: false } do
+              %i.bi.bi-file-earmark-arrow-down{ aria: { hidden: true } }
+              %span
+                %span.d-block.fw-semibold= file.filename
+                %span.small= number_to_human_size(file.byte_size)
+      %time.message-time{ datetime: message.created_at.iso8601 }= l(message.created_at, format: :short)

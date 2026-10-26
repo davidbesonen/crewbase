@@ -7,7 +7,7 @@ class Usr::ConversationsController < ApplicationController
 
   def show
     @conversation = @membership.conversation
-    @messages = @conversation.messages.includes(:sender).order(:created_at, :id)
+    @messages = @conversation.messages.includes(:sender, files_attachments: :blob).order(:created_at, :id)
     ConversationReader.new(membership: @membership).call
   end
 
@@ -17,5 +17,6 @@ class Usr::ConversationsController < ApplicationController
     @membership = current_user.conversation_memberships
       .includes(conversation: [ :context, memberships: :user ])
       .find_by!(conversation_id: params[:id])
+    raise ActiveRecord::RecordNotFound unless @membership.conversation.accessible_to?(current_user)
   end
 end

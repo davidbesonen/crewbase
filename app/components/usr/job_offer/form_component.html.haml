@@ -1,0 +1,51 @@
+.row.justify-content-center
+  .col-12.col-lg-8
+    .card.border-0.shadow-sm
+      .card-body.p-4.p-lg-5
+        %h1.fw-bold.mb-3 Offer job
+        %p.text-muted Confirm the terms for #{@application.profile.user.full_name}. This is a booking confirmation, not a signed contract or payment.
+        %p.small.text-muted Pending offers do not reserve a position. Availability and capacity are checked when the worker accepts.
+        - if @offer.errors.any?
+          .alert.alert-danger= @offer.errors.full_messages.to_sentence
+        = form_with model: @offer, url: usr_job_offers_path, builder: ActionView::Helpers::FormBuilder do |form|
+          = hidden_field_tag :job_application_id, @application.id
+          = hidden_field_tag :profile_id, @application.profile_id
+          - if @application.job.multi_position?
+            .mb-3
+              = label_tag :crew_position_id, "Position", class: "form-label"
+              = select_tag :crew_position_id, options_from_collection_for_select(@positions, :id, :title, @position&.id), prompt: "Select a position", required: true, class: "form-select"
+          .mb-3
+            = form.label :role, class: "form-label"
+            = form.text_field :role, class: "form-control", required: true
+          .row.g-3.mb-3
+            .col-md-6
+              = form.label :starts_at, "Work starts", class: "form-label"
+              = form.datetime_local_field :starts_at, class: "form-control", required: true
+            .col-md-6
+              = form.label :ends_at, "Work ends", class: "form-label"
+              = form.datetime_local_field :ends_at, class: "form-control", required: true
+          %p.small.text-muted Dates use #{Time.zone.name} time.
+          .row.g-3.mb-3{ data: { controller: "currency-prefix" } }
+            .col-md-4
+              = form.label :rate, "Agreed rate", class: "form-label"
+              .input-group
+                %span.input-group-text{ data: { currency_prefix_target: "symbol" }, aria: { live: "polite", atomic: "true" } }= currency_prefix
+                = form.number_field :rate, min: 0, step: "0.01", class: "form-control", required: true
+            .col-md-4
+              = form.label :currency, class: "form-label"
+              = form.text_field :currency, maxlength: 3, pattern: "[A-Z]{3}", class: "form-control", required: true, data: { currency_prefix_target: "currency", action: "input->currency-prefix#update change->currency-prefix#update" }
+            .col-md-4
+              = form.label :pay_unit, "Per", class: "form-label"
+              = form.select :pay_unit, Compensated::PAY_PERIODS.keys.map { |unit| [unit.to_s.humanize, unit] }, {}, class: "form-select"
+          .mb-3
+            = form.label :terms, "Essential terms", class: "form-label"
+            = form.text_area :terms, rows: 4, class: "form-control", placeholder: "Travel, expenses, location, or other agreed details"
+          .mb-4
+            = form.label :expires_at, "Respond by (optional)", class: "form-label"
+            = form.datetime_local_field :expires_at, class: "form-control"
+          .d-flex.flex-wrap.gap-2
+            = form.submit "Send offer", class: "btn btn-primary"
+            - if @application.persisted?
+              = link_to "Back to application", usr_job_application_path(@application), class: "btn btn-outline-secondary"
+            - else
+              = link_to "Back to crew", usr_job_crew_path(@application.job), class: "btn btn-outline-secondary"

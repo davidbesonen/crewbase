@@ -1,34 +1,13 @@
 class CrewAssignmentManager
-  def initialize(position:, profile:, assignment: nil, user:)
-    @position = position
-    @profile = profile
-    @assignment = assignment
-    @user = user
+  def initialize(position:, profile:, assignment: nil, user:, attributes: {})
+    @position, @profile, @assignment, @user, @attributes = position, profile, assignment, user, attributes
   end
 
   def call
-    return failure("is not an eligible candidate") unless eligible?
+    return false if @assignment || !@position.job.company.is_owner?(@user)
+    return false unless JobCrewCandidateQuery.new(job: @position.job, user: @user).profiles.exists?(@profile.id)
 
-    position.with_lock do
-      record.profile = profile
-      record.save
-    end
-  end
-
-  private
-
-  attr_reader :position, :profile, :assignment, :user
-
-  def record
-    @record ||= assignment || position.crew_assignments.build
-  end
-
-  def eligible?
-    JobCrewCandidateQuery.new(job: position.job, user:).profiles.exists?(profile.id)
-  end
-
-  def failure(message)
-    record.errors.add(:profile, message)
-    false
+    application = @position.job.job_applications.find_or_initialize_by(profile: @profile)
+    IssueJobOffer.new(application:, sender: @user, position: @position, attributes: @attributes).call.success?
   end
 end

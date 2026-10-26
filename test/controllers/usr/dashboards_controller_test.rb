@@ -22,7 +22,7 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-dashboard-greeting]" do
-      assert_select "h1", text: "👋 Hi, David"
+      assert_select "h1", text: "Hi, David"
       assert_select ".card, .app-hero", count: 0
     end
     assert_select ".card [data-dashboard-greeting], .app-hero[data-dashboard-greeting]", count: 0
@@ -60,15 +60,32 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "uses restrained color accents to organize dashboard content" do
+  test "search floats above tools outside the dashboard cards" do
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "[data-dashboard-greeting]", text: /Hi, David/
-    assert_select "[data-dashboard-search-row] .card-accent.card-accent-cyan"
-    assert_select "[data-dashboard-activity] .card-accent", minimum: 3
-    assert_select "[data-dashboard-secondary] .card-accent", minimum: 2
-    assert_select "[data-dashboard-secondary] .icon-orb.icon-orb-navy", minimum: 1
+    assert_select "[data-dashboard-search-row]" do
+      assert_select ".card", count: 0
+      assert_select "[role='search'] input[role='combobox'][aria-controls='dashboard-quick-search-results']"
+      assert_select "[role='search'] + [data-helpful-tools]"
+    end
+    assert_select ".dashboard [data-dashboard-activity] .card", count: 3
+  end
+
+  test "current applications exclude completed work and resolved decisions" do
+    company = Company.create!(name: "Active applications", contact_email: "active@example.com", industries: [ Industry.create!(name: "Active applications") ])
+    active = create_dashboard_job(company:, title: "Current application", starts_at: 5.days.from_now)
+    past = create_dashboard_job(company:, title: "Old application", starts_at: 5.days.ago)
+    rejected = create_dashboard_job(company:, title: "Rejected application", starts_at: 5.days.from_now)
+    @user.user_profile.job_applications.create!(job: active, status: :in_review)
+    @user.user_profile.job_applications.create!(job: past, status: :accepted)
+    @user.user_profile.job_applications.create!(job: rejected, status: :rejected)
+    get usr_dashboards_path
+    assert_select "[data-current-job-applications]" do
+      assert_select "a", text: active.title
+      assert_select "a", text: past.title, count: 0
+      assert_select "a", text: rejected.title, count: 0
+    end
   end
 
   test "dashboard renders the live cross-model search interface" do
@@ -92,8 +109,8 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-dashboard-search-row]" do
       assert_select "[data-controller='quick-search']"
-      assert_select "[data-company-tools]" do
-        assert_select "h2", text: "Company Tools"
+      assert_select "[role='search'] + [data-company-tools]" do
+        assert_select ".visually-hidden", text: "Company Tools"
         assert_select "a[href='#{new_usr_company_job_path(company)}']", text: "Post a Job"
         assert_select "a[href='#{new_usr_company_project_path(company)}']", text: "Create a Project"
         assert_select "a[href='#{my_postings_usr_jobs_path}']", text: "Job Postings"
@@ -250,7 +267,7 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "[data-open-jobs-card].col-12:not(.col-lg-6)"
+    assert_select ".dashboard-recommendations:not(.dashboard-recommendations--paired) > [data-open-jobs-card]"
     assert_select "[data-people-crews-card]", count: 0
   end
 
@@ -266,8 +283,8 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "[data-open-jobs-card].col-lg-6"
-    assert_select "[data-people-crews-card].col-lg-6", text: /People \/ Crews You May Need/
+    assert_select ".dashboard-recommendations--paired > [data-open-jobs-card]"
+    assert_select ".dashboard-recommendations--paired > [data-people-crews-card]", text: /Recommended Crew/
     assert_select "[data-people-crews-card]", text: /Post a job to receive tailored crew recommendations/
     assert_select "[data-people-crews-card] a[href='#{new_usr_company_job_path(company)}']", text: "Post a Job"
   end
@@ -296,19 +313,57 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-worker-job-recommendation]", count: 1
-    assert_select "[data-worker-job-recommendation] a[href='#{usr_job_path(matching_job)}']", text: matching_job.title
+    assert_select "[data-worker-job-recommendation] a[href='#{usr_job_path(matching_job, source: "recommendation")}']", text: matching_job.title
     assert_select "[data-worker-job-recommendation]", text: /Matches Tour Lighting Technician and GrandMA3/
     assert_select "[data-worker-job-recommendation]", text: /Located in Chicago, IL/
-    assert_select "[data-worker-job-recommendation]", text: /Available for job dates/
+    assert_select "[data-worker-job-recommendation]", text: /Availability unknown/
     assert_select "[data-worker-job-recommendation]", text: /Unrelated Audio Role/, count: 0
   end
 
-  test "dashboard explains when there are no upcoming jobs" do
+  test "dashboard separates booked work from upcoming opportunities when empty" do
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "h5", text: "Upcoming Jobs"
-    assert_select "p", text: "You have no upcoming jobs right now."
+    assert_select "h5", text: "Booked Work"
+    assert_select "h6", text: "Upcoming Opportunities"
+    assert_select "p", text: "You have no booked work scheduled. Confirmed offers and existing bookings will appear here."
+  end
+
+  test "dashboard explains missing matching details and links directly to the profile editor" do
+    get usr_dashboards_path
+
+    assert_response :success
+    assert_select "[data-job-matches-empty]", text: /Add occupations, skills, or equipment/
+    assert_select "[data-job-matches-empty] a[href='#{edit_usr_profile_path(@user.user_profile, source: "completed_profile", anchor: "occupation_form")}']", text: "Add Matching Details"
+    assert_select "h5", text: "Saved Jobs & Crew Lists"
+  end
+
+  test "dashboard distinguishes no suitable openings from missing profile information" do
+    @user.user_profile.skills << Skill.create!(name: "Production Coordination")
+
+    get usr_dashboards_path
+
+    assert_response :success
+    assert_select "[data-job-matches-empty]", text: /No suitable openings match your profile and availability right now/
+    assert_select "[data-job-matches-empty] a[href='#{usr_jobs_path}']", text: "Browse Jobs"
+    assert_select "[data-job-matches-empty]", text: /Add occupations/, count: 0
+  end
+
+  test "dashboard keeps a confirmed filled job separate from open opportunities" do
+    industry = Industry.create!(name: "Booked Dashboard Jobs")
+    company = Company.create!(name: "Booked Productions", contact_email: "booked@example.com", industries: [ industry ])
+    booking = create_dashboard_job(company:, title: "Booked Soundcheck", starts_at: 1.week.from_now, status: :filled)
+    opening = create_dashboard_job(company:, title: "Open Soundcheck", starts_at: 2.weeks.from_now)
+    @user.user_profile.job_applications.create!(job: booking, status: :accepted)
+
+    get usr_dashboards_path
+
+    assert_response :success
+    assert_select "[data-booked-work]", text: /#{booking.title}/
+    assert_select "[data-booked-work] a[href='#{usr_job_path(booking)}']", count: 0
+    assert_select "[data-booked-work] a[href='#{usr_job_path(opening)}']", count: 0
+    assert_select "[data-upcoming-opportunities] a[href='#{usr_job_path(opening)}']", text: opening.title
+    assert_select "[data-upcoming-opportunities] a[href='#{usr_job_path(booking)}']", count: 0
   end
 
   test "dashboard renders future active published jobs in start-date order" do
@@ -328,18 +383,18 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "[data-upcoming-jobs] a", text: next_job.title
-    assert_select "[data-upcoming-jobs] a", text: later_job.title
-    assert_select "[data-upcoming-jobs] a", text: third_job.title
-    assert_select "[data-upcoming-jobs] a", count: 3
-    assert_select "[data-upcoming-jobs]", text: /#{next_job.title}.*#{later_job.title}/m
-    assert_select "[data-upcoming-jobs]", text: /#{company.name}/
-    assert_select "[data-upcoming-jobs]", text: /#{I18n.l(next_job.starts_at.to_date, format: :long)}/
-    assert_select "[data-upcoming-jobs]", text: /#{fourth_job.title}/, count: 0
-    assert_select "[data-upcoming-jobs]", text: /Past Soundcheck/, count: 0
-    assert_select "[data-upcoming-jobs]", text: /Draft Soundcheck/, count: 0
-    assert_select "p", text: "You have no upcoming jobs right now.", count: 0
-    assert_select "a.text-muted[href='#{usr_jobs_path}']", text: "View my Jobs"
+    assert_select "[data-upcoming-opportunities] a", text: next_job.title
+    assert_select "[data-upcoming-opportunities] a", text: later_job.title
+    assert_select "[data-upcoming-opportunities] a", text: third_job.title
+    assert_select "[data-upcoming-opportunities] a", count: 3
+    assert_select "[data-upcoming-opportunities]", text: /#{next_job.title}.*#{later_job.title}/m
+    assert_select "[data-upcoming-opportunities]", text: /#{company.name}/
+    assert_select "[data-upcoming-opportunities]", text: /#{I18n.l(next_job.starts_at.to_date, format: :long)}/
+    assert_select "[data-upcoming-opportunities]", text: /#{fourth_job.title}/, count: 0
+    assert_select "[data-upcoming-opportunities]", text: /Past Soundcheck/, count: 0
+    assert_select "[data-upcoming-opportunities]", text: /Draft Soundcheck/, count: 0
+    assert_select "p", text: "There are no upcoming openings right now.", count: 0
+    assert_select "a.text-muted[href='#{usr_jobs_path}']", text: "Browse Jobs"
   end
 
   test "dashboard renders the next three applications and an applications button" do

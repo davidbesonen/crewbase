@@ -1,4 +1,6 @@
 class Skill < ApplicationRecord
+  scope :categories, -> { where.not(category_key: nil) }
+
   has_many :skill_assignments, dependent: :destroy
   has_many :profiles, through: :skill_assignments
   has_many :occupation_assignments, as: :assignable, dependent: :destroy

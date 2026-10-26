@@ -1,0 +1,59 @@
+.app-hero.app-hero-sky.mb-4
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+    %div
+      %h1.fw-bold.mb-1 Saved Jobs
+      %p.text-muted.mb-0 Your shortlist of opportunities. See what’s still open and pick up where you left off.
+    = link_to usr_jobs_path, class: "btn btn-primary" do
+      %i.bi.bi-search.me-2{ aria: { hidden: true } }
+      Browse Jobs
+.card.border-0.shadow-sm.mb-4
+  .card-body
+    = form_with url: usr_saved_jobs_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "row g-3 align-items-end" do |form|
+      .col-12.col-md-6
+        = form.label :q, "Search saved jobs", class: "form-label"
+        = form.search_field :q, value: @query, placeholder: "Job title or company", class: "form-control", maxlength: 100
+      .col-12.col-md-3
+        = form.label :status, "Availability", class: "form-label"
+        = form.select :status, [["All saved jobs", "all"], ["Open to applications", "open"], ["No longer available", "unavailable"]], { selected: @status }, class: "form-select"
+      .col-12.col-md-3.d-flex.gap-2
+        = form.submit "Filter", class: "btn btn-primary"
+        - if filtered?
+          = link_to "Reset", usr_saved_jobs_path, class: "btn btn-outline-secondary"
+- if @saved_jobs.any?
+  .d-flex.flex-column.gap-3
+    - @saved_jobs.each do |saved_job|
+      %article.card.border-0.shadow-sm{ data: { saved_job: saved_job.job.id } }
+        .card-body.p-4.d-flex.flex-column.flex-md-row.justify-content-between.align-items-start.gap-3
+          .flex-grow-1
+            %h2.h5.fw-semibold.mb-1
+              - if visible_job?(saved_job.job)
+                = link_to saved_job.job.title, usr_job_path(saved_job.job), class: "text-dark text-decoration-none"
+              - else
+                = saved_job.job.title
+            %p.text-muted.mb-2= saved_job.job.company.name
+            .d-flex.flex-wrap.gap-3.small.text-muted.mb-2
+              %span
+                %i.bi.bi-geo-alt.me-1{ aria: { hidden: true } }
+                = saved_job.job.formatted_location
+              - if saved_job.job.compensation_range.present?
+                %span= "#{saved_job.job.compensation_range} #{saved_job.job.pay_period&.humanize&.downcase}"
+            - if saved_job.job.accepting_applications?
+              %span.status-badge.status-available Open to applications
+              - if saved_job.job.application_deadline
+                %p.small.text-muted.mt-2.mb-0 Apply by #{l(saved_job.job.application_deadline, format: :long)}
+            - else
+              %span.status-badge.status-unavailable No longer accepting applications
+            %p.small.text-muted.mb-0.mt-2 Saved #{l(saved_job.created_at.to_date, format: :long)}
+          .d-flex.flex-wrap.gap-2
+            - if visible_job?(saved_job.job)
+              = link_to "View job", usr_job_path(saved_job.job), class: "btn btn-outline-primary btn-sm"
+            = button_to usr_job_saved_job_path(saved_job.job), method: :delete, class: "btn btn-outline-secondary btn-sm", aria: { label: "Remove #{saved_job.job.title} from saved jobs" } do
+              %i.bi.bi-bookmark-dash.me-1{ aria: { hidden: true } }
+              Remove
+- else
+  .empty-state.empty-state-sky
+    %i.bi.bi-bookmark.fs-2.text-primary.mb-3{ aria: { hidden: true } }
+    %h2.h5.fw-semibold= filtered? ? "No saved jobs match these filters" : "No Saved Jobs Yet"
+    %p.text-muted= filtered? ? "Try another search or view all your saved opportunities." : "Save jobs while browsing to compare them and come back later."
+    - if filtered?
+      = link_to "Show all saved jobs", usr_saved_jobs_path, class: "btn btn-outline-primary"

@@ -2,6 +2,10 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
+# Rails lazily loads routes, but Warden's test login runs before route dispatch.
+# Finalize Devise's scoped serializers before that first simulated sign-in.
+Rails.application.reload_routes!
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers

@@ -38,7 +38,7 @@
             - if result.matched_skills_and_equipment.any?
               .small.mt-2
                 %i.bi.bi-stars.text-primary.me-1{ aria: { hidden: true } }
-                = "Skills & equipment: #{result.matched_skills_and_equipment.to_sentence}"
+                = "Reported skills & equipment: #{result.matched_skills_and_equipment.to_sentence}"
             - if result.gap_reasons.any?
               - result.gap_reasons.each do |reason|
                 .small.text-warning.mt-2

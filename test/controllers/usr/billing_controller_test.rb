@@ -33,10 +33,8 @@ class Usr::BillingControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: "Billing & plans"
-    assert_select "[data-user-plan='crew-pro']", text: /\$5\.99/
-    assert_select "[data-user-plan='crew-pro']", text: /\$49/
-    assert_select "form[action='#{subscription_checkout_usr_settings_billing_path}']", count: 2
-    assert_select ".badge", text: "Roadmap — not yet available"
+    assert_select "h2", text: "Free for crew"
+    assert_select "form[action='#{subscription_checkout_usr_settings_billing_path}']", count: 0
     assert_select "p", text: /profiles, applications, messages, invitations, saved jobs, and availability remain free/i
   end
 
@@ -59,13 +57,20 @@ class Usr::BillingControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action='#{subscription_checkout_usr_settings_billing_path}']", count: 0
   end
 
-  test "checkout reports missing Stripe configuration instead of taking payment" do
+  test "retired crew checkout redirects to free membership" do
     @plan.update!(stripe_monthly_price_id: nil)
 
     post subscription_checkout_usr_settings_billing_path, params: { user_plan_id: @plan.id, billing_interval: "monthly" }
 
     assert_redirected_to usr_settings_billing_path
-    assert_match(/monthly Stripe price/, flash[:alert])
+    assert_match(/Crew accounts are free/, flash[:notice])
+  end
+
+  test "past due crew subscribers can still manage their billing" do
+    @user.user_subscriptions.create!(user_plan: @plan, status: "past_due", stripe_customer_id: "cus_past_due", stripe_subscription_id: "sub_past_due")
+    get usr_settings_billing_path
+    assert_select "form[action='#{portal_usr_settings_billing_path}'] button", text: "Manage billing in Stripe"
+    assert_select ".badge", text: "Past due"
   end
 
   test "billing portal requires an existing Stripe subscription" do

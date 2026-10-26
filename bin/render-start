@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for name in DATABASE_URL CACHE_DATABASE_URL QUEUE_DATABASE_URL CABLE_DATABASE_URL SECRET_KEY_BASE; do
+  if [[ -z "${!name:-}" ]]; then
+    echo "Missing required deployment setting: $name" >&2
+    exit 1
+  fi
+done
+bundle exec rails db:prepare
+if [[ "${CREWBASE_DEMO:-}" == "true" ]]; then
+  bundle exec rails demo:seed
+fi
+exec bundle exec puma -C config/puma.rb

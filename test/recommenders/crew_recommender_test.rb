@@ -1,4 +1,5 @@
 require "test_helper"
+require Rails.root.join("db/catalogs/experience_v1")
 
 class CrewRecommenderTest < ActiveSupport::TestCase
   self.fixture_table_names = []
@@ -31,7 +32,7 @@ class CrewRecommenderTest < ActiveSupport::TestCase
     assert recommendations.results.all? { |result| matching_profiles.include?(result.profile) }
     assert recommendations.results.all? { |result| result.job == job }
     assert recommendations.results.all? { |result| result.match_reason == "Matches Lighting Technician" }
-    assert recommendations.results.all? { |result| result.availability_label == "Available for job dates" }
+    assert recommendations.results.all? { |result| result.availability_label == "Availability unknown" }
     assert_not_includes recommendations.results.map(&:profile), unavailable_profile
   end
 
@@ -224,6 +225,33 @@ class CrewRecommenderTest < ActiveSupport::TestCase
     results = CrewRecommender.new(user: owner, jobs: [ job ], limit: nil).results
 
     assert_not_includes results.map(&:profile), distant_profile
+  end
+
+  test "location alone does not imply relevant work experience" do
+    owner = create_user("BroadOwner")
+    company = create_company(owner)
+    company.locations << Location.create!(city: "Chicago", state: "IL", country: "US")
+    job = create_job(company, title: "Lighting crew")
+    profile = create_user("UnrelatedLocal").profiles.create!(profile_type: "user", completed_at: Time.current)
+    profile.locations << company.locations.first
+
+    assert_empty CrewRecommender.new(user: owner, jobs: [ job ], limit: nil).results
+  end
+
+  test "shared categories recommend a profile despite a different specific job title" do
+    owner = create_user("FamilyOwner")
+    company = create_company(owner)
+    ExperienceV1.install!
+    category = Occupation.find_by!(category_key: "audio")
+    job = create_job(company, title: "Touring FOH mixer")
+    job.job_requirements.create!(requirement: category, importance: :required)
+    profile = create_user("SoundWorker").profiles.create!(profile_type: "user", completed_at: Time.current)
+    profile.occupations << category
+    profile.update!(work_examples: "Mix engineer on regional tours")
+
+    result = CrewRecommender.new(user: owner, jobs: [ job ]).results.first
+    assert_equal profile, result.profile
+    assert_equal "Matches Audio & sound", result.match_reason
   end
 
   private

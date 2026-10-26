@@ -59,6 +59,15 @@ class JobCrewSearchTest < ActiveSupport::TestCase
     ).results
   end
 
+  test "filters by a personally entered skill and equipment name" do
+    @matching_profile.update!(skills_text: "Rare workflow", equipment_text: "Custom console")
+    assert_equal [ @matching_profile ], JobCrewSearch.new(job: @job, user: @owner, skill_query: "RARE workflow", equipment_query: "Custom console").results.map(&:profile)
+    assert_empty JobCrewSearch.new(job: @job, user: @owner, skill_query: "Unknown skill").results
+    assert_empty JobCrewSearch.new(job: @job, user: @owner, skill_id: @skill.id).results
+    @matching_profile.update!(capability_keys: [ "audio" ], equipment_family_keys: [ "audio_systems" ])
+    assert_equal [ @matching_profile ], JobCrewSearch.new(job: @job, user: @owner, skill_query: "Audio production", equipment_query: "Audio systems").results.map(&:profile)
+  end
+
   private
 
   def create_user(label)

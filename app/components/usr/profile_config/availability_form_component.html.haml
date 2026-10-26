@@ -40,10 +40,10 @@
                         %div{ id: "availability_date_#{day.to_s}", class: "d-flex justify-content-center align-items-center" }
                           - day_key = day.strftime("%Y-%m-%d")
                           - if selectable && @calendar_events.key?(day_key)
-                            = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: profile.id, date: day, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+                            = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: profile.id, date: day, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
                               = day.day
                           - elsif selectable
-                            = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: profile.id, date: day, toggle_action: "add", month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+                            = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: profile.id, date: day, toggle_action: "add", month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
                               = day.day
                           - else
                             %button.btn.btn-outline-secondary.rounded-pill.px-3.py-2.fw-normal.availability-date-pill.text-muted{ type: "button", disabled: true }
@@ -66,7 +66,7 @@
               .col-sm-6.d-flex.align-items-center
                 %p.text-muted="#{@calendar_events.size} blockout date#{'s' if @calendar_events.size != 1}"
               .col-sm-6.text-end
-                = link_to destroy_all_usr_profile_calendar_events_path(profile_id: profile.id, month: month_start.strftime("%Y-%m-%d")), class: "btn btn-sm btn-outline-danger" do
+                = link_to destroy_all_usr_profile_calendar_events_path(profile_id: profile.id, month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :delete }, class: "btn btn-sm btn-outline-danger" do
                   %i.bi.bi-trash
                   Clear all
             .row
@@ -81,7 +81,7 @@
                             %i.bi.bi-x-circle-fill.text-danger.me-2
                             = date.strftime("%A, %B %d, %Y")
                         %td.text-end
-                          = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: profile.id, date: date, toggle_action: "remove", calendar_event_id: event_id, month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-sm btn-outline-danger my-1" do
+                          = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: profile.id, date: date, toggle_action: "remove", calendar_event_id: event_id, month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-sm btn-outline-danger my-1" do
                             %i.bi.bi-trash
         
 .row
@@ -143,7 +143,7 @@
     .col-md-6
       = link_to edit_usr_profile_path(profile, current_page: "skill_equipment_form", source: source), class: "btn btn-quiet" do
         %i.bi.bi-arrow-left-circle
-        Skills & Services
+        Skills & equipment
     .col-md-6.d-flex.justify-content-end.align-items-end
       = link_to edit_usr_profile_path(profile, current_page: "online_presence_form", source: source), class: "btn btn-primary" do
         %i.bi.bi-arrow-right-circle

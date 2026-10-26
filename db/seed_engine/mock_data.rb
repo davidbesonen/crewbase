@@ -233,12 +233,13 @@ module SeedEngineMockData
   def configure_profile!(profile, user, index)
     occupations = seeded_occupations(index)
     skills = seeded_skills(occupations)
-    equipment = seeded_equipment(occupations)
     location = build_location(index, "#{user.first_name} #{user.last_name}")
 
     profile.update!(
       headline: seeded_headline(occupations),
       bio: seeded_bio(user, occupations, skills),
+      skills_text: skills.join("\n"),
+      equipment_text: "Two-way radios\nProject scheduling software",
       website_url: "https://#{user.first_name.downcase}creative.com",
       linkedin_url: "https://linkedin.com/in/#{user.first_name.downcase}-#{user.last_name.downcase}",
       twitter_handle: "#{user.first_name.downcase}creates",
@@ -250,8 +251,12 @@ module SeedEngineMockData
     profile.location_assignments.destroy_all
     profile.locations << location
     profile.occupations = occupations
-    profile.skills = skills
-    profile.equipment = equipment
+    # Synthetic demo members explicitly exercise the category confirmation flow.
+    suggestions = ExperienceCategorySuggestions.new(profile: profile).results
+    profile.update!(
+      capability_keys: suggestions.select { |item| item.field == :capability_keys }.map { |item| item.category.key },
+      equipment_family_keys: suggestions.select { |item| item.field == :equipment_family_keys }.map { |item| item.category.key }
+    )
   end
 
   def create_seed_companies(david_user)
@@ -289,11 +294,11 @@ module SeedEngineMockData
   end
 
   def seed_plan_for_company_index(index)
-    Plan.find_by!(key: %w[starter team studio][index % 3])
+    Plan.find_by!(key: index.even? ? "team_2026" : "free")
   end
 
   def seed_plan_for_company(blueprint, index)
-    return Plan.find_by!(key: "team") if blueprint.fetch(:name) == "David Besonen Music"
+    return Plan.find_by!(key: "team_2026") if blueprint.fetch(:name) == "David Besonen Music"
 
     seed_plan_for_company_index(index)
   end
@@ -337,7 +342,7 @@ module SeedEngineMockData
 
   def create_seed_jobs(companies, projects_by_company)
     companies.flat_map.with_index do |company, company_index|
-      occupations = company.primary_industry&.occupations&.order(:name)&.to_a || []
+      occupations = company.primary_industry&.occupations&.where(category_key: nil)&.order(:name)&.to_a || []
       projects = projects_by_company.fetch(company.id)
 
       next [] if occupations.empty?
@@ -395,23 +400,10 @@ module SeedEngineMockData
       confirmed_at: Time.current
     )
 
-    occupation.skills.order(:name).first(3).each_with_index do |skill, index|
-      job.job_requirements.create!(
-        requirement: skill,
-        importance: index.zero? ? :required : :preferred,
-        source: :employer,
-        confirmed_at: Time.current
-      )
-    end
-
-    occupation.equipment.order(:name).first(2).each_with_index do |equipment, index|
-      job.job_requirements.create!(
-        requirement: equipment,
-        importance: index.zero? ? :required : :preferred,
-        source: :employer,
-        confirmed_at: Time.current
-      )
-    end
+    demonstration_profile = Profile.new(occupations: [ occupation ])
+    categories = ExperienceCategorySuggestions.new(profile: demonstration_profile).results
+      .select { |item| item.field == :capability_keys }.map { |item| item.category.key }
+    job.update!(required_capability_keys: categories.first(1), required_skills_text: "", preferred_skills_text: "Crew communication", preferred_equipment_text: "Two-way radios")
   end
 
   def create_seed_job_applications(jobs, users)
@@ -471,7 +463,7 @@ module SeedEngineMockData
     jobs.select(&:multi_position?).each do |job|
       occupations = [
         job.required_occupations.first,
-        *job.company.primary_industry.occupations.order(:name).first(3)
+        *job.company.primary_industry.occupations.where(category_key: nil).order(:name).first(3)
       ].compact.uniq.first(3)
 
       positions = occupations.map do |occupation|
@@ -605,6 +597,13 @@ module SeedEngineMockData
       association = requirement.requirement_type.underscore.pluralize
       profile.public_send(association) << requirement.requirement unless profile.public_send(association).include?(requirement.requirement)
     end
+    requirements = JobExperienceRequirements.new(job)
+    profile.update!(
+      capability_keys: (profile.capability_keys + job.required_capability_keys).uniq,
+      equipment_family_keys: (profile.equipment_family_keys + job.required_equipment_family_keys).uniq,
+      skills_text: ExperienceTerms.new(profile.reported_skills + requirements.names_for(:required_skills_text)).values.join("\n"),
+      equipment_text: ExperienceTerms.new(profile.reported_equipment + requirements.names_for(:required_equipment_text)).values.join("\n")
+    )
   end
 
   def create_seed_blockout(profile, date, suffix)
@@ -667,45 +666,11 @@ module SeedEngineMockData
     industries = Industry.includes(:occupations).order(:name).to_a
     industry = industries[index % industries.length]
     occupation_count = [ 1, 2, 3 ][index % 3]
-    industry.occupations.order(:name).sample(occupation_count)
+    industry.occupations.where(category_key: nil).order(:name).sample(occupation_count)
   end
 
   def seeded_skills(occupations)
-    skills = Skill.joins(:occupation_assignments)
-      .where(occupation_assignments: { occupation_id: occupations.map(&:id), assignable_type: "Skill" })
-      .distinct
-      .order(:name)
-      .to_a
-    if skills.empty?
-      occupations.each do |occupation|
-        [
-          "#{occupation.name} Workflow",
-          "#{occupation.name} Prep",
-          "#{occupation.name} Client Communication"
-        ].each do |skill_name|
-          skill = Skill.find_or_create_by!(name: skill_name)
-          skill.occupation_assignments.find_or_create_by!(occupation: occupation)
-          occupation.industries.find_each do |industry|
-            skill.industry_assignments.find_or_create_by!(industry: industry)
-          end
-          skills << skill
-        end
-      end
-    end
-    return [] if skills.empty?
-
-    skills.sample([ skills.length, rand(2..5) ].min)
-  end
-
-  def seeded_equipment(occupations)
-    equipment = Equipment.joins(:occupation_assignments)
-      .where(occupation_assignments: { occupation_id: occupations.map(&:id), assignable_type: "Equipment" })
-      .distinct
-      .order(:name)
-      .to_a
-    return [] if equipment.empty?
-
-    equipment.sample([ equipment.length, rand(2..4) ].min)
+    [ "#{occupations.first.name} workflow", "Crew communication" ]
   end
 
   def build_location(index, name, city: nil, state: nil)
@@ -726,7 +691,7 @@ module SeedEngineMockData
 
   def seeded_bio(user, occupations, skills)
     focus = occupations.map(&:name).to_sentence
-    skill_text = skills.map(&:name).presence&.first(3)&.to_sentence || "cross-functional production skills"
+    skill_text = skills.presence&.first(3)&.to_sentence || "cross-functional production skills"
 
     "#{user.first_name} #{user.last_name} is a #{focus.downcase} with experience across live events, studio sessions, and fast-moving client work. Known for clear communication, organized prep, and #{skill_text.downcase}."
   end

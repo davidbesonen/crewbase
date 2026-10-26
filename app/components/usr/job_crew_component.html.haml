@@ -23,10 +23,14 @@
             = form.text_area :description, rows: 3, class: "form-control", placeholder: "Responsibilities, experience, and other role details", styled: true
           .col-md-4
             = form.label :pay_min, "Minimum pay", class: "form-label"
-            = form.number_field :pay_min, min: 0, step: 0.01, class: "form-control", styled: true
+            .input-group
+              %span.input-group-text $
+              = form.number_field :pay_min, min: 0, step: 0.01, class: "form-control", styled: true
           .col-md-4
             = form.label :pay_max, "Maximum pay", class: "form-label"
-            = form.number_field :pay_max, min: 0, step: 0.01, class: "form-control", styled: true
+            .input-group
+              %span.input-group-text $
+              = form.number_field :pay_max, min: 0, step: 0.01, class: "form-control", styled: true
           .col-md-4
             = form.label :pay_period, "Pay period", class: "form-label"
             = form.select :pay_period, compensation_period_options, { include_blank: "Select pay period" }, class: "form-select"

@@ -1,4 +1,12 @@
 class Job < ApplicationRecord
+  has_many :recommendation_feedbacks, dependent: :destroy
+  has_many :product_events, dependent: :nullify
+  ExperienceCategories::JOB_FIELDS.each do |field, (type, _importance)|
+    normalizes field, with: ->(values) { Array(values).compact_blank.uniq }
+    validates field, experience_category_keys: { type: type }
+  end
+  validates(*JobExperienceRequirements::TEXT_FIELDS.keys, experience_terms: true)
+
   include Compensated
 
   belongs_to :company, optional: true
@@ -10,8 +18,10 @@ class Job < ApplicationRecord
   has_many :crew_positions, dependent: :destroy
   has_many :crew_assignments, through: :crew_positions
   has_many :saved_jobs, dependent: :destroy
+  has_many :network_job_shares, dependent: :destroy
   has_many :saving_users, through: :saved_jobs, source: :user
   has_many :job_requirements, dependent: :destroy
+  has_many :contracts, -> { order(created_at: :desc, id: :desc) }, class_name: "JobContract", dependent: :destroy
   has_many :required_occupation_requirements,
     -> { required.where(requirement_type: "Occupation") },
     class_name: "JobRequirement"
@@ -95,11 +105,38 @@ class Job < ApplicationRecord
     completed: 5
   }
 
+  scope :not_ended, lambda {
+    now = Time.current
+    where("jobs.ends_at >= :now OR (jobs.ends_at IS NULL AND (jobs.starts_at IS NULL OR jobs.starts_at >= :today))",
+      now:, today: now.beginning_of_day)
+  }
+
+  scope :not_moderated, -> { where(restricted_at: nil, company_id: Company.where(restricted_at: nil).select(:id)) }
+
+  scope :accepting_applications, lambda {
+    not_moderated.not_ended.where(is_active: true, status: :published)
+      .where("application_deadline IS NULL OR application_deadline >= ?", Time.current)
+  }
+
   scope :upcoming, lambda {
-    where(is_active: true, status: :published)
+    accepting_applications
       .where(starts_at: Time.current..)
       .order(:starts_at, :id)
   }
+
+  def accepting_applications?
+    publicly_visible? && !conversation_archived? && (application_deadline.nil? || application_deadline >= Time.current)
+  end
+
+  def publicly_visible?
+    is_active? && published? && !on_hold?
+  end
+
+  def on_hold?
+    restricted_at? || company&.restricted_at? || false
+  end
+
+  alias_method :network_shareable?, :accepting_applications?
 
   class << self
     def ransackable_attributes(auth_object = nil)
@@ -180,6 +217,22 @@ class Job < ApplicationRecord
     return false if user.blank?
 
     company&.is_owner?(user) || created_by == user.id
+  end
+
+  def documents_visible_to?(user)
+    company&.is_owner?(user) || hired?(user)
+  end
+
+  def hired?(user)
+    return false unless user
+
+    profile_ids = user.profiles.select(:id)
+    job_applications.accepted.where(profile_id: profile_ids).exists? ||
+      crew_assignments.where(profile_id: profile_ids).exists?
+  end
+
+  def conversation_archived?
+    completed? || archived? || (ends_at || starts_at&.end_of_day)&.past? || false
   end
 
   def posting_type_label

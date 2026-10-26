@@ -1,11 +1,20 @@
-.card.border-0.shadow-sm
-  .card-body.p-4
-    .d-flex.flex-column.gap-3.mb-4{ id: dom_id(conversation, :messages) }
-      - message_bubbles.each do |message_bubble|
-        = message_bubble
-
-    = form_with url: usr_conversation_contextual_messages_path(conversation), scope: :contextual_message, data: { controller: "message-form", action: "turbo:submit-end->message-form#reset" } do |form|
-      .mb-3
-        = form.label :body, "Message", class: "form-label"
-        = form.text_area :body, class: "form-control", rows: 3, required: true, maxlength: 5000
-      = form.submit "Send message", class: "btn btn-primary"
+.conversation-thread
+  .conversation-timeline{ id: dom_id(conversation, :messages), role: "log", aria: { label: "Conversation messages", live: "polite" } }
+    - message_bubbles.each do |message_bubble|
+      = message_bubble
+  - if conversation.archived?
+    .conversation-archive{ data: { conversation_archived: true } }
+      %i.bi.bi-archive.me-2{ aria: { hidden: true } }
+      %strong Archived conversation
+      %p.mb-0 This job has ended. Messages and files remain available, but new messages cannot be sent.
+  - else
+    = form_with url: usr_conversation_contextual_messages_path(conversation), scope: :contextual_message, class: "message-composer", data: { controller: "message-form", action: "turbo:submit-end->message-form#reset" } do |form|
+      #message-errors{ aria: { live: "assertive" } }
+      = form.label :body, "Message", class: "form-label fw-semibold"
+      = form.text_area :body, class: "form-control", rows: 3, maxlength: 5000, placeholder: "Coordinate details, ask a question, or share a file…"
+      .message-composer-tools
+        %div
+          = form.label :files, "Attach files", class: "form-label small mb-1"
+          = form.file_field :files, multiple: true, class: "form-control form-control-sm", accept: UploadPolicy::CONTENT_TYPES.join(","), aria: { describedby: "message-file-help" }
+          %p.form-text.mb-0#message-file-help Documents and images · up to 35 MB each · shared only with this conversation’s participants
+        = form.submit "Send message", class: "btn btn-primary", data: { turbo_submits_with: "Sending…" }

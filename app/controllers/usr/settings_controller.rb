@@ -3,7 +3,7 @@ class Usr::SettingsController < ApplicationController
   end
 
   def update
-    if current_user.update(settings_params)
+    if current_user.update(settings_params.merge(sms_notifications_enabled: false))
       redirect_to usr_settings_path, notice: "Settings updated."
     else
       render :show, status: :unprocessable_entity
@@ -19,7 +19,6 @@ class Usr::SettingsController < ApplicationController
       :email,
       :phone,
       :email_notifications_enabled,
-      :sms_notifications_enabled,
       :job_alert_notifications_enabled,
       :recommended_role_notifications_enabled,
       :upcoming_job_reminder_notifications_enabled

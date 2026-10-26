@@ -11,6 +11,7 @@
         = link_to "Meet the Team", meet_the_team_path, class: "marketing-nav__anchor"
         = link_to "What’s new", change_log_entries_path, class: "marketing-nav__anchor"
       .marketing-nav__actions
+        = appearance
         - if show_auth_links
           = link_to "Sign in", new_user_session_path, class: "btn btn-quiet"
         = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary"
@@ -58,7 +59,7 @@
               .marketing-crew-row__copy
                 %strong Avery Brooks
                 %span A1 Audio Engineer
-              %span.marketing-crew-reason Role + skills
+              %span.marketing-crew-reason Occupation + skills
             .marketing-crew-row
               .marketing-avatar.marketing-avatar--sky MK
               .marketing-crew-row__copy
@@ -73,7 +74,7 @@
               %span.marketing-crew-reason Role + location
           .marketing-preview-note
             %i.bi.bi-stars
-            Matched by role, skills, equipment, location, and availability.
+            Matched by occupation, skills, equipment experience, location, and availability.
 
   %section.marketing-trust-strip
     .marketing-container{ data: { marketing_motion_target: "reveal" } }
@@ -97,7 +98,7 @@
           %span.marketing-step__number 01
           %i.bi.bi-person-vcard
           %h3 Show what you do
-          %p Build a useful professional profile or company presence with roles, skills, equipment, verified Crewbase Credits, experience, and availability.
+          %p Build a useful professional profile or company presence with occupations, broad capabilities, equipment families, specific experience, verified Crewbase Credits, and availability.
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
           %span.marketing-step__number 02
           %i.bi.bi-search-heart
@@ -106,8 +107,8 @@
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
           %span.marketing-step__number 03
           %i.bi.bi-kanban
-          %h3 Keep work moving
-          %p Invite, apply, shortlist, assign, message, and track the details that turn an open role into a dependable crew.
+          %h3 Confirm bookings together
+          %p Invite, apply, and shortlist, then send clear offer terms for crew to review and accept before a booking is confirmed.
 
   %section.marketing-section.marketing-section--tinted#for-crew
     .marketing-container
@@ -122,8 +123,8 @@
         %article.marketing-feature.marketing-feature--wide{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
           .marketing-feature__icon
             %i.bi.bi-person-badge
-          %h3 Skills & equipment, with proof of work
-          %p Go beyond a generic résumé with occupations, specialties, equipment fluency, significant experience, verified Crewbase Credits earned from completed jobs, and reviews visible only to company owners.
+          %h3 Broad experience, specific strengths
+          %p Choose occupations, transferable capabilities and equipment families to match relevant work. Add your own techniques, products and experience examples, alongside verified Crewbase Credits and reviews visible only to company owners.
           .marketing-tag-row
             %span A1 Audio
             %span GrandMA3
@@ -133,12 +134,12 @@
           .marketing-feature__icon
             %i.bi.bi-calendar2-check
           %h3 Availability without back-and-forth
-          %p Share explicit availability, block conflicts, and connect an iCal feed so teams can plan with better information.
+          %p Share availability, block conflicts, and connect an iCal feed. Download confirmed bookings to your calendar so work stays on your schedule.
         %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
           .marketing-feature__icon
             %i.bi.bi-briefcase
           %h3 Jobs worth seeing
-          %p Browse structured postings, save roles, apply once, and receive recommendations grounded in your actual profile.
+          %p Browse structured postings, save roles, and receive recommendations grounded in your profile. Hide suggestions that miss the mark and review offer terms before accepting work.
 
   %section.marketing-section#for-companies
     .marketing-container
@@ -164,7 +165,7 @@
           .marketing-feature__icon
             %i.bi.bi-diagram-3
           %h3 One hiring workflow, end to end
-          %p Invite candidates, review applications, build shortlists, organize crew positions and assignments, and keep conversations connected to the work.
+          %p Invite candidates, review applications, build shortlists, and send offers for crew to accept. Keep confirmed bookings and conversations connected to the work.
           .marketing-flow
             %span Post
             %i.bi.bi-arrow-right
@@ -177,27 +178,33 @@
   %section.marketing-section.marketing-section--tinted#pricing
     .marketing-container
       .marketing-section-heading{ data: { marketing_motion_target: "reveal" } }
-        %span.marketing-kicker Simple beta pricing
-        %h2 Free forever for crew. Straightforward plans for companies.
-        %p Every professional can build a profile, apply, message, and manage their work for free. Company billing begins after the beta, with advance notice and no surprise charges.
+        %span.marketing-kicker Simple, affordable pricing
+        %h2 Free for crew. Room for your company to grow.
+        %p Build your profile, apply, message, and manage availability for free. Companies can start without a card and upgrade when they need more capacity. All prices are in USD, per company.
       .marketing-price-grid
-        - pricing_plans.each_with_index do |(name, monthly, annual, limits, description), index|
-          %article.marketing-price-card{ class: ("marketing-price-card--featured" if index == 1), data: { marketing_motion_target: "reveal", marketing_motion_stagger: index } }
-            - if index == 1
-              %span.marketing-price-card__badge Recommended
-            %h3= name
+        - pricing_plans.each_with_index do |plan, index|
+          %article.marketing-price-card{ class: ("marketing-price-card--featured" unless plan.free?), data: { marketing_motion_target: "reveal", marketing_motion_stagger: index } }
+            - unless plan.free?
+              %span.marketing-price-card__badge For growing teams
+            %h3= plan.name
             %p.marketing-price-card__price
-              %strong= monthly
-              %span / month
-            %p.marketing-price-card__annual #{annual}/year — two months free
-            %p.fw-semibold= limits
-            %p= description
+              %strong= plan.free? ? "Free" : plan.monthly_price
+              - unless plan.free?
+                %span / month
+            %p.marketing-price-card__annual= plan.free? ? "No card. No trial deadline." : "#{plan.annual_price} billed yearly · save #{plan.annual_savings}"
+            %ul.marketing-check-list
+              - plan.capacity_items.each do |capacity|
+                %li
+                  %i.bi.bi-check2{ aria: { hidden: true } }
+                  = capacity[:label]
+            %p= plan.description
+            = link_to "Start free", primary_cta_path, class: "btn btn-outline-primary"
       .marketing-founder-offer{ data: { marketing_motion_target: "reveal" } }
-        %i.bi.bi-stars
+        %i.bi.bi-shield-check{ aria: { hidden: true } }
         %div
-          %span.marketing-kicker Founding Company offer
-          %h3 Help shape Crewbase and keep a lasting advantage.
-          %p.mb-0 The first 100 paying companies receive 50% off their first year, then 25% off while continuously subscribed, 24-month price protection, a Founding Company profile badge, concierge onboarding, priority feature voting, and early access. Beta access is free for 60 days with no card required.
+          %span.marketing-kicker Work comes first
+          %h3 No fees to apply. No paid ranking boosts.
+          %p.mb-0 Both plans include applications, messaging, recommendations, multi-position staffing, and availability-aware crew planning. Team gives you more jobs, team members, and projects. Paid upgrades open once billing is available; you can start free now.
 
   %section.marketing-section.marketing-platform#platform
     .marketing-container.marketing-platform__grid
@@ -209,23 +216,28 @@
           %li
             %i.bi.bi-check2
             %span
+              %strong Private crew connections
+              to reconnect after completed gigs and share relevant job openings.
+          %li
+            %i.bi.bi-check2
+            %span
               %strong Private project workspaces
               for company owners to organize related postings.
           %li
             %i.bi.bi-check2
             %span
               %strong Contextual messaging and notifications
-              around applications and invitations.
+              with private file sharing around applications and invitations.
           %li
             %i.bi.bi-check2
             %span
-              %strong Saved jobs, crew shortlists, and private reviews
-              that make repeat work easier.
+              %strong Job documents, saved jobs, crew shortlists, and private reviews
+              that keep hiring details organized and make repeat work easier.
       .marketing-principle-card{ data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
         %i.bi.bi-stars
         %span.marketing-kicker Matching without the mystery
         %h3 Recommendations you can understand.
-        %p Crewbase bases recommendations on clear, job-relevant details like occupation, skills, equipment, location, requirements, and known availability—not an unexplained black box.
+        %p Crewbase bases recommendations on clear, job-relevant details like occupations, skills, equipment experience, location, requirements, and known availability—not an unexplained black box.
         .marketing-signal-list
           %span Occupation
           %span Skills

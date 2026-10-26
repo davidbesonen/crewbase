@@ -6,7 +6,7 @@ class Usr::Company::ApplicationPipelineComponent < ApplicationComponent
   TRANSITION_LABELS = {
     "in_review" => "Mark In Review",
     "shortlisted" => "Shortlist",
-    "accepted" => "Accept",
+    "accepted" => "Offer job",
     "rejected" => "Reject"
   }.freeze
 
@@ -23,8 +23,26 @@ class Usr::Company::ApplicationPipelineComponent < ApplicationComponent
     JobApplication.review_pipeline_statuses
   end
 
-  def pipeline_action_statuses
+  def pipeline_action_statuses(application)
+    return [] if application.accepted? || offer_for(application)
+
     JobApplication.review_statuses
+  end
+
+  def offer_for(application)
+    application.job_offers.to_a.select { |offer| offer.accepted? || offer.effective_status == "pending" }
+      .max_by { |offer| [ offer.created_at || Time.at(0), offer.id || 0 ] }
+  end
+
+  def status_label(application)
+    return "Booking confirmed" if application.accepted?
+    return "Offer pending" if offer_for(application)&.effective_status == "pending"
+
+    application.status.humanize.titleize
+  end
+
+  def offer_link_label(application)
+    application.accepted? ? "View booking" : "View offer"
   end
 
   def current_status?(application, status)
@@ -35,11 +53,26 @@ class Usr::Company::ApplicationPipelineComponent < ApplicationComponent
     TRANSITION_LABELS.fetch(status)
   end
 
-  def application_card_classes(application)
+  def application_row_classes(application)
     class_names(
-      "card card-accent card-accent-navy",
+      "pipeline-applicant",
       "bg-danger-subtle": application.rejected?
     )
+  end
+
+  def selected_job
+    @selected_job ||= jobs.detect { |job| job.id.to_s == filters[:job_id].to_s }
+  end
+
+  def back_link
+    return return_context if return_context
+    return { label: "Back to Job", path: helpers.usr_job_path(selected_job) } if selected_job
+
+    { label: "Back to Company", path: helpers.usr_company_path(company) }
+  end
+
+  def current_stage(status)
+    "page" if filters[:status].to_s == status.to_s
   end
 
   def recommendation_for(application)

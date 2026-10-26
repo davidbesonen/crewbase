@@ -12,12 +12,12 @@ class Usr::JobCrewsController < ApplicationController
       user: current_user,
       occupation_id: params[:occupation_id],
       skill_id: params[:skill_id],
+      skill_query: params[:skill_query],
+      equipment_query: params[:equipment_query],
       equipment_id: params[:equipment_id],
       availability_state: params[:availability_state]
     ).results
-    @occupations = Occupation.order(:name).to_a
-    @skills = Skill.order(:name).to_a
-    @equipment = Equipment.order(:name).to_a
+    @occupations = OccupationCatalog.new.records(selected_ids: [ params[:occupation_id] ]).to_a
     @crew_shortlists = @job.company.crew_shortlists.order(:name).to_a
   end
 

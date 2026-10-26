@@ -1,0 +1,4 @@
+en:
+  devise:
+    failure:
+      suspended: "Your account is suspended. Contact support for help."

@@ -1,0 +1,16 @@
+%section.card.border-0.shadow-sm.mb-4.screening-answers{ aria: { labelledby: "screening-answers-heading" } }
+  .card-body.p-4
+    %h2.h5.fw-semibold.mb-3#screening-answers-heading Screening Answers
+    - if answers.present?
+      %dl.screening-answers__list.mb-0
+        - answers.each do |question, answer|
+          .screening-answers__item
+            %dt.screening-answers__question= question
+            %dd.screening-answer{ class: ("screening-answer--empty" if answer.blank?) }
+              - if answer.present?
+                %span.screening-answer__label Applicant response
+                .screening-answer__text= answer
+              - else
+                %p.mb-0 No answer provided.
+    - else
+      %p.text-muted.mb-0 No screening questions were answered.

@@ -8,9 +8,11 @@ module Usr
       option :results
       option :applied_job_ids
       option :jobs_path
+      option :matching_profile
+      option :edit_profile_path
 
       def job_path(job)
-        helpers.usr_job_path(job.id)
+        helpers.usr_job_path(job.id, source: "recommendation")
       end
 
       def company_path(company)

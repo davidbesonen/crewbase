@@ -23,7 +23,7 @@ class ApplicationPipelineRecommendations
 
   def recommendable_jobs
     @recommendable_jobs ||= applications.map(&:job).uniq.select do |job|
-      job.is_active? && job.published?
+      job.publicly_visible?
     end
   end
 

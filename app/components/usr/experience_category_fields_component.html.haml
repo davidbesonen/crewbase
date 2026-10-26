@@ -1,0 +1,30 @@
+%div{ data: { controller: "experience-categories", experience_categories_occupations_value: occupation_categories.to_json, experience_categories_coverage_value: coverage.to_json, action: "taxonomy-multiselect:selection-change@document->experience-categories#occupationsChanged" } }
+  .row.g-3
+    - groups.each do |group|
+      %fieldset.col-md-6{ data: { experience_categories_target: "group", category_type: group[:type] } }
+        %legend.fs-6.fw-semibold= group[:label]
+        %p.small.text-muted{ hidden: group[:core_names].empty?, data: { category_core_summary: true }, aria: { live: "polite" } }= "Included through occupations: #{group[:core_names].join(', ')}"
+        = hidden_field_tag "#{scope}[#{group[:field]}][]", ""
+        %p.small.text-muted{ data: { experience_categories_target: "summary" }, aria: { live: "polite" } }= group[:names].presence&.to_sentence || "No categories selected"
+        %p.small.fw-semibold{ data: { category_guidance: true }, aria: { live: "polite" } }= group[:tailored] ? "Relevant to selected occupations and your selections" : "All categories — select occupations to tailor choices"
+        = label_tag "#{scope}_#{group[:field]}_search", "Search #{group[:label].downcase}", class: "visually-hidden"
+        = search_field_tag nil, nil, id: "#{scope}_#{group[:field]}_search", class: "form-control form-control-sm mb-2", placeholder: "Search all choices", autocomplete: "off", data: { category_search: true, action: "input->experience-categories#filter" }
+        %p.small.text-muted{ data: { category_search_status: true }, aria: { live: "polite" } }
+        - group[:sections].each do |section, categories|
+          %details{ open: section == :primary, hidden: section == :other && categories.empty?, data: { category_section: section }, class: "border rounded p-3 mb-2" }
+            %summary.fw-semibold= section == :primary ? "Suggested choices & selections" : "Other categories"
+            .mt-3.overflow-auto.experience-category-options{ data: { "category-#{section}" => true } }
+              - categories.each do |category|
+                .form-check.mb-3{ hidden: group[:redundant].include?(category.key), data: { category_row: true } }
+                  = check_box_tag "#{scope}[#{group[:field]}][]", category.key, group[:selected].include?(category.key), disabled: group[:redundant].include?(category.key), id: "#{scope}_#{group[:field]}_#{category.key}", class: "form-check-input", data: { experience_categories_target: "choice", experience_category_field: group[:field], experience_category_name: category.name, action: "change->experience-categories#refresh" }
+                  = label_tag "#{scope}_#{group[:field]}_#{category.key}", class: "form-check-label" do
+                    %span.d-block.fw-semibold= category.name
+                    %span.d-block.small.text-muted= category.description
+        - group[:errors].each do |message|
+          %p.text-danger.small= message
+  - if suggestions?
+    .mt-3
+      = suggestions
+      %button.btn.btn-sm.btn-outline-primary.mt-2{ type: "submit", name: "suggest_experience_categories", value: "1", formnovalidate: true }
+        Suggest from occupations & details
+      %p.form-text Suggestions do not save the form. Add the ones that describe your experience, then save your profile.

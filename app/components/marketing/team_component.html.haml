@@ -10,6 +10,7 @@
         = link_to "Meet the Team", meet_the_team_path, class: "marketing-nav__anchor", aria: { current: "page" }
         = link_to "What’s new", change_log_entries_path, class: "marketing-nav__anchor"
       .marketing-nav__actions
+        = appearance
         - if show_auth_links
           = link_to "Sign in", new_user_session_path, class: "btn btn-quiet"
         = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary"

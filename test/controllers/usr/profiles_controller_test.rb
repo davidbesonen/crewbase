@@ -16,6 +16,142 @@ class Usr::ProfilesControllerTest < ActionDispatch::IntegrationTest
     @user.visits.create!
   end
 
+  test "stores confirmed broad experience separately from personal details" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    patch usr_profile_path(profile), params: { source: "completed_profile", profile: {
+      capability_keys: [ "", "audio" ], equipment_family_keys: [ "audio_systems" ],
+      skills_text: "Live sound mixing", equipment_text: "Yamaha CL5"
+    } }
+    assert_redirected_to usr_profile_path(profile)
+    assert_equal [ "audio" ], profile.reload.attributes["capability_keys"]
+    assert_equal [ "audio_systems" ], profile.attributes["equipment_family_keys"]
+    assert_equal "Live sound mixing", profile.skills_text
+    get usr_profile_path(profile)
+    assert_select "#profile-skills", text: /Audio production/
+    assert_select "#profile-skills", text: /Audio systems/
+    get edit_usr_profile_path(profile), params: { source: "completed_profile" }
+    assert_select "input[name='profile[capability_keys][]'][value='audio'][checked]"
+    assert_select "input[name='profile[equipment_family_keys][]'][value='audio_systems'][checked]"
+  end
+
+  test "occupation changes update only the picker and never replace unsaved experience fields" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    profile.update!(capability_keys: [ "camera" ], skills_text: "Camera setup")
+    occupation = Occupation.create!(name: "FOH Engineer")
+    post toggle_occupation_selection_usr_profile_path(profile), params: { occupation_id: occupation.id, source: "completed_profile" }, as: :turbo_stream
+    assert_response :success
+    assert_select "turbo-stream[target='occupation_form']", count: 1
+    assert_select "turbo-stream[target='skill_equipment_form']", count: 0
+    assert_equal [ "camera" ], profile.reload.capability_keys
+    assert_equal "Camera setup", profile.skills_text
+    get edit_usr_profile_path(profile), params: { source: "completed_profile" }
+    assert_select "[data-category-row][hidden] input[value='audio'][disabled]"
+    assert_select "[data-category-core-summary]", text: /Front-of-house mixing/
+    assert_select "[data-category-primary] input[value='camera'][checked]"
+    assert_select "[data-category-other] input[value='lighting']"
+  end
+
+  test "suggestions based on details require confirmation and never save the submitted form" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    patch usr_profile_path(profile), params: { source: "completed_profile", suggest_experience_categories: "1", profile: {
+      skills_text: "Live sound mixing", equipment_text: "Digital mixing consoles", bio: "Unsaved bio"
+    } }, as: :turbo_stream
+    assert_response :success
+    assert_select "turbo-stream[target='experience-category-suggestions']"
+    assert_includes response.body, 'data-experience-category-key="foh_mixing"'
+    assert_includes response.body, 'data-experience-category-key="mixing_consoles"'
+    assert_empty profile.reload.capability_keys
+    assert_nil profile.skills_text
+    assert_nil profile.bio
+  end
+
+  test "unrecognized product names stay personal details without forced classification" do
+    sign_in @user, scope: :user
+    patch usr_profile_path(@user.user_profile), params: { suggest_experience_categories: "1", profile: {
+      equipment_text: "UncataloguedWidget ZX999"
+    } }, as: :turbo_stream
+    assert_response :success
+    assert_includes response.body, "Choose any relevant categories above"
+    assert_not_includes response.body, "data-experience-category-key="
+  end
+
+  test "rejects unknown experience categories without creating new catalog records" do
+    sign_in @user, scope: :user
+    assert_no_difference [ "Skill.count", "Equipment.count" ] do
+      patch usr_profile_path(@user.user_profile), params: { source: "completed_profile", profile: { capability_keys: [ "made_up_category" ] } }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "saves personal entries without growing the global catalogs and shows them on the profile" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    assert_no_difference [ "Skill.count", "Equipment.count" ] do
+      patch usr_profile_path(profile), params: {
+        source: "completed_profile", profile: { skills_text: "Uncommon workflow", equipment_text: "Custom console model" }
+      }
+    end
+    assert_redirected_to usr_profile_path(profile)
+    get usr_profile_path(profile)
+    assert_select "#profile-skills", text: /Uncommon workflow/
+    assert_select "#profile-skills", text: /Custom console model/
+  end
+
+  test "legacy selection submissions update the personal entries after migration" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    skill = Skill.create!(name: "Legacy workflow")
+    profile.update!(skills_text: "Old migrated entry")
+    patch usr_profile_path(profile), params: { source: "completed_profile", profile: { skill_ids: [ skill.id ] } }
+    assert_redirected_to usr_profile_path(profile)
+    assert_equal [ skill.name ], profile.reload.reported_skills
+
+    post toggle_skill_selection_usr_profile_path(profile), params: { skill_id: skill.id }, as: :turbo_stream
+    assert_response :success
+    assert_empty profile.reload.reported_skills
+  end
+
+  test "legacy directory filters use current entries after a member clears old selections" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    skill = Skill.create!(name: "Retired experience")
+    profile.skills << skill
+    profile.update!(skills_text: "")
+    get usr_profiles_path, params: { q: { skills_name_eq: skill.name } }
+    assert_response :success
+    assert_select "h4 a[href='#{usr_profile_path(profile)}']", count: 0
+  end
+
+  test "overlong experience examples are rejected without losing the saved text" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    profile.update!(work_examples: "Original experience")
+    patch usr_profile_path(profile), params: {
+      source: "completed_profile", profile: { work_examples: "x" * 2001 }
+    }
+    assert_response :unprocessable_entity
+    assert_equal "Original experience", profile.reload.work_examples
+  end
+
+  test "onboarding saves optional concrete examples and displays them as text" do
+    sign_in @user, scope: :user
+    profile = @user.user_profile
+    get edit_usr_profile_path(profile), params: { current_page: "skill_equipment_form" }
+    assert_select "textarea[name='profile[work_examples]']"
+
+    patch usr_profile_path(profile), params: {
+      source: "completed_profile", profile: { work_examples: "FOH mixing on regional tours; <script>alert(1)</script>" }
+    }
+    assert_redirected_to usr_profile_path(profile)
+    assert_includes profile.reload.work_examples, "regional tours"
+    get usr_profile_path(profile)
+    assert_select "#profile-work-examples", text: /regional tours/
+    assert_select "#profile-work-examples script", count: 0
+  end
+
   test "updating a calendar feed queues synchronization" do
     sign_in @user, scope: :user
     profile = @user.user_profile
@@ -43,6 +179,7 @@ class Usr::ProfilesControllerTest < ActionDispatch::IntegrationTest
     Profile.create!(
       user: matching_user,
       profile_type: "user",
+      completed_at: Time.current,
       headline: "Production Manager"
     )
 
@@ -56,6 +193,7 @@ class Usr::ProfilesControllerTest < ActionDispatch::IntegrationTest
     Profile.create!(
       user: other_user,
       profile_type: "user",
+      completed_at: Time.current,
       headline: "Lighting Designer"
     )
 

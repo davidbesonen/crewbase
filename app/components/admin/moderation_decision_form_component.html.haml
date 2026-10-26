@@ -1,0 +1,14 @@
+.card
+  .card-body
+    %h2.h5 Record a decision
+    %p.text-muted Record investigation findings and any correction or follow-up completed. Status changes do not delete or edit the reported content. Internal notes are visible only to administrators.
+    = form_with model: decision, url: helpers.admin_report_path(report), method: :patch, builder: ActionView::Helpers::FormBuilder do |form|
+      - if decision.errors.any?
+        .alert.alert-danger{ role: "alert" }= decision.errors.full_messages.to_sentence
+      .mb-3
+        = form.label :status, "Decision", class: "form-label"
+        = form.select :status, SafetyReport.statuses.keys.map { |status| [status.humanize, status] }, { selected: report.status }, class: "form-select"
+      .mb-3
+        = form.label :notes, "Findings and actions taken", class: "form-label"
+        = form.text_area :notes, class: "form-control", rows: 4, required: true, maxlength: 5000
+      = form.submit "Record decision", class: "btn btn-primary"

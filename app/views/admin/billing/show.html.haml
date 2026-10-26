@@ -1,0 +1,45 @@
+%h1.h3 Billing support
+%p.text-muted Review company subscription state and follow up on payment issues. Refunds, cancellations, and payment changes are managed in your payment provider.
+.row.g-3.mb-4
+  .col-sm-6
+    .card.h-100
+      .card-body
+        %h2.h6 Subscriptions needing attention
+        %p.h3.mb-0= @attention_count
+  .col-sm-6
+    .card.h-100
+      .card-body
+        %h2.h6 Unprocessed billing events
+        %p.h3.mb-0= @unprocessed_count
+= form_with url: admin_billing_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mb-4" do |form|
+  = form.search_field :q, value: params[:q], placeholder: "Company, email, or subscription ID", class: "form-control w-auto", aria: { label: "Search subscriptions" }
+  = form.select :status, CompanyPlan::STATUSES.map { |status| [status.humanize, status] }, { include_blank: "All statuses", selected: params[:status] }, class: "form-select w-auto", aria: { label: "Subscription status" }
+  = form.submit "Filter", class: "btn btn-primary"
+  = link_to "Clear", admin_billing_path, class: "btn btn-outline-secondary"
+.card
+  .card-body
+    - if @subscriptions.empty?
+      %p.text-muted.mb-0 No matching subscriptions. Companies without a subscription use the configured Starter plan.
+    - else
+      .table-responsive
+        %table.table.align-middle
+          %thead
+            %tr
+              %th Company
+              %th Plan / interval
+              %th Status
+              %th Period ends
+              %th Subscription ID
+          %tbody
+            - @subscriptions.each do |subscription|
+              %tr
+                %td= link_to subscription.company.name, admin_company_path(subscription.company)
+                %td= [subscription.plan.name, subscription.billing_interval&.humanize].compact.join(" · ")
+                %td
+                  = subscription.status.humanize
+                  - if subscription.cancel_at_period_end?
+                    %div.small.text-muted Cancels at period end
+                %td= subscription.current_period_end&.to_fs(:long) || "Not set"
+                %td.text-break= subscription.stripe_subscription_id.presence || "No Stripe subscription"
+- if @pagy.pages > 1
+  .mt-4= bootstrap_pagy_nav(@pagy)

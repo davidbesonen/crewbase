@@ -258,7 +258,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "input[name='job[posting_type]'][value='multi_position'][disabled]"
-    assert_select "[data-feature-upgrade='multi-position-gigs']", text: /Team and Studio plans/i
+    assert_select "[data-feature-upgrade='multi-position-gigs']", text: /Team plans/i
 
     assert_no_difference("Job.count") do
       post usr_company_jobs_path(@company), params: {
@@ -269,7 +269,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
       }
     end
     assert_redirected_to usr_company_path(@company)
-    assert_match(/requires a Team or Studio plan/, flash[:alert])
+    assert_match(/requires a Team plan/, flash[:alert])
   end
 
   test "owner creates a multi-position gig and sees its staffing workspace" do
@@ -461,7 +461,7 @@ class Usr::CompanyJobAuthorizationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-job-primary-actions]" do
       assert_select "a[href='#{usr_job_crew_path(@job)}']", text: "Staff This Gig"
-      assert_select "form[action='#{usr_job_saved_job_path(@job)}']"
+      assert_select "form[action='#{usr_job_saved_job_path(@job)}']", count: 0
     end
     assert_select "[data-job-heading-controls] a[href='#{usr_job_crew_path(@job)}']", count: 0
   end

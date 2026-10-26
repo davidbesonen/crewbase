@@ -21,11 +21,15 @@ class WorkerJobRecommender
     @limit ? ranked.first(@limit) : ranked
   end
 
+  def matching_profile?
+    [ @profile.occupations, @profile.capability_keys, @profile.equipment_family_keys, @profile.reported_skills, @profile.reported_equipment ].any?(&:any?)
+  end
+
   private
 
   def candidate_jobs
-    scope = Job
-      .where(is_active: true, status: :published)
+    scope = Job.accepting_applications
+      .where.not(id: RecommendationFeedback.where(user: @profile.user).select(:job_id))
       .where.not(company_id: owned_company_ids)
       .includes(
         :locations,
@@ -44,8 +48,10 @@ class WorkerJobRecommender
   def recommendation_for(job)
     return if unavailable?(job)
 
-    taxonomy_matches = taxonomy_matches(job)
-    return unless taxonomy_matches
+    experience_match = ExperienceMatch.new(profile: @profile, job: job)
+    return if experience_match.missing_requirements.any?
+
+    taxonomy_matches = experience_match.names
 
     occupations = taxonomy_matches.fetch("Occupation")
     skills = taxonomy_matches.fetch("Skill")
@@ -67,40 +73,6 @@ class WorkerJobRecommender
       score: (occupations.size * 8) + (skills.size * 5) + (equipment.size * 5) + location_score,
       matched_terms:
     )
-  end
-
-  def matching_names(records, job)
-    haystack = "#{job.title} #{job.plain_description}".downcase
-    records.filter_map { |record| record.name if haystack.include?(record.name.downcase) }
-  end
-
-  def taxonomy_matches(job)
-    requirements = job.job_requirements.to_a
-    return legacy_taxonomy_matches(job) if requirements.empty?
-    return if requirements.any? { |requirement| requirement.required? && !profile_matches?(requirement) }
-
-    requirements.each_with_object(empty_taxonomy_matches) do |requirement, matches|
-      next unless profile_matches?(requirement)
-
-      matches.fetch(requirement.requirement_type) << requirement.requirement.name
-    end
-  end
-
-  def legacy_taxonomy_matches(job)
-    {
-      "Occupation" => matching_names(@profile.occupations, job),
-      "Skill" => matching_names(@profile.skills, job),
-      "Equipment" => matching_names(@profile.equipment, job)
-    }
-  end
-
-  def empty_taxonomy_matches
-    { "Occupation" => [], "Skill" => [], "Equipment" => [] }
-  end
-
-  def profile_matches?(job_requirement)
-    association = job_requirement.requirement_type.underscore.pluralize
-    @profile.public_send(association).include?(job_requirement.requirement)
   end
 
   def location_match(job)
@@ -136,11 +108,20 @@ class WorkerJobRecommender
   end
 
   def unavailable?(job)
-    JobAvailability.new(job:).conflict_dates(events: @profile.calendar_events).any?
+    availability(job).state == :unavailable
   end
 
   def availability_label(job)
-    job.starts_at.present? ? "Available for job dates" : "Availability not confirmed"
+    availability(job).label
+  end
+
+  def availability(job)
+    @availability ||= {}
+    @availability[job.id] ||= ProfileJobAvailability.new(profile: @profile, job:, bookings: booked_schedules).result
+  end
+
+  def booked_schedules
+    @booked_schedules ||= BookedSchedules.new(profile_ids: [ @profile.id ]).results.fetch(@profile.id, [])
   end
 
   def compensation_reason(job)

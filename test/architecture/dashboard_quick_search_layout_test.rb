@@ -1,11 +1,10 @@
 require "test_helper"
 
 class DashboardQuickSearchLayoutTest < ActiveSupport::TestCase
-  test "quick search results can extend beyond their card" do
-    template = Rails.root.join("app/views/usr/dashboards/index.html.haml").read
-    stylesheet = Rails.root.join("app/assets/stylesheets/application.scss").read
+  test "standalone search allows results to extend over dashboard content" do
+    stylesheet = Rails.root.join("app/assets/stylesheets/_dashboard.scss").read
 
-    assert_includes template, ".dashboard-quick-search-card"
-    assert_match(/\.dashboard-quick-search-card\s*\{[^}]*overflow: visible/m, stylesheet)
+    assert_match(/\.dashboard-quick-search\s*\{[^}]*overflow: visible/m, stylesheet)
+    assert_match(/#dashboard-quick-search-results\s*\{[^}]*z-index:/m, stylesheet)
   end
 end

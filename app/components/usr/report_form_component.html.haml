@@ -1,0 +1,19 @@
+.card.border-0.shadow-sm
+  .card-body.p-4
+    %h1.h3 Report a concern
+    %p.text-muted Reports are reviewed by Crewbase administrators. Reporting does not automatically remove content or notify the person reported.
+    = form_with model: report, scope: :report, url: helpers.usr_reports_path, builder: ActionView::Helpers::FormBuilder do |form|
+      - if report.errors.any?
+        .alert.alert-danger{ role: "alert" }= report.errors.full_messages.to_sentence
+      = form.hidden_field :subject_type
+      = form.hidden_field :subject_id
+      .mb-3
+        = form.label :category, "What is the concern?", class: "form-label"
+        = form.select :category, SafetyReport::CATEGORIES.map { |key, label| [label, key] }, { prompt: "Choose a reason" }, class: "form-select", required: true
+      .mb-3
+        = form.label :details, "Details and requested correction", class: "form-label"
+        = form.text_area :details, class: "form-control", rows: 6, maxlength: 5000, required: true, aria: { describedby: "report-help" }
+        %p.small.text-muted.mt-2#report-help Explain what happened, dates, and what should be corrected. Do not include passwords or payment details.
+      .d-flex.flex-wrap.gap-2
+        = form.submit "Submit report", class: "btn btn-primary"
+        = link_to "My reports & blocked people", helpers.usr_reports_path, class: "btn btn-outline-secondary"

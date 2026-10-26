@@ -1,0 +1,64 @@
+.discovery-page {
+  max-width: 1500px;
+  margin-inline: auto;
+}
+
+.discovery-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.discovery-results {
+  min-width: 0;
+
+  .pagination { flex-wrap: wrap; }
+}
+
+.discovery-filters {
+  min-width: 0;
+
+  .form-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .card-body { padding: 1.25rem; }
+
+  .discovery-filter-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding-block: 0.75rem;
+    border-top: 1px solid #e6edf4;
+    z-index: 1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .discovery-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    grid-template-areas: "results filters";
+  }
+
+  .discovery-results { grid-area: results; }
+
+  .discovery-filters {
+    grid-area: filters;
+    position: sticky;
+    top: 5rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .discovery-filters {
+    .card-body { padding-block: 1rem !important; }
+    h6, .card-body > p { display: none; }
+    .card-body > button { margin-bottom: 0 !important; }
+    .collapse.show, .collapsing { padding-top: 1rem; }
+  }
+}

@@ -23,10 +23,14 @@ class PlanTest < ActiveSupport::TestCase
     starter = Plan.new(key: "starter")
     studio = Plan.new(key: "studio")
 
-    assert_equal Plan::COMPANY_FEATURES.keys, starter.feature_matrix.map { |feature| feature.fetch(:key) }
+    assert_equal Plan::LAUNCH_FEATURES.keys, starter.feature_matrix.map { |feature| feature.fetch(:key) }
     assert_not starter.feature_matrix.find { |feature| feature[:key] == :multi_position_gigs }.fetch(:included)
     assert starter.feature_matrix.find { |feature| feature[:key] == :live_messaging }.fetch(:included)
     assert studio.feature_matrix.all? { |feature| feature.fetch(:included) }
+  end
+
+  test "unrecognized plan keys do not grant company features" do
+    assert_not Plan.new(key: "unconfigured").feature_available?(:crew_marketplace)
   end
 
   test "requires a unique stable key" do

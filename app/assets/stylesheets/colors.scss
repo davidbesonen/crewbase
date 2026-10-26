@@ -1,50 +1,10 @@
-// colors.scss
-
-// ===========================
-// Campus Clash Color Palette
-// ===========================
-
-// Primary Colors
-$primary: #1B4965;
-
-// Secondary Colors
-$secondary: #62B6CB;
-
-// Logo Color
-$logo: #5FA8D3;
-
-// Background Colors
-$background-base: #E9E2D9;
-$background-card: #FFF9F0;
-$background-alt: #FAEBC8;
-
-// Text Colors
-$text-primary: #1D3557;
-$text-secondary: #62B6CB;
-$text-disabled: #A29F9F;
-$text-dark: #242424;
-
-// UI Element Colors
-$danger: #E63946;
-$success: #94cfad;
-$info: #A8DADC;
-$neutral: #CAE9FF;
-$button-neutral: #5F6B76;
-$button-neutral-border: #ADB5BD;
-$button-neutral-background: #FFFFFF;
-
-// Optional Dark Mode Colors
-$dark-bg-primary: #1D3557;
-$dark-bg-card: #2B2B2B;
-$dark-text-primary: #F1F1F1;
-
-// ===========================
-// Button Utility Classes
-// ===========================
+// Crewbase button roles and compatibility utilities. Palette: theme_variables.
+// Sprockets also compiles this public stylesheet independently.
+@import "theme_variables";
 
 .btn {
-  font-weight: 600;
-  border-radius: 0.5rem;
+  font-weight: $btn-font-weight;
+  border-radius: $btn-border-radius;
   cursor: pointer;
   box-shadow: none;
   transition:
@@ -125,7 +85,7 @@ $dark-text-primary: #F1F1F1;
   &-info {
     background-color: $info;
     border-color: $info;
-    color: $primary;
+    color: #fff;
 
     &:hover {
       background-color: darken($info, 10%);
@@ -228,11 +188,11 @@ $dark-text-primary: #F1F1F1;
 }
 
 .btn-sm {
-  border-radius: 0.4rem;
+  border-radius: $btn-border-radius-sm;
 }
 
 .btn-lg {
-  border-radius: 0.625rem;
+  border-radius: $btn-border-radius-lg;
 }
 
 .btn-icon {
@@ -273,35 +233,11 @@ $dark-text-primary: #F1F1F1;
   }
 }
 
-/* ALERTS */
-.alert-info,
-.alert-warning,
-.alert-success,
-.alert-error,
-.alert-dark {
-  color: white;
-}
-
-.alert-info {
-  background-color: $info;
-  border-color: darken($info, 10%);
-  color: $primary;
-}
-
-.alert-warning {
-  background-color: lighten($danger, 15%);
-  border-color: $danger;
-}
-
-.alert-success {
-  background-color: $success;
-  border-color: darken($success, 10%);
-}
-
-.alert-error,
-.alert-dark {
-  background-color: $danger;
-  border-color: darken($danger, 15%);
+// Bootstrap supplies pale, readable alerts from the shared semantic palette.
+.alert-error {
+  color: var(--bs-danger-text-emphasis);
+  background-color: var(--bs-danger-bg-subtle);
+  border-color: var(--bs-danger-border-subtle);
 }
 
 // ===========================
@@ -395,5 +331,5 @@ $dark-text-primary: #F1F1F1;
 }
 
 // ===========================
-// End of Campus Clash Palette
+// End of Crewbase utilities
 // ===========================

@@ -23,7 +23,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "#for-companies"
     assert_select "#platform"
     assert_select "*", text: /Availability/
-    assert_select "*", text: /Skills & equipment/
+    assert_select "*", text: /Broad experience, specific strengths/
     assert_select "*", text: /job.*match|match.*job/i
     assert_select "*", text: /projects?/i
     assert_select "*", text: /applications?/i

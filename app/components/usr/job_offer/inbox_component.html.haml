@@ -1,0 +1,54 @@
+.app-hero.app-hero-sky.mb-4
+  .d-flex.flex-wrap.align-items-center.justify-content-between.gap-3
+    .d-flex.align-items-center.gap-3
+      %span.icon-orb.icon-orb-sky
+        %i.bi.bi-calendar-check{ aria: { hidden: true } }
+      %div
+        %h1.fw-bold.mb-1 Offers & bookings
+        %p.text-muted.mb-0 Review terms, keep track of replies, and plan confirmed work.
+    = link_to "View applications", usr_job_applications_path, class: "btn btn-outline-primary"
+%nav.d-flex.flex-wrap.gap-2.mb-4{ aria: { label: "Filter offers" } }
+  - JobOfferInbox::VIEWS.each do |value, label|
+    = link_to usr_job_offers_path(view: value, q: @query.presence), class: "btn #{@view == value ? 'btn-primary' : 'btn-outline-secondary'}", aria: { current: ("page" if @view == value) } do
+      = label
+      %span.badge.rounded-pill.ms-2{ class: @view == value ? "bg-white text-primary" : "text-bg-light", data: { offer_count: true } }= @counts.fetch(value)
+.card.border-0.shadow-sm.mb-4
+  .card-body
+    = form_with url: usr_job_offers_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-column flex-sm-row align-items-sm-end gap-3" do |form|
+      = form.hidden_field :view, value: @view
+      .flex-grow-1
+        = form.label :q, "Search offers", class: "form-label"
+        = form.search_field :q, value: @query, placeholder: "Role, company, or crew member", maxlength: 100, class: "form-control"
+      .d-flex.gap-2
+        = form.submit "Search", class: "btn btn-primary"
+        - if @query.present?
+          = link_to "Clear search", usr_job_offers_path(view: @view), class: "btn btn-outline-secondary"
+- if @summaries.empty?
+  .empty-state.empty-state-sky
+    %i.bi.bi-calendar-check.fs-2.text-primary.mb-3{ aria: { hidden: true } }
+    %h2.h4.fw-semibold= empty_title
+    %p.text-muted.mb-3 Offers appear here when an employer proposes dates and terms. A booking is confirmed once the worker accepts.
+    = link_to "Browse jobs", usr_jobs_path, class: "btn btn-outline-primary"
+- else
+  .d-flex.flex-column.gap-3
+    - @summaries.each do |summary|
+      %article.card.border-0.shadow-sm{ data: { offer_id: summary.offer.id } }
+        .card-body.p-4
+          .d-flex.flex-column.flex-lg-row.justify-content-between.align-items-lg-start.gap-3
+            .flex-grow-1
+              .d-flex.flex-wrap.align-items-center.gap-2.mb-2
+                %span.status-badge{ class: summary.status_class }= summary.label
+                - if summary.expiring_soon?
+                  %span.small.fw-semibold.text-warning
+                    %i.bi.bi-clock.me-1{ aria: { hidden: true } }
+                    Reply due soon
+              %h2.h5.fw-semibold.mb-1= link_to summary.offer.role, usr_job_offer_path(summary.offer), class: "text-dark text-decoration-none"
+              %p.text-muted.mb-2 #{summary.job.company.name} · #{summary.offer.profile.user.full_name}
+              .d-flex.flex-wrap.gap-3.small.text-muted
+                %span
+                  %i.bi.bi-calendar3.me-1{ aria: { hidden: true } }
+                  #{l(summary.offer.starts_at.to_date, format: :long)} – #{l(summary.offer.ends_at.to_date, format: :long)}
+                %span.fw-semibold #{summary.offer.currency} #{number_with_precision(summary.offer.rate, precision: 2, delimiter: ',')} / #{summary.offer.pay_unit.humanize.downcase}
+              - if summary.state == "pending" && summary.offer.expires_at
+                %p.small.text-muted.mb-0.mt-2 Respond by #{l(summary.offer.expires_at, format: :long)} (#{Time.zone.name})
+            = link_to summary.action_label, usr_job_offer_path(summary.offer), class: "btn #{summary.state == 'pending' && summary.recipient? ? 'btn-primary' : 'btn-outline-primary'}"

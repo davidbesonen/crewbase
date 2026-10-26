@@ -1,10 +1,13 @@
 .container-fluid.py-4
-  .d-flex.justify-content-between.align-items-center.mb-4
+  .d-flex.flex-wrap.gap-3.justify-content-between.align-items-center.mb-4
     %h1.mb-0 Users
-    = form_with url: admin_users_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex gap-2", data: { turbo_frame: "_top" } do |form|
+    = form_with url: admin_users_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2", data: { turbo_frame: "_top" } do |form|
       = form.search_field :q, value: params[:q], class: "form-control", placeholder: "Search users", aria: { label: "Search users" }
+      = form.select :restricted, [["Restricted", "yes"], ["Unrestricted", "no"]], { include_blank: "All access states", selected: params[:restricted] }, class: "form-select", aria: { label: "Access state" }
       = form.submit "Search", class: "btn btn-primary"
 
+  - if @users.empty?
+    .alert.alert-light No matching users. Try a different search.
   .card
     .table-responsive
       %table.table.table-hover.align-middle.mb-0
@@ -15,15 +18,18 @@
             %th Profile
             %th Companies
             %th Roles
+            %th Access
             %th Joined
         %tbody
           - @users.each do |user|
             %tr
-              %td= user.full_name
+              %td= link_to user.full_name, admin_user_path(user)
               %td= user.email
               %td= user.profiles.any?(&:completed_at?) ? "Complete" : "Incomplete"
               %td= user.companies.length
               %td= user.roles.map(&:pretty_name).compact.to_sentence.presence || user.roles.map(&:name).to_sentence.presence || "Member"
+              %td= user.restricted_at? ? "Restricted" : "Unrestricted"
               %td= l(user.created_at.to_date, format: :long)
+  = link_to "Clear filters", admin_users_path, class: "btn btn-link mt-2"
   - if @pagy.pages > 1
     .mt-4.d-flex.justify-content-end= bootstrap_pagy_nav(@pagy)

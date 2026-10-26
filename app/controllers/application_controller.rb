@@ -4,6 +4,9 @@ class ApplicationController < ActionController::Base
   helper Pagy::Frontend
 
   before_action :authenticate_user!
+  before_action :reject_restricted_account
+  before_action { Current.user = current_user }
+  include ValidatedUploads
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   unless Rails.env.development?
     # Only enforce modern browser requirements outside of development
@@ -32,6 +35,13 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def reject_restricted_account
+    return unless current_user&.restricted_at?
+
+    sign_out current_user
+    redirect_to new_user_session_path, alert: "Your account is suspended. Contact support for help."
+  end
+
   def set_unread_notification_count
     @unread_notification_count = current_user&.notifications&.unread&.count.to_i
   end
@@ -59,11 +69,11 @@ class ApplicationController < ActionController::Base
     return session.delete(:return_to_after_auth) if session[:return_to_after_auth].present?
 
     if resource.is_a?(User)
-      profile = resource.profiles.find_or_create_by(profile_type: "user")
-      return edit_usr_profile_path(profile) if needs_profile_setup?(resource)
+      resource.profiles.find_or_create_by(profile_type: "user")
+      return usr_onboarding_path if needs_profile_setup?(resource)
     end
 
-    if resource.has_role?("admin")
+    if resource.site_admin?
       admin_root_path
     else
       usr_dashboards_path
@@ -73,6 +83,6 @@ class ApplicationController < ActionController::Base
   def needs_profile_setup?(user)
     return false unless user.is_a?(User)
 
-    !user.visits.exists? || !user.has_completed_user_profile?
+    user.onboarding_completed_at.nil? && !user.has_completed_user_profile? && !user.site_admin?
   end
 end

@@ -1,0 +1,20 @@
+Hi <%= @delivery.recipient.first_name %>,
+
+<%= @content.title %>
+
+<% @content.jobs.each do |job| %>
+<%= job.title %> at <%= job.company.name %>
+<%= usr_job_url(job) %>
+
+<% end %>
+<% if @content.offer %>
+<%= @content.offer.role %>
+Starts: <%= @content.offer.starts_at.strftime("%B %-d, %Y at %-I:%M %p %Z") %>
+<%= usr_job_offer_url(@content.offer) %>
+<% elsif @content.application %>
+<%= @content.application.job.title %>
+Starts: <%= @content.application.job.starts_at.strftime("%B %-d, %Y at %-I:%M %p %Z") %>
+<%= usr_job_application_url(@content.application) %>
+<% end %>
+
+Manage your email preferences: <%= usr_settings_url %>

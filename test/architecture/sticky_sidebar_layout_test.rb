@@ -5,8 +5,8 @@ class StickySidebarLayoutTest < ActiveSupport::TestCase
     stylesheet = Rails.root.join("app/assets/stylesheets/application.scss").read
     layout = Rails.root.join("app/views/layouts/application.html.haml").read
 
-    %w[user admin].each do |role|
-      navbar = Rails.root.join("app/views/layouts/_#{role}_navbar.html.haml").read
+    %w[app/views/layouts/_user_navbar.html.haml app/components/admin/navigation_component.html.haml].each do |path|
+      navbar = Rails.root.join(path).read
 
       assert_includes navbar, ".app-top-nav"
     end
@@ -28,7 +28,9 @@ class StickySidebarLayoutTest < ActiveSupport::TestCase
     %w[jobs profiles companies].each do |index|
       template = Rails.root.join("app/views/usr/#{index}/index.html.haml").read
 
-      assert_includes template, ".app-sticky-filter"
+      assert_includes template, ".discovery-layout"
+      assert_includes template, "%aside.discovery-filters"
+      assert_operator template.index(".discovery-filters"), :<, template.index(".discovery-results")
       assert_not_includes template, 'style: "position: sticky; top: 0;"'
     end
   end

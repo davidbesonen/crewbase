@@ -42,17 +42,7 @@
               %div.text-muted.small Decision
               %div.fw-semibold= l(@job_application.decision_at.to_date, format: :long)
 
-    .card.border-0.shadow-sm.mb-4
-      .card-body.p-4
-        %h4.fw-semibold.mb-3 Screening Answers
-        - if @job_application.question_answers.present?
-          .d-flex.flex-column.gap-4
-            - @job_application.question_answers.each do |question, answer|
-              %div
-                %div.fw-semibold.mb-1= question
-                %div.text-muted= simple_format(answer.presence || "No answer provided.")
-        - else
-          %p.text-muted.mb-0 No screening questions were answered.
+    = render Usr::JobApplication::ScreeningAnswersComponent.new(answers: @job_application.question_answers)
 
     .card.border-0.shadow-sm
       .card-body.p-4
@@ -67,6 +57,8 @@
         %h4.fw-semibold.mb-3 Conversation
         - if @conversation.present?
           = link_to "Open conversation", usr_conversation_path(@conversation), class: "btn btn-primary"
+        - elsif @job.conversation_archived?
+          %p.text-muted.mb-0 This job has ended. New conversations cannot be started.
         - else
           = form_with url: usr_job_application_contextual_messages_path(@job_application), scope: :contextual_message do |form|
             .mb-3
@@ -84,7 +76,7 @@
           = link_to "View Crewbase Credit", usr_profile_path(@job_application.profile, anchor: "profile-credits"), class: "btn btn-outline-primary"
 
   .col-12.col-lg-4
-    - if @company_owner_view
+    - if @company_owner_view && !@job_application.accepted?
       .card.border-0.shadow-sm.mb-4
         .card-body.p-4
           %h5.fw-semibold.mb-0 Review Application
@@ -92,17 +84,17 @@
           .d-grid.gap-2
             - JobApplication.review_statuses.each do |status|
               - next if @job_application.status == status
-              - if status == "accepted" && @job.multi_position?
-                - if @available_crew_positions.any?
-                  = form_with url: update_status_usr_job_application_path(@job_application), method: :patch, class: "d-grid gap-2" do |form|
-                    = form.hidden_field :status, value: "accepted"
-                    = form.label :crew_position_id, "Position", class: "form-label mb-0"
-                    = form.select :crew_position_id, options_from_collection_for_select(@available_crew_positions, :id, :title), { prompt: "Select a position" }, class: "form-select", required: true
-                    = form.submit "Accept for Position", class: "btn btn-primary"
-                - else
-                  %p.text-muted.small.mb-0 All positions for this gig are already staffed.
+              - if status == "accepted"
+                = link_to "Offer job", new_usr_job_offer_path(job_application_id: @job_application.id), class: "btn btn-primary"
               - else
-                = link_to status.humanize.titleize, update_status_usr_job_application_path(@job_application, status: status), class: "btn btn-primary", data: { turbo_method: :patch, turbo_confirm: "Set this application to #{status.humanize.titleize}?" }
+                = link_to status.humanize.titleize, update_status_usr_job_application_path(@job_application, status: status), class: "btn btn-outline-primary", data: { turbo_method: :patch, turbo_confirm: "Set this application to #{status.humanize.titleize}?" }
+
+    - if @offers.any?
+      .card.border-0.shadow-sm.mb-4
+        .card-body.p-4
+          %h2.h5 Offers & booking history
+          - @offers.each do |offer|
+            %p.mb-2= link_to "#{offer.role} · #{offer.effective_status.humanize}", usr_job_offer_path(offer)
 
     .card.border-0.shadow-sm.mb-4
       .card-body.p-4
@@ -111,13 +103,13 @@
           %div
             %div.text-muted.small Resume
             - if @job_application.resume.attached?
-              = link_to @job_application.resume.filename.to_s, rails_blob_path(@job_application.resume, disposition: "attachment"), class: "fw-semibold text-decoration-none"
+              = link_to @job_application.resume.filename.to_s, rails_service_blob_path(@job_application.resume.blob.signed_id, @job_application.resume.filename), class: "fw-semibold text-decoration-none"
             - else
               %div.fw-semibold Not provided
           %div
             %div.text-muted.small Cover Letter
             - if @job_application.cover_letter_file.attached?
-              = link_to @job_application.cover_letter_file.filename.to_s, rails_blob_path(@job_application.cover_letter_file, disposition: "attachment"), class: "fw-semibold text-decoration-none"
+              = link_to @job_application.cover_letter_file.filename.to_s, rails_service_blob_path(@job_application.cover_letter_file.blob.signed_id, @job_application.cover_letter_file.filename), class: "fw-semibold text-decoration-none"
             - else
               %div.fw-semibold Not provided
           %div
@@ -125,13 +117,15 @@
             - if @job_application.attachments.attached?
               .d-flex.flex-column.gap-2.mt-2
                 - @job_application.attachments.each do |attachment|
-                  = link_to attachment.filename.to_s, rails_blob_path(attachment, disposition: "attachment"), class: "fw-semibold text-decoration-none"
+                  = link_to attachment.filename.to_s, rails_service_blob_path(attachment.blob.signed_id, attachment.filename), class: "fw-semibold text-decoration-none"
             - else
               %div.fw-semibold None uploaded
 
     .card.border-0.shadow-sm
       .card-body.p-4
-        - if @company_owner_view && @job.company.present?
+        - if @pipeline_available
+          = link_to "Back to Applicants", usr_company_applications_path(@job.company, job_id: @job.id), class: "btn btn-quiet w-100"
+        - elsif @company_owner_view && @job.company.present?
           = link_to "Back to Company", usr_company_path(@job.company), class: "btn btn-quiet w-100"
         - else
           = link_to "Back to My Applications", usr_job_applications_path, class: "btn btn-quiet w-100"

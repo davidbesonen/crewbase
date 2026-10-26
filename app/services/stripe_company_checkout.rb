@@ -25,6 +25,7 @@ class StripeCompanyCheckout
 
   def validate_selection!
     raise InvalidSelection, "That billing plan is unavailable." unless plan&.active?
+    raise InvalidSelection, "Starter is free and does not need checkout." if plan.free?
     raise InvalidSelection, "Choose monthly or annual billing." unless INTERVALS.include?(interval)
     raise InvalidSelection, "Stripe pricing is not configured for that plan." if stripe_price_id.blank?
   end

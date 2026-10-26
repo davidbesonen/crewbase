@@ -3,6 +3,34 @@ require "test_helper"
 class DashboardQuickSearchTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
+  test "company search respects membership and immediately reflects visibility changes" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    owner = User.create!(first_name: "Search", last_name: "Owner", email: "search-owner@example.com", password: "password123")
+    company = Company.create!(name: "Private Search Studio", contact_email: "search@example.com",
+      industries: [ Industry.create!(name: "Search privacy") ], is_public: false)
+    company.company_assignments.create!(user: owner, role: "owner")
+
+    assert_empty DashboardQuickSearch.new("Private Search").results
+    assert_includes DashboardQuickSearch.new("Private Search", user: owner).results.map { |row| row[:label] }, company.name
+    company.update!(is_public: true)
+    assert_includes DashboardQuickSearch.new("Private Search").results.map { |row| row[:label] }, company.name
+    company.update!(is_public: false)
+    assert_empty DashboardQuickSearch.new("Private Search").results
+  ensure
+    Rails.cache = original_cache
+  end
+
+  test "search omits expired openings and unfinished profiles" do
+    company = Company.create!(name: "Search Audio", contact_email: "audio@example.com",
+      industries: [ Industry.create!(name: "Audio discovery") ])
+    create_job(company:, title: "Searchable Audio").update!(application_deadline: 1.minute.ago)
+    user = User.create!(first_name: "Searchable", last_name: "Person", email: "unfinished@example.com", password: "password123")
+    user.profiles.create!(profile_type: "user")
+
+    assert_empty DashboardQuickSearch.new("Searchable").results
+  end
+
   test "adds a filtered jobs link after individual results when several jobs match" do
     industry = Industry.create!(name: "Music")
     company = Company.create!(

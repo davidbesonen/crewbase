@@ -105,6 +105,7 @@ class Usr::Companies::JobsController < ApplicationController
       :is_active,
       :status,
       :description,
+      *JobExperienceRequirements::TEXT_FIELDS.keys,
       :pay_min,
       :pay_max,
       :pay_period,
@@ -118,6 +119,10 @@ class Usr::Companies::JobsController < ApplicationController
       :created_by,
       :project_id,
       required_occupation_ids: [],
+      required_capability_keys: [],
+      preferred_capability_keys: [],
+      required_equipment_family_keys: [],
+      preferred_equipment_family_keys: [],
       required_skill_ids: [],
       preferred_skill_ids: [],
       required_equipment_ids: [],
@@ -134,10 +139,9 @@ class Usr::Companies::JobsController < ApplicationController
     projects = @company.projects.active
     projects = projects.or(@company.projects.where(id: @job.project_id)) if @job&.project_id?
     @projects = projects.order(:name).to_a
-    @occupations = Occupation.order(:name).to_a
-    @skills = Skill.order(:name).to_a
-    @equipment = Equipment.order(:name).to_a
     @requirement_selections = submitted_requirement_selections
+    catalog = OccupationCatalog.new(selected: @job.job_requirements.map(&:requirement))
+    @occupations = catalog.records(selected_ids: @requirement_selections[:required_occupation_ids]).to_a
   end
 
   def requested_multi_position?
@@ -163,6 +167,7 @@ class Usr::Companies::JobsController < ApplicationController
       @job.save!
       JobRequirementsUpdater.new(job: @job, selections: requirement_selections).call if requirement_selections?
       JobCompletion.new(job: @job).call if @job.completed?
+      ProductEvent.record(user: current_user, name: "job_published", subject: @job, event_key: @job.id) if @job.published?
       true
     end
   rescue ActiveRecord::RecordInvalid => error
@@ -171,14 +176,12 @@ class Usr::Companies::JobsController < ApplicationController
   end
 
   def requirement_selections
-    permitted = job_params
-    {
-      required_occupation_ids: permitted[:required_occupation_ids],
-      required_skill_ids: permitted[:required_skill_ids],
-      preferred_skill_ids: permitted[:preferred_skill_ids],
-      required_equipment_ids: permitted[:required_equipment_ids],
-      preferred_equipment_ids: permitted[:preferred_equipment_ids]
-    }
+    selections = job_params.slice(*REQUIREMENT_PARAMETER_KEYS).to_h.symbolize_keys
+    # A modern form's personal entries take precedence over stale catalog IDs.
+    JobExperienceRequirements::TEXT_FIELDS.each do |field, (type, importance)|
+      selections.delete(:"#{importance}_#{type.underscore}_ids") if job_params.key?(field)
+    end
+    selections
   end
 
   def requirement_selections?

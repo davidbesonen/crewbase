@@ -69,6 +69,42 @@ class Usr::CompanyBillingControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to checkout_session.url, allow_other_host: true
   end
 
+  test "invalid billing interval cannot update an existing subscription" do
+    @plan.update!(stripe_monthly_price_id: "price_monthly")
+    @company.company_plans.create!(plan: @plan, status: "active", stripe_subscription_id: "sub_active", stripe_subscription_item_id: "si_active")
+    called = false
+    fake_change = Object.new
+    fake_change.define_singleton_method(:call) { called = true }
+    with_singleton_method(StripeCompanySubscriptionChange, :new, ->(**) { fake_change }) do
+      post usr_company_billing_checkout_path(@company), params: { plan_id: @plan.id, billing_interval: "weekly" }
+    end
+    assert_not called, "Invalid intervals must be rejected before changing a paid subscription"
+    assert_redirected_to usr_company_plan_path(@company)
+    assert_match(/monthly or annual/, flash[:alert])
+  end
+
+  test "Stripe outages return to plan management without changing access" do
+    fake_checkout = Object.new
+    fake_checkout.define_singleton_method(:call) { raise Stripe::APIConnectionError, "Connection failed" }
+    with_singleton_method(StripeCompanyCheckout, :new, ->(**) { fake_checkout }) do
+      assert_no_difference "CompanyPlan.count" do
+        post usr_company_billing_checkout_path(@company), params: { plan_id: @plan.id, billing_interval: "monthly" }
+      end
+    end
+    assert_redirected_to usr_company_plan_path(@company)
+    assert_match(/temporarily unavailable/, flash[:alert])
+  end
+
+  test "Stripe portal outages preserve a path back to company billing" do
+    fake_portal = Object.new
+    fake_portal.define_singleton_method(:call) { raise Stripe::APIConnectionError, "Connection failed" }
+    with_singleton_method(StripeCustomerPortal, :new, ->(**) { fake_portal }) do
+      post usr_company_billing_portal_path(@company)
+    end
+    assert_redirected_to usr_company_plan_path(@company)
+    assert_match(/temporarily unavailable/, flash[:alert])
+  end
+
   private
 
   def with_singleton_method(target, method_name, replacement)

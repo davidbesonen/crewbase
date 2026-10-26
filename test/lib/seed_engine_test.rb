@@ -46,53 +46,31 @@ class SeedEngineTest < ActiveSupport::TestCase
     assert_not Notification.exists?
   end
 
-  test "creates broad skills and equipment coverage for every occupation" do
+  test "seeds occupations without expanding skill and equipment catalogs" do
+    counts = [ Skill.count, Equipment.count ]
     @engine.create_industries
     @engine.create_occupations
-    @engine.create_brands
     @engine.create_equipment
     @engine.create_skills
-
-    uncovered_skills = Occupation.left_joins(:skills).group(:id).having("COUNT(skills.id) < 5").pluck(:name)
-    uncovered_equipment = Occupation.left_joins(:equipment).group(:id).having("COUNT(equipment.id) < 3").pluck(:name)
-
-    assert_empty uncovered_skills, "Expected at least five skills for: #{uncovered_skills.to_sentence}"
-    assert_empty uncovered_equipment, "Expected at least three equipment entries for: #{uncovered_equipment.to_sentence}"
-
-    assert Skill.exists?(name: "Dante Audio Networking")
-    assert Skill.exists?(name: "RF Coordination")
-    assert Skill.exists?(name: "Entertainment Power Distribution")
-    assert Skill.exists?(name: "SMPTE ST 2110")
-    assert Skill.exists?(name: "Color Management")
-
-    assert Equipment.exists?(name: "Avid VENUE S6L")
-    assert Equipment.exists?(name: "DiGiCo Quantum Series")
-    assert Equipment.exists?(name: "grandMA3")
-    assert Equipment.exists?(name: "ETC Eos Family")
-    assert Equipment.exists?(name: "ARRI ALEXA 35")
-    assert Equipment.exists?(name: "Ross Carbonite")
+    assert_equal counts, [ Skill.count, Equipment.count ]
+    assert Occupation.exists?(name: "Audio Engineer", category_key: nil)
+    assert Occupation.exists?(name: "Camera Operator", category_key: nil)
+    assert Industry.all.all? { |industry| industry.occupations.where(category_key: nil).any? }
   end
 
-  test "creates every company-scoped beta plan without limiting company ownership" do
+  test "creates two company-scoped launch plans without limiting company ownership" do
     @engine.create_plans
 
-    assert_equal %w[starter team studio], Plan.active.pluck(:key)
+    assert_equal %w[free team_2026], Plan.active.pluck(:key)
     Plan.active.each do |plan|
       assert_equal "company", plan.data.fetch("billing_scope")
       assert_not plan.data.key?("companies_limit")
     end
   end
 
-  test "creates the crew Pro catalog without embedding Stripe identifiers" do
+  test "does not seed paid crew memberships" do
     @engine.create_user_plans
-
-    plan = UserPlan.find_by!(slug: "crew-pro")
-    assert_equal "Crew Pro", plan.name
-    assert_equal 599, plan.monthly_price_cents
-    assert_equal 4_900, plan.annual_price_cents
-    assert plan.active?
-    assert_nil plan.stripe_monthly_price_id
-    assert_nil plan.stripe_annual_price_id
+    assert_empty UserPlan.active
   end
 
   test "mock companies exercise every beta pricing tier" do
@@ -100,7 +78,7 @@ class SeedEngineTest < ActiveSupport::TestCase
 
     selected_keys = 6.times.map { |index| @engine.send(:seed_plan_for_company_index, index).key }
 
-    assert_equal %w[starter team studio starter team studio], selected_keys
+    assert_equal %w[team_2026 free team_2026 free team_2026 free], selected_keys
   end
 
   test "David Besonen Music is seeded on Team" do
@@ -116,7 +94,7 @@ class SeedEngineTest < ActiveSupport::TestCase
 
     company = Company.find_by!(name: "David Besonen Music")
 
-    assert_equal "team", CompanyPlanEntitlement.new(company).tier
+    assert_equal "team_2026", CompanyPlanEntitlement.new(company).tier
   end
 
   test "every seeded user has sent and received invitation history" do
@@ -155,7 +133,9 @@ class SeedEngineTest < ActiveSupport::TestCase
     assert Job.where.not(project_id: nil).exists?
     assert Job.joins(:job_requirements).distinct.exists?
     assert JobRequirement.required.where(requirement_type: "Occupation").exists?
-    assert JobRequirement.preferred.where(requirement_type: "Skill").exists?
+    assert Job.where.not(preferred_skills_text: [ nil, "" ]).exists?
+    assert Profile.where.not(capability_keys: []).exists?
+    assert Job.where.not(required_capability_keys: []).exists?
     assert Job.joins(crew_positions: :crew_assignments).distinct.exists?
 
     single_postings = Job.single_role

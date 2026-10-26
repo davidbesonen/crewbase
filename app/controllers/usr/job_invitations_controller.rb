@@ -8,9 +8,9 @@ class Usr::JobInvitationsController < ApplicationController
   def create
     return create_email_invitation if params[:job_id].present?
 
-    profile = Profile.find(params[:profile_id])
-    job = Job
-      .where(company_id: current_user.owned_companies.select(:id), is_active: true, status: :published)
+    profile = Profile.where(user_id: User.where(restricted_at: nil).select(:id)).find(params[:profile_id])
+    job = Job.accepting_applications
+      .where(company_id: current_user.owned_companies.select(:id))
       .find(invitation_params[:job_id])
 
     JobInvitationCreator.new(job:, profile:, invited_by: current_user).call
@@ -33,8 +33,8 @@ class Usr::JobInvitationsController < ApplicationController
   private
 
   def create_email_invitation
-    job = Job
-      .where(company_id: current_user.owned_companies.select(:id), is_active: true, status: :published)
+    job = Job.accepting_applications
+      .where(company_id: current_user.owned_companies.select(:id))
       .find(params[:job_id])
     invitation = JobInvitationCreator.new(
       job:,

@@ -11,7 +11,7 @@ class Usr::Companies::ApplicationsController < ApplicationController
       user: current_user,
       applications: @applications
     ).by_application_id
-    @jobs = pipeline.jobs
+    @jobs = pipeline.jobs.to_a
     @stage_counts = pipeline.stage_counts
     @total_count = pipeline.total_count
     @filters = {

@@ -23,11 +23,13 @@ class Usr::ProfileConfig::OccupationFormComponentTest < ViewComponent::TestCase
       )
     )
 
+    assert_includes result.text, "What occupations do you work in?"
     occupation_button_texts = result.css("a[id^='occupation_button_id_']").map { |node| node.text.strip }
     selected_occupation_texts = result.css(".selected-occupation-pill").map { |node| node.text.strip }
 
     assert_equal [ "Audio Engineer", "Lighting Designer" ], occupation_button_texts
     assert_empty result.css(".industry-pill")
+    assert_selector "a[aria-pressed=true]", count: 1
     assert_equal [ "Lighting Designer" ], selected_occupation_texts
   end
 end

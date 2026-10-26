@@ -1,0 +1,23 @@
+.card.network-form
+  .card-body.p-4
+    %h1.h3.mb-2 Share this job
+    %p.fw-semibold.mb-1= job.title
+    %p.text-muted.small Send a private note to a connection. They decide whether to apply; this does not refer them to the company.
+    - if share.errors.any?
+      .alert.alert-danger{ role: "alert" }= share.errors.full_messages.to_sentence
+    - if recipients.any?
+      = form_with model: share, url: helpers.usr_job_network_job_shares_path(job), builder: ActionView::Helpers::FormBuilder do |form|
+        .mb-3
+          = form.label :recipient_id, "Connection", class: "form-label"
+          = form.select :recipient_id, recipients.map { |person| [ person.full_name, person.id ] }, { include_blank: "Choose a connection", selected: share.recipient_id }, class: "form-select", required: true
+        .mb-3
+          = form.label :note, "Note (optional)", class: "form-label"
+          = form.text_area :note, value: share.note, class: "form-control", rows: 3, maxlength: 1000, placeholder: "Why this opportunity made you think of them"
+        .d-flex.gap-2
+          = form.submit "Share job", class: "btn btn-primary"
+          = link_to "Cancel", helpers.usr_job_path(job), class: "btn btn-quiet"
+    - else
+      .empty-state
+        %p Connect with crew members first to share jobs with them.
+        = link_to "Find crew", helpers.usr_profiles_path, class: "btn btn-primary"
+        = link_to "Back to job", helpers.usr_job_path(job), class: "btn btn-quiet"

@@ -10,6 +10,9 @@ class Usr::CompanyBillingPortalsController < ApplicationController
     redirect_to session.url, allow_other_host: true
   rescue StripeCustomerPortal::CustomerMissing => error
     redirect_to usr_company_plan_path(@company), alert: error.message
+  rescue Stripe::StripeError => error
+    Rails.error.report(error, context: { company_id: @company.id })
+    redirect_to usr_company_plan_path(@company), alert: "Billing management is temporarily unavailable. Please try again shortly."
   end
 
   private

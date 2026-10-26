@@ -1,0 +1,13 @@
+%h1.h3 Audit log
+%p.text-muted Administrative changes, reasons, and before-and-after values. Times use the application time zone.
+= form_with url: admin_audit_events_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mb-4" do |form|
+  = form.search_field :q, value: params[:q], placeholder: "Search reasons", aria: { label: "Search reasons" }, class: "form-control w-auto"
+  = form.select :subject_type, %w[User Company Job SafetyReport], { include_blank: "All record types", selected: params[:subject_type] }, class: "form-select w-auto", aria: { label: "Record type" }
+  = form.number_field :subject_id, value: params[:subject_id], placeholder: "Record ID", min: 1, class: "form-control w-auto", aria: { label: "Record ID" }
+  = form.submit "Filter", class: "btn btn-primary"
+  = link_to "Clear", admin_audit_events_path, class: "btn btn-outline-secondary"
+.card
+  .card-body
+    = render Admin::AuditLogComponent.new(events: @events)
+- if @pagy.pages > 1
+  .mt-4= bootstrap_pagy_nav(@pagy)

@@ -53,6 +53,7 @@ gem "simple_form"
 
 # Files
 gem "shrine"
+gem "aws-sdk-s3", require: false
 
 # User authentication and management
 gem "devise"

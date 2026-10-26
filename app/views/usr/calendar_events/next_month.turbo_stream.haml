@@ -32,10 +32,10 @@
                   %div{ id: "availability_date_#{day.to_s}", class: "d-flex justify-content-center align-items-center" }
                     - day_key = day.strftime("%Y-%m-%d")
                     - if selectable && @calendar_events.key?(day_key)
-                      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: day, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: @month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+                      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: day, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: @month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
                         = day.day
                     - elsif selectable
-                      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: day, toggle_action: "add", month: @month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+                      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: day, toggle_action: "add", month: @month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
                         = day.day
                     - else
                       %button.btn.btn-outline-secondary.rounded-pill.px-3.py-2.fw-normal.availability-date-pill.text-muted{ type: "button", disabled: true }

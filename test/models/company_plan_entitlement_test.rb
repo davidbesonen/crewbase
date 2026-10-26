@@ -83,6 +83,13 @@ class CompanyPlanEntitlementTest < ActiveSupport::TestCase
     assert_not entitlement.within_limit?(:active_jobs)
   end
 
+  test "ended postings stop consuming active job capacity" do
+    plan = create_plan("starter", active_jobs_limit: 1)
+    @company.company_plans.create!(plan:, status: "active")
+    create_job("Ended posting").update_columns(starts_at: 2.days.ago, ends_at: 1.day.ago)
+    assert CompanyPlanEntitlement.new(@company).within_limit?(:active_jobs)
+  end
+
   private
 
   def create_plan(key, **limits)

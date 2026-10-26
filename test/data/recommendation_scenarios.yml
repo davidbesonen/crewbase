@@ -1,0 +1,48 @@
+live_music:
+  industry: Live Music & Touring
+  occupation: FOH Engineer
+  role: Tour front-of-house engineer
+  capability: foh_mixing
+  equipment: mixing_consoles
+film:
+  industry: Film, TV & Commercial Production
+  occupation: Camera Operator
+  role: Commercial camera operator
+  capability: camera_operation
+  equipment: cinema_cameras
+post_production:
+  industry: Post-Production & Creative Services
+  occupation: Editor
+  role: Documentary picture editor
+  capability: picture_editing
+  equipment: editing_software
+recording:
+  industry: Music Recording & Production
+  occupation: Music Producer
+  role: Artist recording producer
+  capability: music_programming
+  equipment: audio_workstations
+theater:
+  industry: Theater & Performing Arts
+  occupation: Stage Manager
+  role: Repertory stage manager
+  capability: show_calling
+  equipment: intercom_systems
+events:
+  industry: Corporate & Special Events
+  occupation: Event Producer
+  role: Conference producer
+  capability: production_coordination
+  equipment: production_software
+broadcast:
+  industry: Broadcast & Live Streaming
+  occupation: Broadcast Engineer
+  role: Live broadcast engineer
+  capability: signal_routing
+  equipment: video_switchers
+education:
+  industry: Education & Training
+  occupation: Instructor
+  role: Production workshop instructor
+  capability: workshop_instruction
+  equipment: learning_platforms

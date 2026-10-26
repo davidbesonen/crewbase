@@ -8,7 +8,7 @@
           %h5.card-section-title.fw-bold.mb-0 Crewbase Credits
           %span.badge.rounded-pill.text-bg-light.border{ data: { profile_credit_count: true } }
             = "#{helpers.pluralize(credits.size, "credit")} earned"
-        %p.text-muted.mb-0 Verified gigs completed through Crewbase.
+        %p.text-muted.mb-0 Work credits distinguish verified Crewbase gigs from self-reported experience.
       - if owner_view && !visible
         %span.badge.text-bg-light.border Hidden from others
     - if credits.any?
@@ -29,8 +29,12 @@
                 %span.badge.text-bg-light.border.rounded-pill= credit.display_dates
                 - if credit.verified?
                   .mt-2= helpers.crewbase_credit_badge(variant: :blue)
+                - else
+                  .mt-2
+                    %span.badge.text-bg-light.border Self-reported
                 - if owner_view && !credit.visible?
                   .small.text-muted.mt-2 Hidden from others
+            = link_to "Dispute this credit", helpers.new_usr_report_path(subject_type: "Credit", subject_id: credit.id, category: "incorrect_credit"), class: "btn btn-sm btn-outline-secondary mt-2"
             - if credit.description.present?
               %p.text-muted.mt-2.mb-0= credit.description
     - else

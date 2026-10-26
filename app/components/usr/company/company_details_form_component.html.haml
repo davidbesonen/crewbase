@@ -128,41 +128,44 @@
           = f.input :is_public, as: :boolean, label: "Make Company Profile Public", hint: "If checked, your company profile will be visible to others on Crewbase."
   .card.border-0.shadow-sm.mt-3
     .card-body
-      .row.g-3
-        %h3.fw-bold.mb-0 Socials
-        %p.text-muted.mt-1.mb-3 Add links to your company's social media profiles to enhance your online presence.
-        .col-sm-12
-          = f.input :website_url, label: "Website URL", placeholder: "https://www.example.com"
-        .col-sm-12
-          = f.input :twitter_handle, label: "Twitter Handle", placeholder: "@yourhandle"
-        .col-sm-12
-          = f.input :instagram_handle, label: "Instagram Handle", placeholder: "@yourhandle"
-        .col-sm-12
-          = f.input :tiktok_handle, label: "TikTok Handle", placeholder: "@yourhandle"
-        .col-sm-12
-          = f.input :linkedin_url, label: "LinkedIn URL", placeholder: "https://www.linkedin.com/company/yourcompany"
-        .col-sm-12
-          = f.input :facebook_url, label: "Facebook URL", placeholder: "https://www.facebook.com/yourcompany"
-        .col-sm-12
-          = f.input :youtube_url, label: "YouTube URL", placeholder: "https://www.youtube.com/yourchannel"
+      %details.mb-4
+        %summary.fw-semibold Website & social links (optional)
+        %p.text-muted.small.mt-2 Add these now or return to them after creating your company.
+        .row.g-3.mt-2
+          .col-sm-12
+            = f.input :website_url, label: "Website URL", placeholder: "https://www.example.com"
+          .col-sm-12
+            = f.input :twitter_handle, label: "Twitter Handle", placeholder: "@yourhandle"
+          .col-sm-12
+            = f.input :instagram_handle, label: "Instagram Handle", placeholder: "@yourhandle"
+          .col-sm-12
+            = f.input :tiktok_handle, label: "TikTok Handle", placeholder: "@yourhandle"
+          .col-sm-12
+            = f.input :linkedin_url, label: "LinkedIn URL", placeholder: "https://www.linkedin.com/company/yourcompany"
+          .col-sm-12
+            = f.input :facebook_url, label: "Facebook URL", placeholder: "https://www.facebook.com/yourcompany"
+          .col-sm-12
+            = f.input :youtube_url, label: "YouTube URL", placeholder: "https://www.youtube.com/yourchannel"
       .row
         .col-sm-6
           - if source_action == "new"
-            = link_to previous_form_usr_companies_path(current_page: "company_details_form"), class: "btn btn-quiet" do
+            = link_to new_usr_company_path, class: "btn btn-quiet" do
               %i.bi.bi-arrow-left-circle
               Change Plan
         .col-sm-6.text-end
           - if source_action == "new"
-            - if plan.present?
+            - if plan.present? && !plan.free?
               .d-flex.flex-wrap.justify-content-end.align-items-center.gap-3.mb-3
                 %span.fw-semibold Billing
-                .form-check.form-check-inline.mb-0
-                  = radio_button_tag :billing_interval, "monthly", true, id: "company_billing_monthly", class: "form-check-input"
-                  = label_tag :company_billing_monthly, "#{plan.monthly_price}/month", class: "form-check-label"
-                .form-check.form-check-inline.mb-0
-                  = radio_button_tag :billing_interval, "annual", false, id: "company_billing_annual", class: "form-check-input"
-                  = label_tag :company_billing_annual, "#{plan.annual_price}/year", class: "form-check-label"
+                - if plan.checkout_available?("monthly")
+                  .form-check.form-check-inline.mb-0
+                    = radio_button_tag :billing_interval, "monthly", true, id: "company_billing_monthly", class: "form-check-input"
+                    = label_tag :company_billing_monthly, "#{plan.monthly_price}/month", class: "form-check-label"
+                - if plan.checkout_available?("annual")
+                  .form-check.form-check-inline.mb-0
+                    = radio_button_tag :billing_interval, "annual", !plan.checkout_available?("monthly"), id: "company_billing_annual", class: "form-check-input"
+                    = label_tag :company_billing_annual, "#{plan.annual_price}/year", class: "form-check-label"
               %p.small.text-muted.mb-2 Your company is created first, then Stripe securely collects payment details.
-            = f.submit(plan.present? ? "Create Company and Continue to Payment" : "Create Company", class: "btn btn-primary")
+            = f.submit(plan.present? && !plan.free? ? "Create Company and Continue to Payment" : "Create Company", class: "btn btn-primary")
           - else
             = f.submit "Update Company", class: "btn btn-primary"

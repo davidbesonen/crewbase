@@ -10,7 +10,7 @@ class Usr::ConversationMessageComponentTest < ViewComponent::TestCase
     render_inline(Usr::ConversationMessageComponent.new(message:, current_user: sender))
 
     assert_css "#contextual_message_42.justify-content-end[data-message-id='42']"
-    assert_text "Hello alert('no')"
+    assert_text "Hello <script>alert('no')</script>"
     assert_no_css "script"
   end
 end

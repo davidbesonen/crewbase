@@ -70,7 +70,10 @@ class Usr::ProjectsController < ApplicationController
   end
 
   def select_company
-    @companies = owned_companies.order(:name)
+    @companies = owned_companies.includes(:locations, :industries).order(:name).to_a
+    @projects_by_company = Project.active.where(company: @companies)
+      .order(updated_at: :desc, id: :desc)
+      .group_by(&:company_id)
   end
 
   private

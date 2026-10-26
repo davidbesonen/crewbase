@@ -1,0 +1,17 @@
+.card.border-0.shadow-sm.mt-4
+  .card-body
+    %h2.h6 Trust & support
+    .d-flex.flex-wrap.gap-2
+      = link_to "My reports & blocked people", helpers.usr_reports_path, class: "btn btn-outline-secondary"
+      - unless own_profile
+        = link_to helpers.new_usr_report_path(subject_type: "Profile", subject_id: profile.id), class: "btn btn-outline-secondary" do
+          %i.bi.bi-flag.me-1{ aria: { hidden: true } }
+          Report profile
+        - if block
+          = button_to "Unblock person", helpers.usr_user_block_path(block), method: :delete, class: "btn btn-outline-secondary"
+        - else
+          = button_to helpers.usr_user_blocks_path, params: { user_block: { profile_id: profile.id } }, class: "btn btn-outline-danger", data: { turbo_confirm: "Block new connection requests, job shares, invitations, and offers? Existing job conversations will stay available for coordination and reporting." } do
+            %i.bi.bi-person-slash.me-1{ aria: { hidden: true } }
+            Block person
+    - if blocked
+      %p.small.text-muted.mt-3.mb-0 New connections, job shares, invitations, and offers are unavailable between these accounts. Existing job conversations remain available for coordination and reporting.

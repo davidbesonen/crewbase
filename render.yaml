@@ -1,0 +1,53 @@
+services:
+  - type: web
+    name: crewbase-demo
+    runtime: ruby
+    plan: free
+    region: ohio
+    buildCommand: bin/render-build
+    startCommand: bin/render-start
+    healthCheckPath: /up
+    autoDeployTrigger: off
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: BUNDLE_WITHOUT
+        value: development:test
+      - key: RUBY_VERSION
+        value: 3.4.5
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: WEB_CONCURRENCY
+        value: "0"
+      - key: RAILS_MAX_THREADS
+        value: "3"
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      - key: SOLID_QUEUE_IN_PUMA
+        value: "true"
+      - key: SOLID_QUEUE_SUPERVISOR_MODE
+        value: async
+      - key: CREWBASE_DEMO
+        value: "true"
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: DEMO_OWNER_PASSWORD
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: CACHE_DATABASE_URL
+        sync: false
+      - key: QUEUE_DATABASE_URL
+        sync: false
+      - key: CABLE_DATABASE_URL
+        sync: false
+      - key: S3_BUCKET
+        value: crewbase-demo
+      - key: S3_REGION
+        value: us-east-2
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false

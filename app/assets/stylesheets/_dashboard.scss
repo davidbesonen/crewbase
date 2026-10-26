@@ -1,0 +1,236 @@
+/* Dashboard surfaces and typography share one restrained visual rhythm. */
+.dashboard {
+  max-width: 1500px;
+  margin-inline: auto;
+  font-size: 0.925rem;
+
+  .crew-recommendation-copy {
+    padding-right: 0;
+  }
+
+  .crew-recommendation-location {
+    position: static !important;
+    max-width: none;
+    text-align: left;
+    margin-bottom: 0.25rem;
+  }
+
+  .profile-completion-wheel {
+    width: 4.25rem;
+    height: 4.25rem;
+    flex-basis: 4.25rem;
+    background: conic-gradient(#4a87b8 var(--profile-completion), #eaf1f7 0);
+  }
+
+  .profile-completion-wheel__center {
+    width: 3.6rem;
+    height: 3.6rem;
+    font-size: 0.925rem;
+    color: #315f86;
+  }
+}
+
+.dashboard-recommendations {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1200px) {
+  .dashboard-recommendations--paired {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dashboard-heading {
+  margin-bottom: 1.75rem;
+
+  h1 {
+    font-size: clamp(1.9rem, 3vw, 2.5rem);
+    letter-spacing: -0.055em;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+}
+
+.dashboard-eyebrow {
+  margin-bottom: 0.65rem;
+  color: #637e96;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.dashboard-intro {
+  color: var(--bs-secondary-color);
+  margin-bottom: 0;
+  font-size: 0.925rem;
+}
+
+.dashboard-discovery {
+  margin-bottom: 2rem;
+}
+
+.dashboard-quick-search {
+  overflow: visible;
+  border: 1px solid #dce7f2;
+  border-radius: 1.1rem;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(49, 94, 138, 0.08), 0 2px 4px rgba(49, 94, 138, 0.025);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &:focus-within {
+    border-color: #6c9fc8;
+    box-shadow: 0 0 0 3px rgba(83, 142, 190, 0.14), 0 8px 28px rgba(49, 94, 138, 0.08);
+  }
+}
+
+.dashboard-search-field {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1.4rem;
+
+  .form-control {
+    min-width: 0;
+    min-height: 3rem;
+    padding-left: 0;
+    border: 0;
+    background: transparent;
+    color: var(--bs-body-color);
+    font-size: 1rem;
+    box-shadow: none;
+
+    &::placeholder {
+      color: #708397;
+      opacity: 1;
+    }
+  }
+}
+
+.dashboard-search-icon {
+  font-size: 1.2rem;
+  color: #4e7ba2;
+}
+
+#dashboard-quick-search-results {
+  top: calc(100% + 0.65rem);
+  left: 0;
+  z-index: 1010;
+  max-height: 26rem;
+  overflow-y: auto;
+  padding: 0.4rem;
+  border: 1px solid #dce7f2;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(36, 65, 98, 0.14) !important;
+
+  .list-group-item {
+    border: 0;
+    border-radius: 0.65rem;
+    padding: 0.8rem;
+  }
+
+  .min-w-0 {
+    min-width: 0;
+  }
+
+  .active {
+    background: #e7f0fa;
+    color: #233c55;
+  }
+}
+
+.dashboard-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.dashboard-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid #dce6f0;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: #455f78;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+
+  .bi {
+    color: #5280a6;
+    font-size: 1rem;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #fff;
+    border-color: #8babc7;
+    color: #214f7d;
+  }
+}
+
+.dashboard-tool--primary {
+  background: #dceaf7;
+  border-color: #c0d6ea;
+  color: #214f7d;
+  font-weight: 600;
+
+  .bi {
+    color: currentColor;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #cddff0;
+    border-color: #91b3d1;
+    color: #193f65;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dashboard-heading {
+    margin-bottom: 1.35rem;
+  }
+
+  .dashboard-search-field {
+    gap: 0.7rem;
+    padding: 0.5rem 1rem;
+
+    .form-control {
+      font-size: 0.85rem;
+    }
+  }
+
+  .dashboard-tools {
+    gap: 0.5rem;
+  }
+
+  .dashboard-tool {
+    flex: 1 1 calc(50% - 0.5rem);
+    padding-inline: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-quick-search,
+  .dashboard-tool {
+    transition: none;
+  }
+}
+
+@media (max-height: 700px) {
+  #dashboard-quick-search-results {
+    max-height: 60vh;
+  }
+}

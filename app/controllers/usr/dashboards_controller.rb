@@ -7,6 +7,10 @@ class Usr::DashboardsController < ApplicationController
 
   def index
     @profile = current_user.user_profile
+    pending_offers = JobOffer.where(profile: @profile).awaiting_response
+    @pending_offer_count = pending_offers.count
+    @pending_offers = pending_offers.includes(job_application: { job: :company })
+      .order(Arel.sql("job_offers.expires_at ASC NULLS LAST"), created_at: :asc).limit(3).to_a
     @profile_completion = @profile.completion_percentage
     @profile_next_step = @profile.next_completion_step
     @availability_overview = @profile.availability_overview
@@ -19,14 +23,22 @@ class Usr::DashboardsController < ApplicationController
     @owned_job_postings = owned_job_postings
     prepare_owned_job_postings
     prepare_crew_recommendations
-    @upcoming_jobs = Job.upcoming.includes(:company).limit(3)
+    work_schedule = DashboardWorkSchedule.new(profile: @profile)
+    @booked_jobs = work_schedule.booked_jobs
+    @upcoming_opportunities = work_schedule.opportunities
 
-    @job_recommendations = WorkerJobRecommender.new(profile: @profile).results
+    recommender = WorkerJobRecommender.new(profile: @profile)
+    @job_recommendations = recommender.results
+    @job_recommendations.each do |result|
+      ProductEvent.record(user: current_user, name: "recommendation_shown", subject: result.job, event_key: "#{Date.current}:#{result.job.id}")
+    end
+    @matching_profile = recommender.matching_profile?
     recommended_job_ids = @job_recommendations.map { |result| result.job.id }
     @applied_job_ids = @profile.job_applications.where(job_id: recommended_job_ids).pluck(:job_id).to_set
     @current_job_applications = current_user.user_profile.job_applications
+      .where(status: %i[submitted in_review shortlisted])
       .joins(:job)
-      .where.not(jobs: { status: Job.statuses[:filled] })
+      .merge(Job.not_ended.where(is_active: true, status: %i[published closed]))
       .includes(job: [ :company, :locations ])
       .order(created_at: :desc)
       .limit(3)
@@ -46,7 +58,7 @@ class Usr::DashboardsController < ApplicationController
   end
 
   def quick_search
-    render json: { results: DashboardQuickSearch.new(params[:q]).results }
+    render json: { results: DashboardQuickSearch.new(params[:q], user: current_user).results }
   end
 
   private
@@ -91,8 +103,8 @@ class Usr::DashboardsController < ApplicationController
   def owned_job_postings
     return Job.none if @owned_companies.empty?
 
-    Job.includes(:locations, :company)
-      .where(company: @owned_companies, is_active: true, status: :published)
+    Job.accepting_applications.includes(:locations, :company)
+      .where(company: @owned_companies)
       .order(created_at: :desc, id: :desc)
       .limit(3)
   end
@@ -100,6 +112,6 @@ class Usr::DashboardsController < ApplicationController
   def ensure_profile_present
     return unless needs_profile_setup?(current_user)
 
-    redirect_to edit_usr_profile_path(current_user.user_profile)
+    redirect_to usr_onboarding_path
   end
 end

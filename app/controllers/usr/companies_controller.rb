@@ -2,10 +2,11 @@ class Usr::CompaniesController < ApplicationController
   before_action :set_owned_company, only: [ :edit, :update, :destroy ]
 
   def index
-    companies_scope = visible_companies.includes(:industries, :jobs, :locations)
+    companies_scope = visible_companies.includes(:industries, :open_jobs, :locations)
 
     @industries = Industry.order(:name)
     @q = companies_scope.ransack(params[:q])
+    @filtered = @q.conditions.any?
     @pagy, @companies = pagy(@q.result(distinct: true).order(created_at: :desc, name: :asc))
   end
 
@@ -33,10 +34,11 @@ class Usr::CompaniesController < ApplicationController
   def new
     @company = Company.new
     @company.locations.build if @company.locations.empty?
-    @current_page = params[:current_page].presence || "company_plan_selection"
+    @current_page = params[:current_page].presence_in(%w[company_plan_selection company_details_form]) || "company_plan_selection"
     @plans = Plan.active
     @industries = Industry.order(:name)
     @selected_plan_id = params[:plan_id]
+    @plan = @plans.find_by(id: @selected_plan_id) if @selected_plan_id.present?
     @selected_industry_ids = []
     @can_fill_mock_company_data = current_user.owned_companies.exists?
   end
@@ -44,7 +46,7 @@ class Usr::CompaniesController < ApplicationController
   def create
     @company = Company.new(company_params.except(:locations_attributes))
     plan_id = params[:plan_id]
-    plan = Plan.active.find_by(id: plan_id) if plan_id.present?
+    plan = plan_id.present? ? Plan.active.find_by(id: plan_id) : Plan.active.find_by(key: "free")
 
     if plan_id.present? && plan.blank?
       @company.errors.add(:base, "Plan is not available.")
@@ -55,7 +57,7 @@ class Usr::CompaniesController < ApplicationController
         @company.save!
         location = find_or_create_location
         @company.locations << location if location && !@company.locations.include?(location)
-        CompanyPlan.create!(company: @company, plan:, status: local_mock_company? ? "active" : "incomplete") if plan.present?
+        CompanyPlan.create!(company: @company, plan:, status: plan.free? || local_mock_company? ? "active" : "incomplete") if plan.present?
         CompanyAssignment.create!(company: @company, user: current_user, role: "owner")
       end
 
@@ -95,7 +97,7 @@ class Usr::CompaniesController < ApplicationController
     @entitlement = CompanyPlanEntitlement.new(@company)
     @company_plan = @company.company_plans.includes(:plan).order(created_at: :desc, id: :desc).first&.plan
     @ratings = @company.ratings
-    @jobs = @company.jobs.published.includes(:project).order(created_at: :desc)
+    @jobs = @company.jobs.accepting_applications.includes(:project, :locations).order(created_at: :desc)
     @job_applications = if @company.is_owner?(current_user)
       JobApplication
         .includes(:profile, { profile: :user }, job: :company)
@@ -133,15 +135,7 @@ class Usr::CompaniesController < ApplicationController
   private
 
   def visible_companies
-    Company.where(
-      "companies.is_public = ? OR EXISTS (" \
-        "SELECT 1 FROM company_assignments " \
-        "WHERE company_assignments.company_id = companies.id " \
-        "AND company_assignments.user_id = ?" \
-      ")",
-      true,
-      current_user.id
-    )
+    Company.visible_to(current_user)
   end
 
   def prepare_new_company_form(selected_plan_id)
@@ -204,7 +198,7 @@ class Usr::CompaniesController < ApplicationController
   end
 
   def redirect_after_company_creation(plan)
-    return redirect_to usr_company_path(@company), notice: "Company created successfully!" unless plan
+    return redirect_to usr_company_path(@company), notice: "Company created successfully!" if plan.nil? || plan.free?
     return redirect_to usr_company_path(@company), notice: "Mock company created with local beta billing." if local_mock_company?
 
     session = StripeCompanyCheckout.new(
@@ -218,6 +212,9 @@ class Usr::CompaniesController < ApplicationController
     redirect_to session.url, allow_other_host: true
   rescue StripeCompanyCheckout::InvalidSelection => error
     redirect_to usr_company_plan_path(@company), alert: "Company created. #{error.message}"
+  rescue Stripe::StripeError => error
+    Rails.error.report(error, context: { company_id: @company.id })
+    redirect_to usr_company_plan_path(@company), alert: "Company created. Payment is temporarily unavailable. Please try again from Billing and plans."
   end
 
   def local_mock_company?

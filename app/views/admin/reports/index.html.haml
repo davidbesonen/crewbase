@@ -1,0 +1,13 @@
+%h1.h3 Moderation queue
+%nav.d-flex.gap-2.mb-4{ aria: { label: "Report status" } }
+  - SafetyReport.statuses.each_key do |status|
+    = link_to "#{status.humanize} (#{@counts.fetch(status, 0)})", admin_reports_path(status: status), class: "btn #{@status == status ? 'btn-primary' : 'btn-outline-secondary'}"
+- if @reports.empty?
+  %p.text-muted No reports in this queue.
+- @reports.each do |report|
+  .card.mb-3
+    .card-body
+      %h2.h5= link_to report.subject_label, admin_report_path(report)
+      %p.small.text-muted.mb-0= "#{SafetyReport::CATEGORIES[report.category]} · #{report.reporter.full_name} · #{report.created_at.to_fs(:long)}"
+- if @pagy.pages > 1
+  .mt-4= bootstrap_pagy_nav(@pagy)

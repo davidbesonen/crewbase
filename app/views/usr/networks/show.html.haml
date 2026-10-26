@@ -1,0 +1,57 @@
+.app-hero.app-hero-cyan.mb-4
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+    %div
+      %h1.fw-bold.mb-2 My Network
+      %p.text-muted.mb-0 Stay connected to your crew. Find your next opportunity together.
+    = link_to "Find crew", usr_profiles_path, class: "btn btn-primary"
+%nav.network-tabs.nav.nav-pills.mb-4{ aria: { label: "My Network sections" } }
+  = link_to "Connections", usr_network_path, class: class_names("nav-link", active: @tab == "connections"), aria: { current: @tab == "connections" ? "page" : nil }
+  = link_to "Worked Together", usr_network_path(tab: "worked_together"), class: class_names("nav-link", active: @tab == "worked_together"), aria: { current: @tab == "worked_together" ? "page" : nil }
+  = link_to usr_network_path(tab: "requests"), class: class_names("nav-link", active: @tab == "requests"), aria: { current: @tab == "requests" ? "page" : nil } do
+    Requests
+    - if @pending_count.positive?
+      %span.badge.rounded-pill.text-bg-light.ms-1= @pending_count
+- if @tab == "worked_together"
+  %p.text-muted.small.mb-3 People with visible, verified credits on the same completed gigs and overlapping work dates. Shared work does not imply a personal endorsement or create a connection.
+- elsif @tab == "connections"
+  %p.text-muted.small.mb-3 Your private professional network. Share an opening from any available job’s page.
+- else
+  %p.text-muted.small.mb-3 Accept people you want to stay in touch with. Only you and the other person can see your requests.
+= form_with url: usr_network_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mb-4", role: "search" do |form|
+  = form.hidden_field :tab, value: @tab
+  = form.label :q, "Search your network", class: "visually-hidden"
+  = form.search_field :q, value: @query, placeholder: "Search by name, role, or city", class: "form-control network-search", maxlength: 100
+  = form.submit "Search", class: "btn btn-quiet"
+  - if @query.present?
+    = link_to "Clear", usr_network_path(tab: @tab), class: "btn btn-quiet"
+- if @rows.any?
+  .row.g-3
+    - @rows.each do |row|
+      .col-12.col-xl-6
+        = render Usr::Network::PersonComponent.new(profile: row.profile, connection: row.connection, credits: row.credits) do |card|
+          - card.with_actions do
+            = render Usr::Network::ConnectionActionsComponent.new(profile: row.profile, connection: row.connection, viewer: current_user)
+  - if @pagy.pages > 1
+    .mt-4= bootstrap_pagy_nav(@pagy)
+- else
+  .empty-state.empty-state-cyan
+    %i.bi.bi-people.fs-2{ aria: { hidden: "true" } }
+    - if @query.present?
+      %h2.h5.mt-3 No matching people
+      %p.text-muted Try a different name, role, or city.
+    - elsif @tab == "worked_together"
+      %h2.h5.mt-3 Your shared work history starts here
+      %p.text-muted Crew members will appear after a shared gig is completed and verified credits are recorded. Hidden credits stay hidden.
+    - elsif @tab == "requests"
+      %h2.h5.mt-3 No pending requests
+      %p.text-muted Incoming and outgoing connection requests will appear here.
+    - else
+      %h2.h5.mt-3 Keep your crew close
+      %p.text-muted Visit someone’s profile and select Connect to invite them to your network.
+      = link_to "Browse people", usr_profiles_path, class: "btn btn-outline-primary"
+- if @tab == "connections" && @shared_jobs.any?
+  %section.mt-5{ aria: { labelledby: "shared-jobs-heading" } }
+    %h2.h4.mb-3#shared-jobs-heading Recently shared with you
+    .d-flex.flex-column.gap-3
+      - @shared_jobs.each do |share|
+        = render Usr::Network::SharedJobComponent.new(share: share, viewer: current_user)

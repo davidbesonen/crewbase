@@ -3,7 +3,7 @@ require "test_helper"
 class Usr::Company::ManagerDashboardComponentTest < ViewComponent::TestCase
   self.fixture_table_names = []
 
-  test "renders Studio benefits and real dashboard data" do
+  test "renders actionable next steps and real dashboard data" do
     company = Company.new(id: 42, name: "Signal Studio")
     plan = Plan.new(key: "studio", name: "Studio")
 
@@ -11,7 +11,8 @@ class Usr::Company::ManagerDashboardComponentTest < ViewComponent::TestCase
 
     assert_selector "[data-company-manager-metric='active_jobs']", text: "4"
     assert_selector "[data-company-manager-metric='pending_invitations'] a.text-decoration-none[href='/usr/job_invitations']", text: "Pending invitations"
-    assert_selector "[data-studio-benefit]", count: 3
+    assert_selector "[data-studio-benefit]", count: 0
+    assert_selector "a[href='/usr/companies/42/applications']", text: "Review applications"
     assert_text "Application acceptance"
     assert_text "50%"
     assert_text "Tour A1"
@@ -24,7 +25,8 @@ class Usr::Company::ManagerDashboardComponentTest < ViewComponent::TestCase
     render_inline Usr::Company::ManagerDashboardComponent.new(company:, plan:, dashboard: dashboard)
 
     assert_selector "[data-studio-benefit]", count: 0
-    assert_text "Upgrade to Studio"
+    assert_no_text "Upgrade to Studio"
+    assert_text "Next steps"
   end
 
   private

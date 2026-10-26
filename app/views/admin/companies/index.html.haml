@@ -1,9 +1,12 @@
 .container-fluid.py-4
-  .d-flex.justify-content-between.align-items-center.mb-4
+  .d-flex.flex-wrap.gap-3.justify-content-between.align-items-center.mb-4
     %h1.mb-0 Companies
-    = form_with url: admin_companies_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex gap-2" do |form|
+    = form_with url: admin_companies_path, method: :get, builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2" do |form|
       = form.search_field :q, value: params[:q], class: "form-control", placeholder: "Search companies", aria: { label: "Search companies" }
+      = form.select :restricted, [["Restricted", "yes"], ["Unrestricted", "no"]], { include_blank: "All access states", selected: params[:restricted] }, class: "form-select", aria: { label: "Access state" }
       = form.submit "Search", class: "btn btn-primary"
+  - if @companies.empty?
+    .alert.alert-light No matching companies. Try a different search.
   .card
     .table-responsive
       %table.table.table-hover.align-middle.mb-0
@@ -14,15 +17,18 @@
             %th Team
             %th Jobs
             %th Plan
+            %th Access
             %th Joined
         %tbody
           - @companies.each do |company|
             %tr
-              %td.fw-semibold= company.name
+              %td.fw-semibold= link_to company.name, admin_company_path(company)
               %td= company.contact_email
               %td= company.users.length
               %td= company.jobs.length
-              %td= company.company_plans.max_by(&:created_at)&.plan&.name || "Beta access"
+              %td= company.company_plans.select(&:entitled?).max_by(&:created_at)&.plan&.name || "Starter (default)"
+              %td= company.restricted_at? ? "Restricted" : "Unrestricted"
               %td= l(company.created_at.to_date, format: :long)
+  = link_to "Clear filters", admin_companies_path, class: "btn btn-link mt-2"
   - if @pagy.pages > 1
     .mt-4.d-flex.justify-content-end= bootstrap_pagy_nav(@pagy)

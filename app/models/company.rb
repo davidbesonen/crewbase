@@ -1,6 +1,11 @@
 class Company < ApplicationRecord
   include ImageUploader::Attachment(:image)
 
+  scope :visible_to, ->(user) {
+    public_companies = where(is_public: true, restricted_at: nil)
+    user ? public_companies.or(where(id: user.company_assignments.select(:company_id))) : public_companies
+  }
+
   has_many :company_assignments, dependent: :destroy
   has_many :users, through: :company_assignments
 
@@ -8,6 +13,7 @@ class Company < ApplicationRecord
   has_many :plans, through: :company_plans
 
   has_many :jobs, dependent: :destroy
+  has_many :open_jobs, -> { accepting_applications }, class_name: "Job"
   has_many :credits, dependent: :nullify
   has_many :projects, dependent: :destroy
   has_many :crew_shortlists, dependent: :destroy
@@ -58,7 +64,7 @@ class Company < ApplicationRecord
   end
 
   def is_owner?(user)
-    owner == user
+    user.present? && company_assignments.exists?(user_id: user.id, role: "owner")
   end
 
   def industry

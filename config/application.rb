@@ -10,6 +10,8 @@ module Crewbase
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
+    config.x.demo_mode = ENV["CREWBASE_DEMO"] == "true"
+    config.active_storage.draw_routes = false
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.

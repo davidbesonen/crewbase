@@ -35,7 +35,7 @@
                   - unless multi_position_available?
                     %p.small.text-primary.fw-semibold.mb-0.mt-2{ data: { feature_upgrade: "multi-position-gigs" } }
                       %i.bi.bi-lock-fill.me-1
-                      Available on Team and Studio plans
+                      Available on Team plans
             - if job.errors[:posting_type].any?
               .text-danger.small.mt-2= job.errors.full_messages_for(:posting_type).to_sentence
         - if job.new_record?
@@ -76,7 +76,7 @@
         .col-12
           %h5.fw-semibold.mb-2 Crew requirements
           %p.text-muted.mb-3
-            Structured requirements power crew matching. Mark only genuine must-haves as required.
+            Choose occupations and describe the skills and equipment needed. Every required entry must match reported experience; preferred entries improve ranking. Verify qualifications before hiring.
           .row.g-3
             - taxonomy_requirement_fields.each do |field|
               .col-md-6
@@ -126,10 +126,13 @@
                             taxonomy_multiselect_target: "option",
                             taxonomy_value: option.id,
                             taxonomy_name: option.name,
-                            taxonomy_search_text: option.name.downcase
+                            taxonomy_search_text: [option.name, option.description].join(" ").downcase
                           }
                         }
-                          %span= option.name
+                          %span
+                            %span.d-block= option.name
+                            - if option.description.present?
+                              %span.d-block.small.text-muted= option.description
                           %i.bi.bi-check-lg.taxonomy-multiselect-check{ aria: { hidden: "true" } }
                     .visually-hidden{ role: "status", aria: { live: "polite" }, data: { taxonomy_multiselect_target: "status" } }
                   .taxonomy-multiselect-chips{ data: { taxonomy_multiselect_target: "chips" } }
@@ -146,6 +149,17 @@
                       }
                         %span= option.name
                         %i.bi.bi-x-lg{ aria: { hidden: "true" } }
+        .col-12
+          %h5.fw-semibold Broad experience
+          %p.text-muted Occupations already cover their core duties. Add any additional capabilities and equipment families this job needs. Required experience must match a person's occupations or selections; preferred experience helps rank matches.
+          = experience_categories
+        .col-12
+          %h5.fw-semibold Specific requirements (optional)
+          %p.text-muted.small Use these only when a particular technique, product or model matters. One entry per line. Required entries need matching named experience; a broad category alone will not satisfy them.
+          .row.g-3
+            - personal_requirement_fields.each do |field|
+              .col-md-6
+                = f.input field[:attribute], as: :text, label: field[:label], input_html: { rows: 4, maxlength: ExperienceTerms::MAX_TEXT_LENGTH, value: field[:value] }
         .col-12
           %label.form-label Screening Questions
           %p.text-muted.mb-2 Add custom screening questions for applicants. Use the plus button to add another question.

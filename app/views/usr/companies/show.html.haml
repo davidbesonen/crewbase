@@ -1,57 +1,57 @@
+- if @company.restricted_at?
+  .alert.alert-warning{ role: "status" }
+    %strong This company is on an administrative hold.
+    Its profile and jobs are hidden from public discovery, and new applications and offers are paused. Your team's existing records remain available.
 - if @company.is_owner?(current_user)
   = render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :profile, entitlement: @entitlement)
 
-.row
-  .col-sm-12
-    .card.border-0.shadow-sm.app-hero.app-hero-cyan
-      .card-body
-        .row.px-4
-          .col-sm-12.mt-4
-            = render Usr::Shared::CompanyIconComponent.new(company: @company, size: 250)
-        .row.mt-4.px-4
-          .col-sm-8
-            .d-flex.flex-wrap.align-items-center.gap-2
-              %h1.fw-bold.mb-0= @company.name
-              = render Usr::Shared::CompanyVisibilityBadgeComponent.new(plan: @company_plan)
-          .col-sm-4.d-flex.align-items-center.justify-content-end
-            - if current_user != @company.owner
-              = link_to new_usr_company_review_path(@company), class: "btn btn-outline-primary me-3", data: { turbo_frame: "remote_modal" } do
-                Write a Review
-        .row.px-4
-          .col-sm-12
-            %p.d-flex.flex-wrap.align-items-center.gap-2.text-muted.mt-1.mb-0{ style: "font-size: 1.3rem;" }
-              %span
-                %strong
-                  %i.bi.bi-buildings.me-1
-              %span= @company.industry_names_text.presence || "Industry not listed"
-              - if @company.formatted_location.present?
-                %span •
-              %span= @company.formatted_location
-              - if @company.is_owner?(current_user)
-                %span.badge.bg-secondary{ style: "font-size: 0.75rem;" }
-                  Owner
-            .d-flex.flex-wrap.gap-3.mt-2.mb-3
-              - if @company.website_url.present?
-                = link_to @company.website_url, target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-globe{ title: "Website" }
-              - if @company.linkedin_url.present?
-                = link_to @company.linkedin_url, target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-linkedin{ title: "LinkedIn" }
-              - if @company.twitter_handle.present?
-                = link_to "https://twitter.com/#{@company.twitter_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-twitter-x{ title: "X (Twitter)" }
-              - if @company.instagram_handle.present?
-                = link_to "https://instagram.com/#{@company.instagram_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-instagram{ title: "Instagram" }
-              - if @company.facebook_url.present?
-                = link_to @company.facebook_url, target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-facebook{ title: "Facebook" }
-              - if @company.youtube_url.present?
-                = link_to @company.youtube_url, target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-youtube{ title: "YouTube" }
-              - if @company.tiktok_handle.present?
-                = link_to "https://www.tiktok.com/@#{@company.tiktok_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "text-muted" do
-                  %i.bi.bi-tiktok{ title: "TikTok" }
+.card.company-profile-hero.border-0.shadow-sm.app-hero.app-hero-cyan
+  .card-body
+    .company-profile-hero__layout
+      .company-profile-hero__avatar
+        = render Usr::Shared::CompanyIconComponent.new(company: @company, size: 112)
+      .company-profile-hero__identity
+        .d-flex.flex-wrap.align-items-center.gap-2
+          %h1.fw-bold.mb-0= @company.name
+          = render Usr::Shared::CompanyVisibilityBadgeComponent.new(plan: @company_plan)
+        %p.d-flex.flex-wrap.align-items-center.gap-2.text-muted.mt-2.mb-0
+          %span
+            %strong
+              %i.bi.bi-buildings.me-1
+          %span= @company.industry_names_text.presence || "Industry not listed"
+          - if @company.formatted_location.present?
+            %span •
+          %span= @company.formatted_location
+          - if @company.is_owner?(current_user)
+            %span.badge.text-bg-light.border
+              Owner
+        .company-profile-socials.d-flex.flex-wrap.gap-2.mt-3
+          - if @company.website_url.present?
+            = link_to @company.website_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Website" }, title: "Website" do
+              %i.bi.bi-globe{ aria: { hidden: true } }
+          - if @company.linkedin_url.present?
+            = link_to @company.linkedin_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "LinkedIn" }, title: "LinkedIn" do
+              %i.bi.bi-linkedin{ aria: { hidden: true } }
+          - if @company.twitter_handle.present?
+            = link_to "https://twitter.com/#{@company.twitter_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "X (Twitter)" }, title: "X (Twitter)" do
+              %i.bi.bi-twitter-x{ aria: { hidden: true } }
+          - if @company.instagram_handle.present?
+            = link_to "https://instagram.com/#{@company.instagram_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Instagram" }, title: "Instagram" do
+              %i.bi.bi-instagram{ aria: { hidden: true } }
+          - if @company.facebook_url.present?
+            = link_to @company.facebook_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Facebook" }, title: "Facebook" do
+              %i.bi.bi-facebook{ aria: { hidden: true } }
+          - if @company.youtube_url.present?
+            = link_to @company.youtube_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "YouTube" }, title: "YouTube" do
+              %i.bi.bi-youtube{ aria: { hidden: true } }
+          - if @company.tiktok_handle.present?
+            = link_to "https://www.tiktok.com/@#{@company.tiktok_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "TikTok" }, title: "TikTok" do
+              %i.bi.bi-tiktok{ aria: { hidden: true } }
+        - if current_user != @company.owner
+          .mt-3
+            = link_to new_usr_company_review_path(@company), class: "btn btn-outline-primary", data: { turbo_frame: "remote_modal" } do
+              %i.bi.bi-chat-square-text.me-1{ aria: { hidden: true } }
+              Write a Review
 
 .row.mt-3
   .col-sm-12
@@ -82,3 +82,8 @@
               = render Usr::Company::ApplicationsTabComponent.new(company: @company, job_applications: @job_applications, pipeline_available: @entitlement.allowed?(:shortlists_pipeline))
             = render Usr::Company::EmployeesTabComponent.new(company: @company)
             = render Usr::Company::RatingsTabComponent.new(company: @company, ratings: @ratings)
+
+.mt-4
+  = link_to new_usr_report_path(subject_type: "Company", subject_id: @company.id), class: "btn btn-sm btn-outline-secondary" do
+    %i.bi.bi-flag.me-1{ aria: { hidden: true } }
+    Report this company

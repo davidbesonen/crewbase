@@ -16,8 +16,12 @@ class Usr::Company::OwnerNavigationComponent < ApplicationComponent
   end
 
   def button_class(destination, secondary: false)
-    return "btn btn-sm btn-primary" if active == destination
+    return "btn btn-sm btn-quiet" if active == destination
 
     "btn btn-sm #{secondary ? 'btn-outline-secondary' : 'btn-outline-primary'}"
+  end
+
+  def current_destination(destination)
+    "page" if active == destination
   end
 end

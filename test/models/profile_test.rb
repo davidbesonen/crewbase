@@ -28,6 +28,13 @@ class ProfileTest < ActiveSupport::TestCase
     assert_equal :has_many, association.macro
   end
 
+  test "core occupation duties satisfy experience completion without redundant selections" do
+    profile = Profile.new(profile_type: "user", occupations: [ Occupation.new(name: "Actor") ])
+    assert_equal 35, profile.completion_percentage
+    assert_empty profile.capability_keys
+    assert_empty profile.equipment_family_keys
+  end
+
   test "profile completion awards useful increments for each profile section" do
     user = User.create!(
       first_name: "Profile",

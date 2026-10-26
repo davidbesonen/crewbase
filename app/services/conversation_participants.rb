@@ -5,11 +5,9 @@ class ConversationParticipants
 
   def users
     case context
-    when JobApplication
+    when JobApplication, JobInvitation
       owners = context.job.company.users.merge(CompanyAssignment.where(role: "owner"))
-      [ context.profile.user, *owners ].uniq
-    when JobInvitation
-      [ context.profile.user, context.invited_by ].uniq
+      [ context.profile&.user, *owners ].compact.uniq
     else
       []
     end

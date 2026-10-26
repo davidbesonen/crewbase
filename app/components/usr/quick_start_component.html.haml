@@ -1,0 +1,17 @@
+.card.mb-4{ data: { quick_start: true } }
+  .card-body
+    .row.g-4
+      - if intent != "hire_crew"
+        .col-md
+          %h2.h5 Find your next role
+          %p.text-muted Browse opportunities now. Add experience and availability to improve your matches.
+          .d-flex.flex-wrap.gap-2
+            = link_to "Explore jobs", usr_jobs_path, class: "btn btn-primary"
+            = link_to "Build my profile", edit_usr_profile_path(profile), class: "btn btn-outline-primary"
+      - if intent != "find_work"
+        .col-md
+          %h2.h5 Post your first role
+          %p.text-muted Set up your company, describe the work, and find relevant crew.
+          = link_to "Start hiring", post_job_path, class: "btn btn-primary"
+    .mt-3
+      = link_to "Change what I'm here for", usr_onboarding_path, class: "small"

@@ -1,4 +1,14 @@
 namespace :usr do
+  resource :onboarding, only: [ :show, :update ], controller: "onboarding"
+  resources :recommendation_feedback, only: :index
+  resources :reports, only: [ :index, :new, :create ]
+  resources :user_blocks, only: [ :create, :destroy ]
+  resource :network, only: :show, controller: "networks"
+  resources :network_connections, only: [ :new, :create, :destroy ] do
+    patch :accept, on: :member
+    patch :decline, on: :member
+  end
+  resources :network_job_shares, only: :show
   resource :settings, only: [ :show, :update ]
   scope "settings", as: :settings do
     resource :billing, only: :show, controller: "billing" do
@@ -7,12 +17,17 @@ namespace :usr do
     end
   end
   resources :jobs, only: [ :index, :show ] do
+    resource :recommendation_feedback, only: [ :create, :destroy ], controller: "recommendation_feedback"
+    resources :network_job_shares, only: [ :new, :create ]
     get :select_company, on: :collection
     get :my_postings, on: :collection
     resource :saved_job, only: [ :create, :destroy ]
     resource :crew, only: :show, controller: "job_crews"
     resources :crew_positions, only: :create
     resources :job_invitations, only: :create
+    resources :contracts, only: [ :create, :destroy ], controller: "job_contracts" do
+      get :download, on: :member
+    end
   end
   resources :crew_positions, only: :destroy do
     resources :crew_assignments, only: :create
@@ -26,6 +41,9 @@ namespace :usr do
   end
   resources :jobs, only: [] do
     resources :job_applications, only: [ :new, :create ]
+  end
+  resources :job_offers, only: [ :index, :new, :create, :show, :update ] do
+    get :calendar, on: :member
   end
   resources :job_applications, only: [ :index, :show ] do
     patch :update_status, on: :member
@@ -42,6 +60,7 @@ namespace :usr do
   end
   resources :notifications, only: [ :index ] do
     patch :read, on: :member
+    patch :read_all, on: :collection
     delete :clear_read, on: :collection
   end
 
@@ -79,15 +98,15 @@ namespace :usr do
     resources :job_invitations, only: [ :create ]
     get :next_page, on: :member, defaults: { format: :turbo_stream }
     get :previous_page, on: :member, defaults: { format: :turbo_stream }
-    get :toggle_occupation_selection, on: :member, defaults: { format: :turbo_stream }
-    get :toggle_skill_selection, on: :member, defaults: { format: :turbo_stream }
-    get :toggle_equipment_selection, on: :member, defaults: { format: :turbo_stream }
+    post :toggle_occupation_selection, on: :member, defaults: { format: :turbo_stream }
+    post :toggle_skill_selection, on: :member, defaults: { format: :turbo_stream }
+    post :toggle_equipment_selection, on: :member, defaults: { format: :turbo_stream }
     get :edit_calendar, on: :member
     patch :update_calendar, on: :member, defaults: { format: :turbo_stream }
     resources :reviews, only: [ :new, :create, :edit, :update, :destroy ]
     resources :calendar_events, only: [ :create, :destroy ], param: :date do
-      get :toggle_date_selection, on: :collection, defaults: { format: :turbo_stream }
-      get :destroy_all, on: :collection, defaults: { format: :turbo_stream }
+      post :toggle_date_selection, on: :collection, defaults: { format: :turbo_stream }
+      delete :destroy_all, on: :collection, defaults: { format: :turbo_stream }
       get :previous_month, on: :collection, defaults: { format: :turbo_stream }
       get :next_month, on: :collection, defaults: { format: :turbo_stream }
     end

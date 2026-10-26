@@ -6,30 +6,28 @@ class DashboardQuickSearch
   MIN_QUERY_LENGTH = 2
   MAX_QUERY_LENGTH = 80
   RESULTS_PER_TYPE = 4
-  CACHE_TTL = 30.seconds
 
-  def initialize(query)
+  def initialize(query, user: nil)
     @query = query.to_s.squish.first(MAX_QUERY_LENGTH)
+    @user = user
   end
 
   def results
     return [] if query.length < MIN_QUERY_LENGTH
 
-    Rails.cache.fetch([ "dashboard-quick-search", query.downcase ], expires_in: CACHE_TTL) do
-      company_results + job_results + person_results
-    end
+    company_results + job_results + person_results
   end
 
   private
 
-  attr_reader :query
+  attr_reader :query, :user
 
   def pattern
     @pattern ||= "%#{ActiveRecord::Base.sanitize_sql_like(query)}%"
   end
 
   def company_results
-    Company
+    Company.visible_to(user)
       .where("name ILIKE ?", pattern)
       .order(Arel.sql("LOWER(name) ASC"))
       .limit(RESULTS_PER_TYPE)
@@ -40,9 +38,8 @@ class DashboardQuickSearch
   end
 
   def job_results
-    scope = Job
+    scope = Job.accepting_applications
       .left_joins(:company)
-      .where(is_active: true, status: :published)
       .where("jobs.title ILIKE ?", pattern)
       .order(Arel.sql("LOWER(jobs.title) ASC"))
 
@@ -65,9 +62,8 @@ class DashboardQuickSearch
   end
 
   def person_results
-    Profile
+    Profile.network_visible
       .joins(:user)
-      .where(profile_type: "user")
       .where(
         "COALESCE(users.first_name, '') || ' ' || COALESCE(users.last_name, '') ILIKE ?",
         pattern

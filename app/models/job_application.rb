@@ -3,6 +3,7 @@ class JobApplication < ApplicationRecord
   DECISION_STATUSES = %w[accepted rejected].freeze
 
   belongs_to :job
+  has_many :job_offers, dependent: :destroy
   belongs_to :profile
   has_one :conversation, as: :context, dependent: :destroy
 
@@ -24,6 +25,14 @@ class JobApplication < ApplicationRecord
     withdrawn: 4,
     accepted: 5
   }
+
+  validate do
+    [ :resume, :cover_letter_file ].each do |name|
+      file = public_send(name)
+      UploadPolicy.validate(self, name, file.blob) if file.attached?
+    end
+    attachments.each { |file| UploadPolicy.validate(self, :attachments, file.blob) }
+  end
 
   validates :status, inclusion: { in: statuses.keys }
 

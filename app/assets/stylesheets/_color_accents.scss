@@ -45,7 +45,7 @@
   overflow: hidden;
   padding: clamp(1.25rem, 2.5vw, 2rem);
   border: 1px solid color-mix(in srgb, var(--app-accent-color) 18%, transparent);
-  border-radius: 1rem;
+  border-radius: var(--bs-border-radius-lg);
   background-color: var(--bs-card-bg);
   color: var(--bs-body-color);
 }
@@ -65,24 +65,10 @@
   --app-accent-surface: var(--app-surface-sky);
 }
 
-/* White cards stay clean; a slim side rail carries the branded accent. */
+/* Accent identity stays available for icons; card surfaces remain neutral. */
 .card-accent {
   position: relative;
-  overflow: hidden;
   background-color: var(--bs-card-bg);
-}
-
-.card-accent::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background-color: var(--app-accent-color);
-  content: "";
-  pointer-events: none;
-}
-
-.card-accent.card-accent-side::before {
-  inset: 0 0 0 auto;
 }
 
 .card-accent-cyan {
@@ -103,12 +89,12 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.65rem;
   background-color: var(--app-accent-surface);
   color: var(--app-accent-ink);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 
 .icon-orb-cyan {
@@ -180,9 +166,9 @@
 /* Friendly, low-density treatment for screens without content yet. */
 .empty-state {
   padding: clamp(1.5rem, 4vw, 3rem);
-  border: 1px dashed color-mix(in srgb, var(--app-accent-color) 32%, transparent);
-  border-radius: 1rem;
-  background-color: var(--app-accent-surface);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius-lg);
+  background-color: var(--bs-tertiary-bg);
   color: var(--bs-body-color);
   text-align: center;
 }

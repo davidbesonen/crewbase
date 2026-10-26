@@ -2,13 +2,12 @@
 
 class Usr::Company::JobFormComponent < ApplicationComponent
   extend Dry::Initializer
+  renders_one :experience_categories
 
   option :company
   option :job
   option :projects, default: proc { [] }
   option :occupations, default: proc { [] }
-  option :skills, default: proc { [] }
-  option :equipment, default: proc { [] }
   option :requirement_selections, default: proc { {} }
   option :entitlement
 
@@ -42,13 +41,14 @@ class Usr::Company::JobFormComponent < ApplicationComponent
   end
 
   def taxonomy_requirement_fields
-    [
-      taxonomy_requirement_field(:occupation, :required, "Required occupations", occupations),
-      taxonomy_requirement_field(:skill, :required, "Required skills", skills),
-      taxonomy_requirement_field(:skill, :preferred, "Preferred skills", skills),
-      taxonomy_requirement_field(:equipment, :required, "Required equipment", equipment),
-      taxonomy_requirement_field(:equipment, :preferred, "Preferred equipment", equipment)
-    ]
+    [ taxonomy_requirement_field(:occupation, :required, "Required occupations", occupations) ]
+  end
+
+  def personal_requirement_fields
+    requirements = JobExperienceRequirements.new(job)
+    JobExperienceRequirements::TEXT_FIELDS.keys.map do |attribute|
+      { attribute: attribute, label: attribute.to_s.delete_suffix("_text").humanize, value: requirements.names_for(attribute).join("\n") }
+    end
   end
 
   private
@@ -61,7 +61,7 @@ class Usr::Company::JobFormComponent < ApplicationComponent
       attribute: attribute,
       id: "job_#{attribute}",
       label: label,
-      noun: type == :equipment ? "equipment entries" : type.to_s.pluralize,
+      noun: "occupations",
       options: collection.sort_by { |item| item.name.downcase },
       selected_ids: selected_ids
     }

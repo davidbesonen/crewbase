@@ -38,14 +38,14 @@ class ProfileJobAvailabilityTest < ActiveSupport::TestCase
     assert_empty result.conflict_dates
   end
 
-  test "treats a connected calendar feed as availability evidence" do
+  test "a calendar feed without a successful sync is unknown" do
     job = Job.new(starts_at: Time.zone.parse("2026-08-08 08:00"))
     profile = profile_with(ical_feed_url: "https://example.com/calendar.ics")
 
     result = ProfileJobAvailability.new(profile:, job:).result
 
-    assert_equal :no_known_conflict, result.state
-    assert_equal "No known conflict", result.label
+    assert_equal :unknown, result.state
+    assert_equal "Availability unknown", result.label
   end
 
   test "reports unknown when the job has no usable dates" do
@@ -77,6 +77,9 @@ class ProfileJobAvailabilityTest < ActiveSupport::TestCase
   private
 
   def profile_with(*events, ical_feed_url: nil)
-    Struct.new(:calendar_events, :ical_feed_url).new(events, ical_feed_url)
+    Profile.new(ical_feed_url:).tap do |profile|
+      events.each { |event| event.provider = :manual }
+      profile.calendar_events = events
+    end
   end
 end

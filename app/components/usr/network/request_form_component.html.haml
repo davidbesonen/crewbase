@@ -1,0 +1,14 @@
+.card.network-form
+  .card-body.p-4
+    %h1.h3.mb-2= "Connect with #{profile.user.full_name}"
+    %p.text-muted Keep in touch for future gigs and share relevant jobs. Your connections are private.
+    - if connection.errors.any?
+      .alert.alert-danger{ role: "alert" }= connection.errors.full_messages.to_sentence
+    = form_with model: connection, url: helpers.usr_network_connections_path, builder: ActionView::Helpers::FormBuilder do |form|
+      = form.hidden_field :profile_id, value: profile.id
+      .mb-3
+        = form.label :introduction, "Add a short introduction (optional)", class: "form-label"
+        = form.text_area :introduction, value: connection.introduction, class: "form-control", rows: 3, maxlength: 500, placeholder: "Where you met or why you’d like to connect"
+      .d-flex.gap-2
+        = form.submit "Send connection request", class: "btn btn-primary"
+        = link_to "Cancel", helpers.usr_profile_path(profile), class: "btn btn-quiet"

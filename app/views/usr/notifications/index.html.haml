@@ -1,8 +1,15 @@
 .app-hero.app-hero-cyan.mb-4
-  .d-flex.align-items-center.gap-3
-    %span.icon-orb.icon-orb-cyan
-      %i.bi.bi-bell{ aria: { hidden: true } }
-    %h1.fw-bold.mb-0 Notifications
+  .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+    .d-flex.align-items-center.gap-3
+      %span.icon-orb.icon-orb-cyan
+        %i.bi.bi-bell{ aria: { hidden: true } }
+      %div
+        %h1.fw-bold.mb-0 Notifications
+        %p.text-muted.mb-0= "#{pluralize(@unread_notifications.size, 'unread update')}"
+    - if @unread_notifications.any?
+      = button_to read_all_usr_notifications_path, method: :patch, class: "btn btn-outline-primary" do
+        %i.bi.bi-check2-all.me-2{ aria: { hidden: true } }
+        Mark all as read
 
 - if @unread_notifications.any? || @read_notifications.any?
   - if @unread_notifications.any?

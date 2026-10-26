@@ -1,0 +1,20 @@
+- if @events.empty?
+  %p.text-muted.mb-0 No administrative changes recorded.
+- else
+  %ol.list-unstyled.mb-0{ data: { audit_log: true } }
+    - @events.each do |event|
+      %li.border-bottom.py-3
+        .row.g-3
+          .col-md-4
+            %h3.h6.mb-1= event.action.humanize
+            %div.small.mb-2
+              - if subject_path(event)
+                = link_to "#{event.subject_type} ##{event.subject_id}", subject_path(event)
+              - else
+                = "#{event.subject_type} ##{event.subject_id}"
+            %div.small.text-muted= event.created_at.to_fs(:long)
+            = link_to event.actor.full_name, admin_user_path(event.actor), class: "small"
+          .col-md-8.text-break
+            %p.mb-2= event.reason
+            - event.changeset.each do |field, values|
+              %div.small.text-muted= "#{field.humanize}: #{values.first.inspect} → #{values.last.inspect}"

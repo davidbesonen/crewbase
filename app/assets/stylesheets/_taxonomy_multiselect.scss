@@ -23,22 +23,22 @@
   gap: 0.35rem;
   max-width: 100%;
   padding: 0.3rem 0.625rem;
-  border: 1px solid color-mix(in srgb, var(--crewbase-primary, #1b4965) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--bs-primary) 20%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--crewbase-primary, #1b4965) 8%, transparent);
-  color: var(--crewbase-primary, #1b4965);
+  background: color-mix(in srgb, var(--bs-primary) 8%, transparent);
+  color: var(--bs-primary);
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .taxonomy-multiselect-chip:hover {
-  background: color-mix(in srgb, var(--crewbase-primary, #1b4965) 14%, transparent);
+  background: color-mix(in srgb, var(--bs-primary) 14%, transparent);
 }
 
 .taxonomy-multiselect-chip:focus-visible {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--crewbase-primary, #1b4965) 20%, transparent);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--bs-primary) 20%, transparent);
 }
 
 .taxonomy-multiselect-chip span {
@@ -78,16 +78,19 @@
 }
 
 .taxonomy-multiselect-check {
-  color: var(--crewbase-primary, #1b4965);
+  color: var(--bs-primary);
   opacity: 0;
 }
 
 .taxonomy-multiselect .taxonomy-multiselect-options [aria-selected="true"] {
-  background: color-mix(in srgb, var(--crewbase-primary, #1b4965) 8%, transparent);
-  color: var(--crewbase-primary, #1b4965);
+  background: color-mix(in srgb, var(--bs-primary) 8%, transparent);
+  color: var(--bs-primary);
   font-weight: 600;
 }
 
 .taxonomy-multiselect .taxonomy-multiselect-options [aria-selected="true"] .taxonomy-multiselect-check {
   opacity: 1;
+}
+.experience-category-options {
+  max-height: 22rem;
 }

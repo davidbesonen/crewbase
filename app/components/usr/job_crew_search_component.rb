@@ -1,18 +1,16 @@
 module Usr
   class JobCrewSearchComponent < ApplicationComponent
-    def initialize(job:, results:, occupations:, skills:, equipment:, crew_shortlists:, filters:)
+    def initialize(job:, results:, occupations:, crew_shortlists:, filters:)
       @job = job
       @results = results
       @occupations = occupations
-      @skills = skills
-      @equipment = equipment
       @crew_shortlists = crew_shortlists
       @filters = filters
     end
 
     private
 
-    attr_reader :job, :results, :occupations, :skills, :equipment, :crew_shortlists, :filters
+    attr_reader :job, :results, :occupations, :crew_shortlists, :filters
 
     def selected_filter(name)
       filters[name].presence
@@ -20,9 +18,7 @@ module Usr
 
     def filter_fields
       [
-        filter_field(:occupation_id, "Occupation", "Any matched occupation", occupations.map { |occupation| [ occupation.name, occupation.id ] }),
-        filter_field(:skill_id, "Skill", "Any skill", skills.map { |skill| [ skill.name, skill.id ] }),
-        filter_field(:equipment_id, "Equipment", "Any equipment", equipment.map { |item| [ item.name, item.id ] }),
+        filter_field(:occupation_id, "Occupation", "Any occupation", occupations.map { |occupation| [ occupation.name, occupation.id ] }),
         filter_field(
           :availability_state,
           "Availability",

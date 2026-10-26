@@ -4,9 +4,6 @@ engine = SeedEngine.new
 engine.reset_mock_data
 engine.create_industries
 engine.create_occupations
-engine.create_brands
-engine.create_equipment
-engine.create_skills
 engine.create_plans
 engine.create_user_plans
 engine.create_roles

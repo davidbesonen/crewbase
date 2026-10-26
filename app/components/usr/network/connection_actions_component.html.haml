@@ -1,0 +1,27 @@
+- if profile.user_id != viewer.id
+  .d-flex.flex-wrap.align-items-center.gap-2
+    - if connection.nil?
+      = link_to helpers.new_usr_network_connection_path(profile_id: profile.id), class: "btn btn-sm btn-outline-primary" do
+        %i.bi.bi-person-plus.me-1{ aria: { hidden: true } }
+        Connect
+    - elsif connection.accepted?
+      %span.small.text-success
+        %i.bi.bi-person-check.me-1{ aria: { hidden: "true" } }
+        Connected
+      = button_to helpers.usr_network_connection_path(connection), method: :delete, class: "btn btn-sm btn-quiet", data: { turbo_confirm: "Remove this connection?" } do
+        %i.bi.bi-person-dash.me-1{ aria: { hidden: true } }
+        Remove
+    - elsif connection.pending? && connection.recipient_id == viewer.id
+      = button_to helpers.accept_usr_network_connection_path(connection), method: :patch, class: "btn btn-sm btn-primary" do
+        %i.bi.bi-check-lg.me-1{ aria: { hidden: true } }
+        Accept connection
+      = button_to helpers.decline_usr_network_connection_path(connection), method: :patch, class: "btn btn-sm btn-quiet" do
+        %i.bi.bi-x-lg.me-1{ aria: { hidden: true } }
+        Decline
+    - elsif connection.pending?
+      %span.small.text-muted Request sent
+      = button_to helpers.usr_network_connection_path(connection), method: :delete, class: "btn btn-sm btn-quiet" do
+        %i.bi.bi-x-lg.me-1{ aria: { hidden: true } }
+        Cancel request
+    - else
+      %span.small.text-muted Not connected

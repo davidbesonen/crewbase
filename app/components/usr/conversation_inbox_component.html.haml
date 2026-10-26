@@ -1,0 +1,25 @@
+- if conversations.any?
+  .conversation-list
+    - conversations.each do |conversation|
+      = link_to usr_conversation_path(conversation), class: "conversation-list-item" do
+        .conversation-list-icon
+          %i.bi{ class: conversation.archived? ? "bi-archive" : "bi-chat-left-text", aria: { hidden: true } }
+        .flex-grow-1.min-width-0
+          .d-flex.flex-wrap.align-items-center.gap-2.mb-1
+            %h2.h6.mb-0= conversation.title
+            - if conversation.archived?
+              %span.badge.text-bg-light Archived
+            - if unread?(conversation)
+              %span.badge.text-bg-primary Unread
+          .small.text-muted= "#{conversation.context.job.company.name} · #{participants(conversation)}"
+          - if conversation.latest_message
+            .conversation-preview= truncate(conversation.latest_message.preview, length: 120)
+        %i.bi.bi-chevron-right.text-muted{ aria: { hidden: true } }
+- else
+  .empty-state.empty-state-sky.py-5
+    %i.bi.bi-chat-left-text.empty-state-icon{ aria: { hidden: true } }
+    %h2.h5 Your conversations start here
+    %p.text-muted.mb-4 Message a company from an application. When you’re hired, a conversation opens automatically.
+    .d-flex.flex-wrap.justify-content-center.gap-2
+      = link_to "View my applications", usr_job_applications_path, class: "btn btn-primary"
+      = link_to "Browse open jobs", usr_jobs_path, class: "btn btn-outline-primary"

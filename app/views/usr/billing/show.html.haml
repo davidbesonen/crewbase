@@ -3,8 +3,8 @@
     .card.border-0.shadow-sm.app-hero.app-hero-cyan.mb-4
       .card-body.p-4
         %h1.fw-bold.mb-1 Billing & plans
-        %p.text-muted.mb-0 Review your individual Crewbase membership and Stripe billing.
+        %p.text-muted.mb-0 Your crew account is free. Review company plans or manage an existing subscription.
 
 .row
   .col-12
-    = render Usr::CrewBillingComponent.new(plans: @plans, subscription: @subscription)
+    = render Usr::CrewBillingComponent.new(subscription: @subscription)

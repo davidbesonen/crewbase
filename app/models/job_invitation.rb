@@ -24,6 +24,7 @@ class JobInvitation < ApplicationRecord
   validates :profile_id, uniqueness: { scope: :job_id }, allow_nil: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, if: -> { profile.nil? }
   validates :email, uniqueness: { scope: :job_id, case_sensitive: false }, allow_blank: true
+  validate :recipient_allows_contact, on: :create
   validate :recipient_must_be_present
   validate :job_must_be_invitable
   validate :inviter_must_own_job_company
@@ -56,12 +57,17 @@ class JobInvitation < ApplicationRecord
     self.email ||= profile&.user&.email
   end
 
+  def recipient_allows_contact
+    recipient = profile&.user || User.find_by("LOWER(email) = ?", email.to_s.downcase)
+    errors.add(:base, "This person is not available for new invitations") if recipient&.restricted_at? || UserBlock.between?(invited_by, recipient)
+  end
+
   def recipient_must_be_present
     errors.add(:base, "A profile or email address is required") if profile.nil? && email.blank?
   end
 
   def job_must_be_invitable
-    return if job&.is_active? && job&.published?
+    return if job&.publicly_visible?
 
     errors.add(:job, "must be an active published job")
   end

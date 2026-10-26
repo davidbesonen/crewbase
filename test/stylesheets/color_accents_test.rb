@@ -50,17 +50,13 @@ class ColorAccentsTest < ActiveSupport::TestCase
     assert_match(/--app-surface-sky:\s*#[Ff]2[Ff]8[Ff][Cc]/, @stylesheet)
   end
 
-  test "card accents use a slim side rail on a clean solid surface" do
+  test "card accents keep clean surfaces without decorative rails" do
     card_accent_rule = @stylesheet.match(/\.card-accent\s*\{(?<body>.*?)\}/m)
-    rail_rule = @stylesheet.match(/\.card-accent::before\s*\{(?<body>.*?)\}/m)
 
-    assert card_accent_rule, "Expected a shared card accent rule"
-    assert rail_rule, "Expected a shared card accent rail"
+    assert card_accent_rule, "Expected a shared card accent surface"
     assert_match(/background-color/, card_accent_rule[:body])
-    assert_match(/width:\s*3px/, rail_rule[:body])
-    assert_match(/background-color:\s*var\(--app-accent-color\)/, rail_rule[:body])
     refute_match(/gradient/, card_accent_rule[:body])
-    refute_match(/border-(top|right|bottom|left)/, card_accent_rule[:body])
+    refute_includes @stylesheet, ".card-accent::before"
   end
 
   test "hero cards use a clean white surface without blue fills or gradients" do
@@ -71,8 +67,9 @@ class ColorAccentsTest < ActiveSupport::TestCase
     refute_match(/gradient/, hero_rule[:body])
   end
 
-  test "application background is a consistent solid color rather than a gradient behind cards" do
-    assert_includes @application_stylesheet, "background-color: var(--bs-tertiary-bg);"
-    refute_includes @application_stylesheet, "linear-gradient(180deg, #f8f8f8 0%, #f0f0f0 100%)"
+  test "application background uses a soft blue gradient behind cards" do
+    assert_match(/^body\s*\{[^}]*background:.*radial-gradient/m, @application_stylesheet)
+    assert_match(/^body\s*\{[^}]*linear-gradient/m, @application_stylesheet)
+    assert_match(/^body\s*\{[^}]*background-attachment: fixed/m, @application_stylesheet)
   end
 end

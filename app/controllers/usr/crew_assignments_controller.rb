@@ -12,21 +12,20 @@ class Usr::CrewAssignmentsController < ApplicationController
 
   def destroy
     job = @assignment.crew_position.job
-    @assignment.destroy
-    redirect_to usr_job_crew_path(job), notice: "Crew member removed."
+    if @assignment.job_offer
+      redirect_to usr_job_offer_path(@assignment.job_offer), notice: "Cancel this booking with a reason to notify the worker."
+    else
+      @assignment.destroy!
+      redirect_to usr_job_crew_path(job), notice: "Crew member removed."
+    end
   end
 
   private
 
   def save_assignment(position:, assignment: nil)
-    profile = Profile.find(assignment_params.fetch(:profile_id))
-    manager = CrewAssignmentManager.new(position:, profile:, assignment:, user: current_user)
-
-    if manager.call
-      redirect_to usr_job_crew_path(position.job), notice: assignment ? "Crew member reassigned." : "Crew member assigned."
-    else
-      redirect_to usr_job_crew_path(position.job), alert: "Crew member could not be assigned."
-    end
+    profile = JobCrewCandidateQuery.new(job: position.job, user: current_user).profiles.find(assignment_params.fetch(:profile_id))
+    redirect_to new_usr_job_offer_path(crew_position_id: position.id, profile_id: profile.id),
+      notice: assignment ? "Send the replacement an offer. Cancel the existing booking before the replacement accepts." : "Confirm the terms before sending this person an offer."
   end
 
   def set_owned_position

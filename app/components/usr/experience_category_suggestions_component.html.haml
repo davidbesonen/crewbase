@@ -1,0 +1,10 @@
+#experience-category-suggestions{ aria: { live: "polite" } }
+  - if suggestions.any?
+    %p.fw-semibold.mb-2 Suggested categories — add only those you have experience with
+    .d-flex.flex-wrap.gap-2
+      - suggestions.each do |suggestion|
+        %button.btn.btn-sm.btn-outline-secondary.text-start{ type: "button", data: { action: "experience-categories#confirm", experience_category_field: suggestion.field, experience_category_key: suggestion.category.key } }
+          %span.d-block= "Add #{suggestion.category.name}"
+          %span.d-block.small= "Based on: #{suggestion.evidence}"
+  - else
+    %p.text-muted.small.mb-0 Choose any relevant categories above. Specific details can stay in your own words, even when no suggestion is available.

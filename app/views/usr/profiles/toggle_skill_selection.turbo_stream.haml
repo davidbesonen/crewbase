@@ -1,2 +1,6 @@
 = turbo_stream.replace "skill_equipment_selection_content" do
-  = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, skills: @skills, equipment: @equipment, profile_occupations: @profile.occupations, profile_skills: @profile_skills, profile_equipment: @profile_equipment, show_navigation: false, source: params[:source])
+  = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, show_navigation: false, source: params[:source]) do |section|
+    - section.with_categories do
+      = render Usr::ExperienceCategoryFieldsComponent.new(record: @profile, scope: :profile, occupations: @occupations, selected_occupation_ids: @profile_occupations.map(&:id)) do |fields|
+        - fields.with_suggestions do
+          = render Usr::ExperienceCategorySuggestionsComponent.new(suggestions: @category_suggestions)

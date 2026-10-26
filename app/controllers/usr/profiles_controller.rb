@@ -16,8 +16,7 @@ class Usr::ProfilesController < ApplicationController
     )
     @recommendations_available = recommendations.active_jobs?
     @recommended_people = @recommendations_available && params[:recommended] == "1"
-    profiles_scope = Profile.includes(:user, :occupations, :locations)
-      .where(profile_type: "user")
+    profiles_scope = Profile.network_visible.includes(:user, :occupations, :locations)
     recommendation_profile_ids = recommendations.results.map { |result| result.profile.id } if @recommended_people
     profiles_scope = profiles_scope.where(id: recommendation_profile_ids) if @recommended_people
 
@@ -27,6 +26,9 @@ class Usr::ProfilesController < ApplicationController
       :skills_name_eq,
       :locations_city_or_locations_state_or_locations_country_cont
     ).to_h
+    legacy_skill_query = search_params.delete("skills_name_eq")
+    @skill_query = params.key?(:skill_query) ? params[:skill_query] : legacy_skill_query
+    profiles_scope = ProfileExperienceSearch.new(scope: profiles_scope, skills_query: @skill_query, equipment_query: params[:equipment_query]).results
     @name_query = search_params.delete("user_first_name_or_user_last_name_cont").to_s.strip
     if @name_query.present?
       escaped_name = ActiveRecord::Base.sanitize_sql_like(@name_query)
@@ -34,9 +36,9 @@ class Usr::ProfilesController < ApplicationController
         .where("concat_ws(' ', users.first_name, users.last_name) ILIKE ?", "%#{escaped_name}%")
     end
 
-    @occupations = Occupation.order(:name)
-    @skills = Skill.order(:name)
+    @occupations = OccupationCatalog.new.records
     @q = profiles_scope.ransack(search_params)
+    @filtered = @q.conditions.any? || @name_query.present? || @skill_query.present? || params[:equipment_query].present? || @recommended_people
     profiles = @q.result(distinct: true)
     if @recommended_people
       profile_rank = recommendation_profile_ids.each_with_index.to_h
@@ -68,12 +70,17 @@ class Usr::ProfilesController < ApplicationController
   def update
     @source = params[:source].presence
     @completed_profile_mode = completed_profile_mode?
+    if params[:suggest_experience_categories].present?
+      @profile.assign_attributes(profile_params.slice(:skills_text, :equipment_text, :capability_keys, :equipment_family_keys))
+      @category_suggestions = ExperienceCategorySuggestions.new(profile: @profile).results
+      return render :experience_suggestions, formats: [ :turbo_stream ]
+    end
     @page_order = [ "location_form", "occupation_form", "skill_equipment_form", "availability_form", "online_presence_form" ]
     @current_page = params[:current_page] || "location_form"
     current_page_index = @page_order.index(@current_page) || 0
     @next_page = @page_order[current_page_index + 1]
 
-    @profile.assign_attributes(profile_params.except(:locations_attributes))
+    @profile.assign_attributes(personal_experience_params.except(:locations_attributes))
     sync_location if @completed_profile_mode || @current_page == "location_form"
 
     if !@completed_profile_mode && @current_page == "online_presence_form"
@@ -84,6 +91,7 @@ class Usr::ProfilesController < ApplicationController
       if @completed_profile_mode
         redirect_to usr_profile_path(@profile), notice: "Profile updated!" and return
       elsif @current_page == "online_presence_form"
+        ProductEvent.record(user: current_user, name: "profile_completed", subject: @profile, event_key: @profile.id)
         current_user.visits.create(sign_in_ip: request.remote_ip) unless current_user.visits.exists?
         redirect_to usr_dashboards_path, notice: "Profile completed!" and return
       end
@@ -122,11 +130,8 @@ class Usr::ProfilesController < ApplicationController
   def toggle_skill_selection
     skill = Skill.find(params[:skill_id])
 
-    if @profile.skills.include?(skill)
-      @profile.skills.delete(skill)
-    else
-      @profile.skills << skill
-    end
+    saved = ToggleProfileExperience.new(profile: @profile, entry: skill).call
+    response.status = :unprocessable_entity unless saved
 
     set_form_data
   end
@@ -134,11 +139,8 @@ class Usr::ProfilesController < ApplicationController
   def toggle_equipment_selection
     equipment = Equipment.find(params[:equipment_id])
 
-    if @profile.equipment.include?(equipment)
-      @profile.equipment.delete(equipment)
-    else
-      @profile.equipment << equipment
-    end
+    saved = ToggleProfileExperience.new(profile: @profile, entry: equipment).call
+    response.status = :unprocessable_entity unless saved
 
     set_form_data
   end
@@ -181,7 +183,12 @@ class Usr::ProfilesController < ApplicationController
   end
 
   def set_profile
-    @profile = Profile.find(params[:id])
+    @profile = Profile.includes(:skills, :equipment, :occupations).find(params[:id])
+    raise ActiveRecord::RecordNotFound if @profile.user.restricted_at?
+
+    if @profile.profile_type == "user" && !@profile.completed_at? && @profile.user_id != current_user.id
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def set_owned_profile
@@ -189,13 +196,10 @@ class Usr::ProfilesController < ApplicationController
   end
 
   def set_form_data
+    @category_suggestions = ExperienceCategorySuggestions.new(profile: @profile).results
     catalog = ProfileFormCatalog.new(@profile)
     @occupations = catalog.occupations
     @profile_occupations = catalog.profile_occupations
-    @skills = catalog.skills
-    @profile_skills = catalog.profile_skills
-    @equipment = catalog.equipment
-    @profile_equipment = catalog.profile_equipment
     @credits = @profile.credits.display_order.to_a
     @credit_applications_by_job_id = @profile.job_applications
       .where(job_id: @credits.filter_map(&:job_id))
@@ -207,6 +211,9 @@ class Usr::ProfilesController < ApplicationController
   end
 
   def set_show_data
+    @profile_block = UserBlock.find_by(blocker: current_user, blocked_user: @profile.user)
+    @profile_contact_blocked = UserBlock.between?(current_user, @profile.user)
+    @network_connection = NetworkConnection.between(current_user, @profile.user).first if @profile.user != current_user
     primary_location = @profile.locations.first
     @can_view_profile_reviews = @profile.user != current_user && current_user.owned_companies.exists?
     @availability_overview = @profile.availability_overview
@@ -228,8 +235,8 @@ class Usr::ProfilesController < ApplicationController
       @review_count = @profile.received_reviews.count
       @average_rating = @profile.received_reviews.where.not(overall_rating: nil).average(:overall_rating)
     end
-    @invitable_jobs = Job
-      .where(company_id: current_user.owned_companies.select(:id), is_active: true, status: :published)
+    @invitable_jobs = Job.accepting_applications
+      .where(company_id: current_user.owned_companies.select(:id))
       .where.not(id: @profile.job_invitations.select(:job_id))
       .includes(:company)
       .order(:title)
@@ -240,6 +247,10 @@ class Usr::ProfilesController < ApplicationController
       .includes(:company)
       .order(:name)
 
+    @reported_skills = @profile.reported_skills
+    @reported_equipment = @profile.reported_equipment
+    @capability_names = @profile.capability_names
+    @equipment_family_names = @profile.equipment_family_names
     @profile_name = @profile.user.full_name
     @profile_headline = @profile.headline.presence || @profile.occupations.limit(2).pluck(:name).to_sentence.presence || "Crewbase Member"
     @location_text = [ primary_location&.city, primary_location&.state ].compact_blank.join(", ").presence || primary_location&.country.presence || "Location not listed"
@@ -315,11 +326,25 @@ class Usr::ProfilesController < ApplicationController
     @profile.locations.reset
   end
 
+  def personal_experience_params
+    attributes = profile_params
+    { skill_ids: [ Skill, :skills_text ], equipment_ids: [ Equipment, :equipment_text ] }.each do |ids_key, (model, text_key)|
+      next unless attributes.key?(ids_key)
+
+      ids = attributes.delete(ids_key)
+      attributes[text_key] = model.where(id: ids).order(:name).pluck(:name).join("\n") unless attributes.key?(text_key)
+    end
+    attributes
+  end
+
   def profile_params
     params.require(:profile).permit(
       :profile_type,
       :completed_at,
       :bio,
+      :work_examples,
+      :skills_text,
+      :equipment_text,
       :location_city,
       :location_state,
       :location_country,
@@ -333,6 +358,8 @@ class Usr::ProfilesController < ApplicationController
       :portfolio_url,
       :show_credits,
       occupation_ids: [],
+      capability_keys: [],
+      equipment_family_keys: [],
       skill_ids: [],
       equipment_ids: [],
       experiences_attributes: [ :id, :title, :company_name, :company_id, :start_month, :start_year, :end_month, :end_year, :currently_active, :summary, :_destroy ],

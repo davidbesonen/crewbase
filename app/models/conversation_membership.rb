@@ -5,7 +5,7 @@ class ConversationMembership < ApplicationRecord
   validates :user_id, uniqueness: { scope: :conversation_id }
 
   def read?
-    latest_message_at = conversation.messages.last&.created_at
+    latest_message_at = conversation.latest_message&.created_at
     last_read_at.present? && latest_message_at.present? && last_read_at >= latest_message_at
   end
 

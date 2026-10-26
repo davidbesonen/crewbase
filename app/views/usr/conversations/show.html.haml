@@ -1,10 +1,13 @@
 .d-flex.justify-content-between.align-items-start.gap-3.mb-4
   %div
-    %div.text-muted.small= @conversation.context_label
+    %div.text-muted.small= "#{@conversation.context.job.company.name} · #{@conversation.context_label}"
     %h1.fw-bold.mb-0= @conversation.title
   = link_to "Back to messages", usr_conversations_path, class: "btn btn-quiet"
 
-= turbo_stream_from @conversation, current_user
+%p.small.text-muted Existing job conversations remain available for work coordination even if a participant is blocked.
+= link_to "Report this conversation", new_usr_report_path(subject_type: "Conversation", subject_id: @conversation.id), class: "btn btn-outline-secondary mb-3"
+
+= turbo_stream_from @conversation, current_user, data: { conversation_id: @conversation.id }
 = render Usr::ConversationThreadComponent.new(conversation: @conversation, messages: @messages, current_user:) do |thread|
   - @messages.each do |message|
     - thread.with_message_bubble(message:, current_user:)

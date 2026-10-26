@@ -62,11 +62,15 @@ class Usr::JobApplicationsControllerTest < ActionDispatch::IntegrationTest
   test "company owner can update an application to each review status" do
     sign_in @owner, scope: :user
 
-    JobApplication.review_statuses.each do |status|
+    (JobApplication.review_statuses - [ "accepted" ]).each do |status|
       patch update_status_usr_job_application_path(@job_application), params: { status: status }
 
-      assert_redirected_to usr_job_application_path(@job_application)
-      assert_equal "Application status updated to #{status.humanize.titleize}.", flash[:notice]
+      if status == "accepted"
+        assert_redirected_to usr_conversation_path(@job_application.reload.conversation)
+      else
+        assert_redirected_to usr_job_application_path(@job_application)
+        assert_equal "Application status updated to #{status.humanize.titleize}.", flash[:notice]
+      end
 
       @job_application.reload
       assert_equal status, @job_application.status
@@ -175,22 +179,20 @@ class Usr::JobApplicationsControllerTest < ActionDispatch::IntegrationTest
       crew_position_id: position.id
     }
 
-    assert_redirected_to usr_job_application_path(@job_application)
-    assert_equal "Application accepted for Audio Lead.", flash[:notice]
-    assert @job_application.reload.accepted?
-    assert_equal @applicant_profile, position.crew_assignments.sole.profile
+    assert_redirected_to new_usr_job_offer_path(job_application_id: @job_application.id, crew_position_id: position.id)
+    assert @job_application.reload.submitted?
+    assert_empty position.crew_assignments
   end
 
-  test "owner accepts a multi-position gig applicant without assigning a position" do
+  test "owner must select a position before accepting a gig applicant" do
     @job.update!(posting_type: :multi_position)
     @job.crew_positions.create!(title: "Audio Lead", headcount: 1)
     sign_in @owner, scope: :user
 
     patch update_status_usr_job_application_path(@job_application), params: { status: :accepted }
 
-    assert_redirected_to usr_job_application_path(@job_application)
-    assert_equal "Application status updated to Accepted.", flash[:notice]
-    assert @job_application.reload.accepted?
+    assert_redirected_to new_usr_job_offer_path(job_application_id: @job_application.id)
+    assert @job_application.reload.submitted?
     assert_empty @job.crew_assignments
   end
 
@@ -202,12 +204,28 @@ class Usr::JobApplicationsControllerTest < ActionDispatch::IntegrationTest
     get usr_job_application_path(@job_application)
 
     assert_response :success
-    assert_select "form[action='#{update_status_usr_job_application_path(@job_application)}']" do
-      assert_select "input[name='status'][value='accepted']"
-      assert_select "select[name='crew_position_id'] option[value='#{position.id}']", text: "Audio Lead"
-      assert_select "input[type='submit'][value='Accept for Position']"
-    end
+    assert_select "a[href='#{new_usr_job_offer_path(job_application_id: @job_application.id)}']", text: "Offer job"
+    get new_usr_job_offer_path(job_application_id: @job_application.id)
+    assert_select "select[name='crew_position_id'] option[value='#{position.id}']", text: "Audio Lead"
     assert_select "a", text: "Accepted", count: 0
+  end
+
+  test "application review distinguishes screening questions from the applicant responses" do
+    @job_application.update!(question_answers: { "What is your experience?" => "Five years\nLive sound and recording" })
+    sign_in @owner, scope: :user
+
+    get usr_job_application_path(@job_application)
+
+    assert_response :success
+    assert_select ".screening-answers" do
+      assert_select "dt", text: "What is your experience?"
+      assert_select "dd.screening-answer" do
+        assert_select ".screening-answer__label", text: "Applicant response"
+        assert_select ".screening-answer__text" do |responses|
+          assert_equal "Five years\nLive sound and recording", responses.first.text.strip
+        end
+      end
+    end
   end
 
   private

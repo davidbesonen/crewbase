@@ -6,8 +6,18 @@ class Conversation < ApplicationRecord
   has_many :users, through: :memberships
   has_many :messages, -> { order(:created_at, :id) }, class_name: "ContextualMessage", dependent: :destroy
 
+  has_one :latest_message, -> { order(created_at: :desc, id: :desc) }, class_name: "ContextualMessage"
+
   validates :context_type, inclusion: { in: CONTEXT_TYPES }
   validates :context_id, uniqueness: { scope: :context_type }
+
+  def accessible_to?(user)
+    user.present? && !user.restricted_at? && ConversationParticipants.new(context:).users.include?(user)
+  end
+
+  def archived?
+    context.job.conversation_archived?
+  end
 
   def title
     context.job.title

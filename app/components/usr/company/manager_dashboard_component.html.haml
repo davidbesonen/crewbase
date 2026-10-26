@@ -3,7 +3,7 @@
     %div
       -# %p.text-uppercase.text-primary.fw-semibold.small.mb-1 Company Workspace
       %h1.mb-1= "#{company.name} Company Manager"
-      %p.text-muted.mb-0 Staffing performance and upcoming work for the last 30 days.
+      %p.text-muted.mb-0 Staffing totals and upcoming work, with an activity chart for the last 30 days.
 
   .row.g-3.mb-4
     - self.class::METRICS.each do |key, (label, icon)|
@@ -60,25 +60,13 @@
     .col-12.col-xl-5
       .card.h-100.border-0.shadow-sm
         .card-body
-          %h2.h5 Studio benefits
-          - if studio?
-            .vstack.gap-3
-              .d-flex.gap-3{ data: { studio_benefit: "priority-support" } }
-                %i.bi.bi-headset.fs-4.text-success
-                %div
-                  %strong Priority support and onboarding
-                  %p.text-muted.small.mb-1 Direct setup and workflow help from the Crewbase team.
-                  = mail_to "support@crewbase.com", "Contact priority support", subject: "Studio support for #{company.name}", class: "small fw-semibold"
-              .d-flex.gap-3{ data: { studio_benefit: "enhanced-visibility" } }
-                %i.bi.bi-megaphone.fs-4.text-success
-                %div
-                  %strong Enhanced company visibility
-                  %p.text-muted.small.mb-0 Your Studio badge appears with your company across the marketplace.
-              .d-flex.gap-3{ data: { studio_benefit: "integration-access" } }
-                %i.bi.bi-plug.fs-4.text-success
-                %div
-                  %strong Early integration access
-                  %p.text-muted.small.mb-1 Studio companies receive first access to integration previews.
-                  = mail_to "support@crewbase.com", "Request preview access", subject: "Integration preview for #{company.name}", class: "small fw-semibold"
-          - else
-            %p.text-muted.mb-2 Upgrade to Studio for priority onboarding, enhanced marketplace visibility, and integration previews.
+          %h2.h5 Next steps
+          %p.text-muted.mb-3 Keep applications moving and prepare your next posting.
+          .d-grid.gap-2
+            = link_to usr_company_applications_path(company), class: "btn btn-primary" do
+              %i.bi.bi-person-lines-fill.me-2{ aria: { hidden: true } }
+              Review applications
+            = link_to new_usr_company_job_path(company), class: "btn btn-outline-primary" do
+              %i.bi.bi-plus-lg.me-2{ aria: { hidden: true } }
+              Post a job
+            = link_to "Review plan and capacity", usr_company_plan_path(company), class: "btn btn-outline-secondary"

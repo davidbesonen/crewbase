@@ -10,11 +10,13 @@ class Usr::Company::CompanyPlanFormComponent < ApplicationComponent
 
   TIER_PRESENTATION = {
     "starter" => { icon: "bi-rocket-takeoff", button: "btn-outline-primary" },
-    "team" => { icon: "bi-people", button: "btn-primary", badge: "Most Popular" },
+    "team" => { icon: "bi-people", button: "btn-primary", badge: "For growing teams" },
     "studio" => { icon: "bi-stars", button: "btn-dark" }
   }.freeze
 
   def tier_key(plan)
+    return "team" if plan.key == "team_2026"
+
     plan.key.presence_in(TIER_PRESENTATION.keys) || "starter"
   end
 

@@ -25,6 +25,39 @@ class Usr::ProjectsControllerTest < ActionDispatch::IntegrationTest
     @company.company_plans.create!(plan: team)
   end
 
+  test "company selection includes company context and only its current projects" do
+    @company.locations << Location.create!(city: "Nashville", state: "TN", country: "United States")
+    project = @company.projects.create!(name: "Autumn Sessions", description: "Record three live performances.", starts_on: Date.current + 14, status: :planning)
+    @company.projects.create!(name: "Archived Sessions", archived_at: Time.current)
+    outsider = Company.create!(name: "Other Company", contact_email: "other-projects@example.com", industries: @company.industries)
+    outsider.projects.create!(name: "Private Other Project")
+    sign_in @owner, scope: :user
+
+    get select_company_usr_projects_path
+
+    assert_response :success
+    assert_select "[data-project-company='#{@company.id}']" do
+      assert_select "h2", text: @company.name
+      assert_select "[data-company-location]", text: /Nashville/
+      assert_select "[data-company-industries]", text: "Project Production"
+      assert_select "a[href='#{new_usr_company_project_path(@company)}']", text: "Start Project"
+      assert_select "a[href='#{usr_project_path(project)}']", text: "Autumn Sessions"
+      assert_select ".status-badge", text: "Planning"
+      assert_select "p", text: "Record three live performances."
+    end
+    assert_select "[data-project-company='#{outsider.id}']", count: 0
+    assert_select "[data-company-projects]", text: /Archived Sessions|Private Other Project/, count: 0
+  end
+
+  test "company selection explains how to start when there are no projects" do
+    sign_in @owner, scope: :user
+
+    get select_company_usr_projects_path
+
+    assert_response :success
+    assert_select "[data-project-company='#{@company.id}']", text: /No projects yet/
+  end
+
   test "company owner creates and manages a lightweight project" do
     sign_in @owner, scope: :user
 

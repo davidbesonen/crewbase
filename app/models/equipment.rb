@@ -1,4 +1,6 @@
 class Equipment < ApplicationRecord
+  scope :categories, -> { where.not(category_key: nil) }
+
   belongs_to :brand, optional: true
 
   has_many :equipment_assignments, dependent: :destroy

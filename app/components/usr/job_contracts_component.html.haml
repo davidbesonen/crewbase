@@ -1,0 +1,51 @@
+.card.border-0.shadow-sm.mt-4#job-contracts{ data: { job_contracts: true } }
+  .card-body.p-4
+    .d-flex.flex-wrap.align-items-start.justify-content-between.gap-2.mb-3
+      %div
+        %h4.fw-semibold.mb-1 Job Documents
+        %p.text-muted.small.mb-0 Private files for company owners and hired crew.
+      - if contracts.any?
+        %span.badge.rounded-pill.text-bg-light.border= pluralize(contracts.size, "document")
+
+    - if owner
+      .border.rounded-3.p-3.mb-4.bg-light-subtle{ data: { contract_upload: true } }
+        %h5.fw-semibold.mb-1 Add a document
+        %p.text-muted.small.mb-3 Share agreements, call sheets, schedules, and reference files. Up to 35 MB per file.
+        = form_with model: new_contract, url: usr_job_contracts_path(job), class: "row g-3 align-items-end" do |form|
+          .col-12.col-md-5
+            = form.label :title, "Document title", class: "form-label"
+            = form.text_field :title, class: "form-control", placeholder: "e.g. Crew services agreement", maxlength: 150, styled: true
+          .col-12.col-md-5
+            = form.label :file, "Document file", class: "form-label"
+            = form.file_field :file, class: "form-control", required: true, accept: JobContract::SUPPORTED_CONTENT_TYPES.join(",")
+          .col-12.col-md-2
+            = form.submit "Upload", class: "btn btn-primary w-100"
+
+    - if contracts.any?
+      .d-flex.flex-column.gap-3
+        - contracts.each do |contract|
+          .border.rounded-3.p-3{ data: { job_contract: contract.id } }
+            .d-flex.flex-column.flex-sm-row.align-items-sm-center.justify-content-between.gap-3
+              .d-flex.align-items-start.gap-3
+                .fs-3.text-primary
+                  %i.bi.bi-file-earmark-text{ aria: { hidden: true } }
+                %div
+                  .fw-semibold= contract.title
+                  .text-muted.small= file_details(contract)
+                  .text-muted.small
+                    Uploaded by #{contract.uploaded_by.full_name} on #{l(contract.created_at.to_date, format: :long)}
+              .d-flex.flex-wrap.gap-2
+                = link_to download_usr_job_contract_path(job, contract), class: "btn btn-primary btn-sm" do
+                  %i.bi.bi-download.me-1{ aria: { hidden: true } }
+                  Download
+                - if owner
+                  = button_to "Remove", usr_job_contract_path(job, contract), method: :delete, class: "btn btn-outline-danger btn-sm", form: { data: { turbo_confirm: "Remove #{contract.title}? This cannot be undone." } }
+    - else
+      .empty-state.empty-state-sky.py-4
+        %i.bi.bi-file-earmark-text.empty-state-icon{ aria: { hidden: true } }
+        %h5.mb-2 No Documents Yet
+        %p.text-muted.mb-0
+          - if owner
+            Documents are private to company owners and hired crew.
+          - else
+            The company has not added any documents for this job.

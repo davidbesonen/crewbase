@@ -40,7 +40,7 @@ class CompanyApplicationPipeline
 
   def base_scope
     JobApplication
-      .includes(:profile, { profile: :user }, job: [ :company, { crew_positions: :crew_assignments } ])
+      .includes(:job_offers, :profile, { profile: :user }, job: [ :company, { crew_positions: :crew_assignments } ])
       .joins(:job)
       .where(jobs: { company_id: company.id })
   end

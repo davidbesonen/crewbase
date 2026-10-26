@@ -1,3 +1,7 @@
+- if @job.on_hold?
+  .alert.alert-warning{ role: "status" }
+    %strong This posting is on an administrative hold.
+    It is hidden from discovery and cannot receive new applications or offers. Existing work records remain available.
 .row.g-4
   .col-12.col-lg-8
     .card.border-0.shadow-sm.mb-4.app-hero.app-hero-sky
@@ -57,18 +61,24 @@
               %span.badge.rounded-pill.text-bg-light.border.px-3.py-2= @job.posting_type_label
             .mt-2
               .d-flex.flex-wrap.gap-2{ data: { job_primary_actions: true } }
+                - if @job.network_shareable?
+                  = link_to new_usr_job_network_job_share_path(@job), class: "btn btn-outline-primary" do
+                    %i.bi.bi-send.me-1{ aria: { hidden: "true" } }
+                    Share with a connection
                 - if @job_application.present?
                   %button.btn.btn-success{ type: "button", disabled: true }
                     %i.bi.bi-check-lg.me-1
                     Applied
                   = link_to "View My Application", usr_job_application_path(@job_application), class: "btn btn-quiet"
+                - elsif !@job.accepting_applications?
+                  %span.badge.text-bg-light.border.align-self-center{ data: { applications_closed: true } } Applications closed
                 - elsif !@job.editable_by?(current_user)
                   = link_to "Apply", new_usr_job_job_application_path(@job), class: "btn btn-primary"
                 - if @saved_job.present?
                   = button_to usr_job_saved_job_path(@job), method: :delete, class: "btn btn-quiet" do
                     %i.bi.bi-bookmark-fill.me-1
                     Saved
-                - else
+                - elsif @job.accepting_applications?
                   = button_to usr_job_saved_job_path(@job), method: :post, class: "btn btn-outline-primary" do
                     %i.bi.bi-bookmark.me-1
                     Save Job
@@ -81,6 +91,8 @@
             .text-muted.mb-0= @job.description
           - else
             %p.text-muted.mb-0 No description has been added for this role yet.
+
+    = render Usr::JobExperienceRequirementsComponent.new(entries: @experience_requirements)
 
     .card.border-0.shadow-sm.card-accent.card-accent-cyan
       .card-body.p-4
@@ -116,6 +128,9 @@
           .col-sm-6
             %div.text-muted.small Travel
             %div.fw-semibold= @job.requires_travel? ? "Required" : "Not required"
+
+    - if @documents_visible
+      = render Usr::JobContractsComponent.new(job: @job, contracts: @contracts, owner: @job.company&.is_owner?(current_user))
 
   .col-12.col-lg-4
     .card.border-0.shadow-sm.mb-4
@@ -169,7 +184,7 @@
         - else
           %p.text-muted.mb-0 This job is not currently attached to a company profile.
 
-    - if @job.editable_by?(current_user) && @job.is_active? && @job.published?
+    - if @job.editable_by?(current_user) && @job.accepting_applications?
       .card.border-0.shadow-sm.mt-4.card-accent.card-accent-cyan{ data: { job_invitation_tools: true } }
         .card-body.p-4
           %h5.fw-semibold.mb-2 Invite someone
@@ -183,3 +198,9 @@
             %button.btn.btn-outline-primary{ type: "button", data: { action: "clipboard#copy", clipboard_target: "button" } } Copy link
 
 = render Usr::JobCrewRecommendationsComponent.new(results: @crew_recommendations, profiles_path: @crew_recommendations_path)
+
+- if @job.publicly_visible?
+  .mt-4
+    = link_to new_usr_report_path(subject_type: "Job", subject_id: @job.id), class: "btn btn-sm btn-outline-secondary" do
+      %i.bi.bi-flag.me-1{ aria: { hidden: true } }
+      Report this job

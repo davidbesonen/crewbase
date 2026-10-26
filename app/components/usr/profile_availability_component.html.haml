@@ -17,4 +17,6 @@
                   = helpers.l(overview.fetch(:next_blockout_date), format: :long)
           - else
             %p.text-muted.small.mb-0 Add blockout dates or connect a calendar to keep your availability current.
-      = link_to "Manage Availability", availability_path, class: "btn btn-primary flex-shrink-0"
+      = link_to availability_path, class: "btn btn-outline-primary flex-shrink-0" do
+        %i.bi.bi-calendar3.me-1{ aria: { hidden: true } }
+        Manage Availability

@@ -50,6 +50,20 @@ class Admin::DashboardAndIndexesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "admin navigation marks the current section including nested screens" do
+    sign_in @admin, scope: :user
+
+    { admin_root_path => admin_root_path, admin_users_path => admin_users_path,
+      admin_companies_path => admin_companies_path, admin_jobs_path => admin_jobs_path,
+      new_admin_change_log_entry_path => admin_change_log_entries_path }.each do |path, navigation_path|
+      get path
+
+      assert_response :success
+      assert_select ".app-top-nav a[aria-current='page']", count: 1
+      assert_select ".app-top-nav a.active[aria-current='page'][href='#{navigation_path}']", count: 1
+    end
+  end
+
   private
 
   def create_user(email, first_name, last_name)

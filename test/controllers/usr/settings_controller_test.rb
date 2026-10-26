@@ -58,13 +58,13 @@ class Usr::SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "jay@example.com", @user.email
     assert_equal "773-555-0100", @user.phone
     assert_not @user.email_notifications_enabled?
-    assert @user.sms_notifications_enabled?
+    assert_not @user.sms_notifications_enabled?
     assert @user.job_alert_notifications_enabled?
     assert_not @user.recommended_role_notifications_enabled?
     assert @user.upcoming_job_reminder_notifications_enabled?
   end
 
-  test "settings re-renders errors when sms is enabled without a phone number" do
+  test "unsupported SMS cannot be enabled through submitted parameters" do
     patch usr_settings_path, params: {
       user: {
         first_name: "Jamie",
@@ -75,8 +75,7 @@ class Usr::SettingsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_response :unprocessable_entity
-    assert_select ".invalid-feedback", text: /Phone can't be blank/
+    assert_redirected_to usr_settings_path
     assert_not @user.reload.sms_notifications_enabled?
   end
 

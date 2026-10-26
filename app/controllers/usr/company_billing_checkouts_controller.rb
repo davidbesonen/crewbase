@@ -3,6 +3,8 @@ class Usr::CompanyBillingCheckoutsController < ApplicationController
 
   def create
     plan = Plan.active.find(params[:plan_id])
+    raise StripeCompanyCheckout::InvalidSelection, "Choose monthly or annual billing." unless CompanyPlan::BILLING_INTERVALS.include?(params[:billing_interval].to_s)
+    raise StripeCompanyCheckout::InvalidSelection, "Starter is free and does not need checkout." if plan.free?
     existing_subscription = @company.company_plans
       .where(status: CompanyPlan::ENTITLED_STATUSES + [ "past_due" ])
       .where.not(stripe_subscription_id: nil)
@@ -22,6 +24,9 @@ class Usr::CompanyBillingCheckoutsController < ApplicationController
     redirect_to session.url, allow_other_host: true
   rescue StripeCompanyCheckout::InvalidSelection => error
     redirect_to usr_company_plan_path(@company), alert: error.message
+  rescue Stripe::StripeError => error
+    Rails.error.report(error, context: { company_id: @company.id })
+    redirect_to usr_company_plan_path(@company), alert: "Payment is temporarily unavailable. Please try again; your current access has not changed."
   end
 
   private

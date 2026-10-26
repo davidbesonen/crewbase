@@ -1,0 +1,219 @@
+/* Navigation and search rails share a surface, with distinct content hierarchy. */
+.user-sidenav-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid #dce6ef;
+  border-radius: 1.15rem;
+  box-shadow: 0 4px 20px rgba(39, 74, 112, 0.025) !important;
+}
+
+.workspace-sidenav {
+  > .card-body {
+    padding: 1rem 0.75rem 0.75rem;
+  }
+
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0.5rem 1rem;
+    border-bottom: 1px solid #e6edf4;
+
+    .avatar-toggle {
+      flex-shrink: 0;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 1px #dae7f1;
+    }
+  }
+
+  &__identity-copy {
+    min-width: 0;
+  }
+
+  &__name,
+  &__caption {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  &__name {
+    color: #304a62;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  &__caption {
+    color: #687e91;
+    font-size: 0.75rem;
+    margin-top: 0.15rem;
+  }
+
+  &__group {
+    margin-top: 1rem;
+  }
+
+  .workspace-sidenav__heading {
+    margin: 0 0 0.35rem;
+    padding-inline: 0.75rem;
+    color: #6c8194;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .nav-link {
+    min-height: 2.75rem;
+    gap: 0.7rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.65rem;
+    color: #4b6076 !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.45;
+    transition: background-color 150ms ease, color 150ms ease;
+
+    > span:not(.badge) {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    > .bi {
+      flex: 0 0 1.15rem;
+      color: #748da3;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    &:hover {
+      background: #f0f5fa;
+      color: #244f76 !important;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #397db4;
+      outline-offset: -2px;
+      background: #edf4fb;
+    }
+
+    &.active {
+      background: #e4eff9;
+      color: #244f76 !important;
+      font-weight: 600;
+      box-shadow: inset 3px 0 0 #6094bd;
+
+      > .bi {
+        color: #39739f;
+      }
+    }
+  }
+
+  &__count {
+    flex-shrink: 0;
+    min-width: 1.4rem;
+    background: #dfeaf5;
+    color: #244f76;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__companies {
+    padding-top: 0.9rem;
+    border-top: 1px solid #e6edf4;
+
+    .nav-link > .workspace-sidenav__company-icon {
+      display: grid;
+      place-items: center;
+      flex-basis: 1.65rem;
+      height: 1.65rem;
+      border: 1px solid #dce7f0;
+      border-radius: 0.45rem;
+      background: #f2f6fa;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    padding: 0.45rem 0.75rem;
+    color: #6c8194;
+    font-size: 0.8rem;
+  }
+
+  &__account {
+    margin-top: 0.8rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid #e6edf4;
+  }
+
+  .workspace-sidenav__sign-out {
+    color: #6c8194 !important;
+  }
+}
+
+.app-sticky-sidenav,
+.app-sticky-filter {
+  border-radius: 1.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: #c2d2e0 transparent;
+}
+
+.app-sticky-filter .user-sidenav-card {
+  > .card-body {
+    padding: 1.25rem !important;
+  }
+
+  h6 {
+    color: #304a62 !important;
+    font-size: 0.95rem;
+  }
+
+  p {
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .form-label {
+    margin-bottom: 0.35rem;
+    color: #536b80;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .form-control,
+  .form-select,
+  .input-group-text {
+    min-height: 2.65rem;
+    font-size: 0.8rem;
+    border-color: #dce6ef;
+  }
+
+  button[type="submit"] {
+    flex-grow: 1;
+  }
+}
+
+#userSidenav {
+  --bs-offcanvas-width: min(320px, 90vw);
+  background: #f8fbfe;
+
+  .offcanvas-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e1eaf2;
+  }
+
+  .offcanvas-title {
+    color: #4b6076;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .workspace-sidenav {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}

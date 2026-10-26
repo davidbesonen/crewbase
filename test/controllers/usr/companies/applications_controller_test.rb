@@ -67,6 +67,39 @@ class Usr::Companies::ApplicationsControllerTest < ActionDispatch::IntegrationTe
     assert_select "p", text: /1 total application/
   end
 
+  test "reviewing one job identifies its recommended applicants without including another job" do
+    other_job = @company.jobs.create!(
+      title: "Unrelated Role",
+      workplace_type: :on_site,
+      employment_type: :contract,
+      status: :published,
+      description: "A different role"
+    )
+    other_application = JobApplication.create!(job: other_job, profile: @application.profile)
+    nonmatching_application = JobApplication.create!(job: @job, profile: @outsider.user_profile)
+    sign_in @owner, scope: :user
+
+    get usr_company_applications_path(@company), params: { job_id: @job.id }
+
+    assert_response :success
+    assert_select "[data-pipeline-application='#{@application.id}'] [data-recommended-applicant]", count: 1
+    assert_select "[data-pipeline-application='#{@application.id}'] [data-recommendation-reason]", text: /Matches Stage Manager/
+    assert_select "[data-pipeline-application='#{nonmatching_application.id}']", count: 1
+    assert_select "[data-pipeline-application='#{nonmatching_application.id}'] [data-recommended-applicant]", count: 0
+    assert_select "[data-pipeline-application='#{other_application.id}']", count: 0
+    assert_select "a[data-pipeline-stage][href*='job_id=#{@job.id}']", count: JobApplication.review_pipeline_statuses.size
+  end
+
+  test "filtered pipeline still requires an entitled company plan" do
+    @company.company_plans.destroy_all
+    sign_in @owner, scope: :user
+
+    get usr_company_applications_path(@company), params: { job_id: @job.id }
+
+    assert_redirected_to usr_company_path(@company)
+    assert_equal "Shortlists and applicant pipeline requires a Team plan.", flash[:alert]
+  end
+
   test "pipeline links back to gig staffing when opened from its review applications link" do
     @job.update!(posting_type: :multi_position)
     sign_in @owner, scope: :user

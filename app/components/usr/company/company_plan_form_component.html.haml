@@ -1,12 +1,12 @@
 %div{ id: "company_plan_selection", class: ("d-none" if visible_form != "company_plan_selection") }
   .row
     .col-sm-12.text-center
-      %h3.fw-bold.mb-0 Select a Company Plan
-      %p.text-muted.mb-4 Please choose a plan that best fits your company's needs.
+      %h2.h4.fw-bold.mb-0 Select a Company Plan
+      %p.text-muted.mb-4 Start free. Upgrade when your team needs more capacity. Prices are in USD, per company.
   .row.g-3.mt-3.justify-content-center
     - plans.each do |plan|
       - presentation = tier_presentation(plan)
-      .col-12.col-md-6.col-xl-4
+      .col-12.col-lg-6
         .card.border-0.shadow-sm.h-100.company-plan-card{ class: ["company-plan-card--#{tier_key(plan)}", ("company-plan-card--featured" if presentation[:badge])] }
           - if presentation[:badge]
             .company-plan-card__badge= presentation[:badge]
@@ -16,13 +16,16 @@
               %i.bi{ class: presentation[:icon] }
             %h3.text-center.fw-bold.mb-2= plan.name
             %p.text-center.company-plan-card__price.mb-2
-              %span.fw-bold= plan.monthly_price
-              %span.text-muted /mo
-              %span.text-muted.mx-1 ·
-              %span.fw-semibold= plan.annual_price
-              %span.text-muted /yr
+              %span.fw-bold= plan.free? ? "Free" : plan.monthly_price
+              - unless plan.free?
+                %span.text-muted / month
+            %p.text-center.text-muted.mb-3
+              - if plan.free?
+                No card required. No trial deadline.
+              - else
+                #{plan.annual_price} billed yearly · save #{plan.annual_savings}
             %p.card-text.text-muted.text-center.company-plan-card__description.mb-3= plan.description
-            .mt-auto
+            .company-plan-card__details
               .company-plan-card__capacities.mt-3
                 - plan.capacity_items.each do |capacity|
                   .company-plan-card__capacity.d-flex.align-items-center.gap-2
@@ -40,5 +43,8 @@
                     %span.company-plan-card__feature-icon{ aria: { hidden: true } }
                       %i.bi{ class: feature[:icon] }
                     %span= feature[:label]
-              = link_to next_form_usr_companies_path(current_page: "company_plan_selection", plan_id: plan.id), class: "btn #{presentation[:button]} w-100 mt-3 company-plan-card__button" do
-                = "Select #{plan.name}"
+              - if plan.free? || plan.checkout_available?("monthly") || plan.checkout_available?("annual")
+                = link_to new_usr_company_path(current_page: "company_details_form", plan_id: plan.id), class: "btn #{presentation[:button]} w-100 mt-3 company-plan-card__button" do
+                  = plan.free? ? "Start free" : "Select #{plan.name}"
+              - else
+                %p.small.text-muted.mb-0.mt-3 Paid upgrades are not available yet. Start with Starter; upgrade later when billing opens.

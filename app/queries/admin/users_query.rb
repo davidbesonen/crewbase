@@ -5,6 +5,8 @@ class Admin::UsersQuery
 
   def results
     scope = User.includes(:roles, :profiles, :companies).order(created_at: :desc, id: :desc)
+    scope = scope.where(restricted_at: nil) if params[:restricted] == "no"
+    scope = scope.where.not(restricted_at: nil) if params[:restricted] == "yes"
     params[:q].present? ? scope.where("users.email ILIKE :q OR users.first_name ILIKE :q OR users.last_name ILIKE :q", q: "%#{User.sanitize_sql_like(params[:q])}%") : scope
   end
 

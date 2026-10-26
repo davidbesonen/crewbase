@@ -4,7 +4,7 @@
       = render Shared::CrewbaseLogoTextComponent.new
     .card.border-0.shadow-sm
       .card-body.p-4.p-lg-5
-        %p.text-uppercase.text-muted.small.fw-semibold.mb-2 Open job posting
+        %p.text-uppercase.text-muted.small.fw-semibold.mb-2 Job posting
         %h1.fw-bold= @job.title
         %p.h5.text-muted= @job.company.name
         .d-flex.flex-wrap.gap-2.my-4
@@ -16,7 +16,10 @@
             %span.badge.text-bg-light.border= @job.compensation_range
         %h2.h5 About this job
         .text-muted.mb-4= @job.description
-        - if current_user && @job.editable_by?(current_user)
+        - if !@job.accepting_applications?
+          %p.mb-3.text-muted{ data: { applications_closed: true } } Applications closed. This posting is no longer accepting applications.
+          = link_to "Browse open jobs", usr_jobs_path, class: "btn btn-primary"
+        - elsif current_user && @job.editable_by?(current_user)
           %p.mb-0.text-muted You manage this posting through Crewbase.
         - elsif current_user
           = link_to "Apply for this posting", new_usr_job_job_application_path(@job), class: "btn btn-primary"
@@ -25,3 +28,5 @@
           .d-flex.flex-wrap.gap-2
             = link_to "Create an account to apply", new_user_registration_path, class: "btn btn-primary"
             = link_to "Sign in", new_user_session_path, class: "btn btn-outline-primary"
+    .mt-4
+      = render Usr::JobExperienceRequirementsComponent.new(entries: @experience_requirements)

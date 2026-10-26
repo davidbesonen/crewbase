@@ -3,7 +3,7 @@
     .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-3
       %div
         %h4.fw-semibold.mb-1 Find Crew for This Job
-        %p.text-muted.mb-0 Search qualified people in the context of #{job.title}.
+        %p.text-muted.mb-0 Search matching people in the context of #{job.title}.
 
     = form_with url: helpers.usr_job_crew_path(job), method: :get, class: "row g-3 align-items-end mb-4" do |form|
       - filter_fields.each do |field|
@@ -55,6 +55,12 @@
                   }
                     = label
               .visually-hidden{ role: "status", aria: { live: "polite" }, data: { searchable_select_target: "status" } }
+      .col-md-3
+        = form.label :skill_query, "Skill or service", class: "form-label"
+        = search_field_tag :skill_query, filters[:skill_query], class: "form-control", placeholder: "Exact skill name"
+      .col-md-3
+        = form.label :equipment_query, "Equipment or software", class: "form-label"
+        = search_field_tag :equipment_query, filters[:equipment_query], class: "form-control", placeholder: "Exact equipment name"
       .col-12.d-flex.gap-2
         = form.submit "Search Crew", class: "btn btn-primary"
         = link_to "Clear", helpers.usr_job_crew_path(job), class: "btn btn-quiet"

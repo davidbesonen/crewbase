@@ -29,9 +29,25 @@
                   - if result.job.pay_period.present?
                     .text-muted.small= result.job.pay_period.humanize
                 .text-muted.small= result.job.relative_published_at
+            %details.mt-2
+              %summary.small.text-muted Not interested?
+              = form_with url: usr_job_recommendation_feedback_path(result.job.id), builder: ActionView::Helpers::FormBuilder, class: "d-flex flex-wrap gap-2 mt-2" do |form|
+                = form.label :reason, "Why hide this recommendation?", for: "feedback_reason_#{result.job.id}", class: "visually-hidden"
+                = form.select :reason, RecommendationFeedback::REASONS.map { |key, label| [label, key] }, {}, id: "feedback_reason_#{result.job.id}", class: "form-select form-select-sm w-auto"
+                = form.submit "Hide recommendation", class: "btn btn-sm btn-outline-secondary"
       .mt-3
         = link_to "View More Jobs", jobs_path, class: "text-muted text-decoration-none fw-semibold"
     - else
-      %p.card-text.text-muted.mb-2
-        Add occupations, skills, or equipment to your profile to receive personalized matches.
-      = link_to "Browse all jobs", jobs_path, class: "text-muted text-decoration-none fw-semibold"
+      %div{ data: { job_matches_empty: true } }
+        - if matching_profile
+          %p.card-text.text-muted.mb-2 No suitable openings match your profile and availability right now.
+          .d-flex.flex-wrap.gap-3
+            = link_to "Browse Jobs", jobs_path, class: "btn btn-outline-primary btn-sm"
+            = link_to "Edit Matching Details", edit_profile_path, class: "text-muted text-decoration-none fw-semibold align-self-center"
+        - else
+          %p.card-text.text-muted.mb-2 Add occupations, skills, or equipment to your profile so we can match you with relevant jobs.
+          .d-flex.flex-wrap.gap-3
+            = link_to "Add Matching Details", edit_profile_path, class: "btn btn-outline-primary btn-sm"
+            = link_to "Browse Jobs", jobs_path, class: "text-muted text-decoration-none fw-semibold align-self-center"
+    .mt-3
+      = link_to "Hidden recommendations", usr_recommendation_feedback_index_path, class: "small text-muted"

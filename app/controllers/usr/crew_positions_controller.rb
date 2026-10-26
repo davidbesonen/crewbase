@@ -13,8 +13,14 @@ class Usr::CrewPositionsController < ApplicationController
 
   def destroy
     job = @position.job
-    @position.destroy
-    redirect_to usr_job_crew_path(job), notice: "Crew position removed."
+    job.with_lock do
+      if JobOffer.accepted.where(crew_position: @position).exists?
+        redirect_to usr_job_crew_path(job), alert: "Cancel confirmed bookings before removing this position."
+      else
+        @position.destroy!
+        redirect_to usr_job_crew_path(job), notice: "Crew position removed."
+      end
+    end
   end
 
   private

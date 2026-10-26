@@ -28,7 +28,7 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
     @job.job_applications.create!(profile: @candidate)
   end
 
-  test "owner defines a position and fills, reassigns, and removes its crew member" do
+  test "direct assignments and replacements require an offer before a worker is booked" do
     replacement = create_user("replacement").user_profile
     @job.job_applications.create!(profile: replacement)
     sign_in @owner, scope: :user
@@ -38,14 +38,15 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
     end
     position = @job.crew_positions.last
 
-    assert_difference -> { position.crew_assignments.count }, 1 do
+    assert_no_difference -> { position.crew_assignments.count } do
       post usr_crew_position_crew_assignments_path(position), params: { crew_assignment: { profile_id: @candidate.id } }
     end
-    assignment = position.crew_assignments.last
+    assert_redirected_to new_usr_job_offer_path(crew_position_id: position.id, profile_id: @candidate.id)
+    assignment = position.crew_assignments.create!(profile: @candidate)
 
     patch usr_crew_assignment_path(assignment), params: { crew_assignment: { profile_id: replacement.id } }
-    assert_redirected_to usr_job_crew_path(@job)
-    assert_equal replacement, assignment.reload.profile
+    assert_redirected_to new_usr_job_offer_path(crew_position_id: position.id, profile_id: replacement.id)
+    assert_equal @candidate, assignment.reload.profile
 
     assert_difference -> { position.crew_assignments.count }, -1 do
       delete usr_crew_assignment_path(assignment)
@@ -106,8 +107,11 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_select "form[action='#{usr_job_crew_positions_path(@job)}']" do
       assert_select "textarea[name='crew_position[description]']"
-      assert_select "input[name='crew_position[pay_min]']"
-      assert_select "input[name='crew_position[pay_max]']"
+      assert_select ".input-group", count: 2 do
+        assert_select "span.input-group-text", text: "$", count: 2
+        assert_select "span.input-group-text + input[name='crew_position[pay_min]'][type='number']"
+        assert_select "span.input-group-text + input[name='crew_position[pay_max]'][type='number']"
+      end
       assert_select "select[name='crew_position[pay_period]'] option[value='daily']", text: "Daily"
     end
     assert_select "[data-assigned-crew-member='#{@candidate.id}']" do
@@ -123,7 +127,7 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
       assert_select "select[name='crew_assignment[profile_id]']", count: 0
     end
     assert_select ".modal[role='dialog'][aria-labelledby]" do
-      assert_select ".modal-title", text: "Assign Camera Operator"
+      assert_select ".modal-title", text: "Offer Camera Operator"
       assert_select "table" do
         assert_select "th", text: "Crew member"
         assert_select "th", text: "Reasoning"
@@ -131,13 +135,13 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
         assert_select "a[href='#{usr_profile_path(replacement)}'][target='_blank'][rel='noopener']", text: replacement.user.full_name
         assert_select "td", text: "Submitted application"
         assert_select "form[action='#{usr_crew_position_crew_assignments_path(position)}']"
-        assert_select "input[type='submit'][value='Assign']"
+        assert_select "input[type='submit'][value='Offer job']"
       end
     end
     assert_select ".modal[role='dialog']" do
       assert_select ".modal-title", text: "Replace #{@candidate.user.full_name}"
       assert_select "form[action='#{usr_crew_assignment_path(position.crew_assignments.first)}']"
-      assert_select "input[type='submit'][value='Replace']"
+      assert_select "input[type='submit'][value='Offer replacement']"
     end
     assert_select "[data-crew-schedule-row][data-availability-conflict='true']" do
       assert_select ".crew-schedule-availability.status-unavailable", text: /Unavailable/
@@ -172,14 +176,14 @@ class Usr::JobCrewsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "form[action='#{usr_job_crew_path(@job)}'][method='get']"
-    assert_select "[data-controller='searchable-select']", count: 4 do
-      assert_select "input[type='search'][role='combobox'][aria-autocomplete='list']", count: 4
-      assert_select "[data-searchable-select-target='select']", count: 4
-      assert_select "[data-searchable-select-target='options'][role='listbox']", count: 4
+    assert_select "[data-controller='searchable-select']", count: 2 do
+      assert_select "input[type='search'][role='combobox'][aria-autocomplete='list']", count: 2
+      assert_select "[data-searchable-select-target='select']", count: 2
+      assert_select "[data-searchable-select-target='options'][role='listbox']", count: 2
     end
     assert_select "#crew_filter_occupation_id_search[value='#{occupation.name}']"
-    assert_select "#crew_filter_skill_id_search[placeholder='Any skill']:not([value])"
-    assert_select "#crew_filter_equipment_id_search[placeholder='Any equipment']:not([value])"
+    assert_select "input[name='skill_query'][placeholder='Exact skill name']"
+    assert_select "input[name='equipment_query'][placeholder='Exact equipment name']"
     assert_select "#crew_filter_availability_state_search[value='No known conflict']"
     assert_select "[data-crew-search-result]", text: /#{@candidate.user.full_name}/
     assert_select "[data-crew-search-result]", text: /No known conflict/

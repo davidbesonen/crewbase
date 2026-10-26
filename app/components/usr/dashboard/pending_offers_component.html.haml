@@ -1,0 +1,15 @@
+%section.card.card-accent.card-accent-cyan.mb-4{ data: { offers_needing_reply: true }, aria: { labelledby: "pending-offers-heading" } }
+  .card-body.p-4
+    .d-flex.flex-wrap.align-items-center.justify-content-between.gap-2.mb-3
+      %div
+        %h2#pending-offers-heading.h5.fw-semibold.mb-1 Offers need your reply
+        %p.small.text-muted.mb-0 Review the dates and terms before confirming your booking.
+      = link_to "View all (#{@count})", usr_job_offers_path(view: "needs_reply"), class: "btn btn-outline-primary btn-sm"
+    - @offers.each do |offer|
+      .d-flex.flex-wrap.align-items-center.justify-content-between.gap-2.py-2
+        %div
+          %h3.h6.mb-1= offer.role
+          %p.text-muted.small.mb-0 #{offer.job_application.job.company.name} · Starts #{l(offer.starts_at.to_date, format: :long)}
+          - if offer.expires_at
+            %p.small.text-muted.mb-0 Reply by #{l(offer.expires_at, format: :long)}
+        = link_to "Review offer", usr_job_offer_path(offer), class: "btn btn-primary btn-sm"

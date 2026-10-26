@@ -16,6 +16,8 @@ class Usr::JobApplicationsController < ApplicationController
   end
 
   def show
+    @pipeline_available = @company_owner_view && CompanyPlanEntitlement.new(@job.company).allowed?(:shortlists_pipeline)
+    @offers = @job_application.job_offers.order(created_at: :desc)
     @conversation = @job_application.conversation
     @existing_credit = applicant_profile.credits.find_by(job: @job)
     @available_crew_positions = available_crew_positions if @company_owner_view && @job.multi_position?
@@ -33,11 +35,15 @@ class Usr::JobApplicationsController < ApplicationController
       return
     end
 
-    if status == "accepted" && @job.multi_position? && params[:crew_position_id].present?
+    if status == "accepted"
       accept_for_position
     else
-      @job_application.update!(review_status_attributes(status))
-      redirect_to usr_job_application_path(@job_application), notice: "Application status updated to #{status.humanize.titleize}."
+      result = ReviewJobApplication.new(application: @job_application, reviewer: current_user, status:).call
+      if result.success?
+        redirect_to usr_job_application_path(@job_application), notice: "Application status updated to #{status.humanize.titleize}."
+      else
+        redirect_to usr_job_application_path(@job_application), alert: result.error
+      end
     end
   end
 
@@ -70,12 +76,15 @@ class Usr::JobApplicationsController < ApplicationController
   def ensure_profile_present
     return unless needs_profile_setup?(current_user)
 
-    redirect_to edit_usr_profile_path(current_user.user_profile)
+    redirect_to usr_onboarding_path
   end
 
   def set_job
     @job = Job.includes(:company, :locations).find(params[:job_id])
     raise ActiveRecord::RecordNotFound unless @job.is_active? && @job.published?
+    return if @job.accepting_applications?
+
+    redirect_to usr_job_path(@job), alert: "This job is no longer accepting applications."
   end
 
   def set_job_application
@@ -110,31 +119,8 @@ class Usr::JobApplicationsController < ApplicationController
     )
   end
 
-  def review_status_attributes(status)
-    attributes = {
-      status: status,
-      reviewed_at: Time.current,
-      reviewed_by: current_user.id
-    }
-
-    attributes[:decision_at] = JobApplication.decision_statuses.include?(status) ? Time.current : nil
-    attributes
-  end
-
   def accept_for_position
-    position = CrewPosition.find_by(id: params[:crew_position_id])
-    result = AcceptJobApplication.new(
-      application: @job_application,
-      reviewer: current_user,
-      crew_position: position
-    ).call
-
-    if result.success?
-      redirect_to usr_job_application_path(@job_application),
-        notice: "Application accepted for #{position.title}."
-    else
-      redirect_to usr_job_application_path(@job_application), alert: result.error
-    end
+    redirect_to new_usr_job_offer_path(job_application_id: @job_application.id, crew_position_id: params[:crew_position_id])
   end
 
   def available_crew_positions

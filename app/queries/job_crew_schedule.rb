@@ -5,7 +5,7 @@ class JobCrewSchedule
     end
 
     def availability_label
-      return "Available for job dates" unless conflict?
+      return "No known conflict" unless conflict?
       return "Unavailable on #{conflict_dates.size} job dates" if conflict_dates.size > 3
 
       "Unavailable #{conflict_dates.map { |date| date.strftime('%b %-d') }.to_sentence}"

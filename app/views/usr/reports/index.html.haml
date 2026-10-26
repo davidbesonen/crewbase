@@ -1,0 +1,35 @@
+%h1.h3.mb-3 Reports & blocked people
+%p.text-muted To report a person, work credit, review, or conversation, use its Report or Dispute link. Administrators review reports; no content is removed automatically.
+.row.g-4
+  .col-lg-8
+    %h2.h5 My reports
+    - if @reports.empty?
+      %p.text-muted You have not submitted any reports.
+    - @reports.each do |report|
+      .card.border-0.shadow-sm.mb-3
+        .card-body
+          .d-flex.justify-content-between.gap-3
+            %h3.h6= report.subject_label
+            %span.badge.text-bg-light= report.status.humanize
+          %p.small.text-muted= "#{SafetyReport::CATEGORIES[report.category]} · #{report.created_at.to_date.to_fs(:long)}"
+          %p.mb-0= report.details
+    %h2.h5.mt-4 Reviews of you and your companies
+    %p.small.text-muted Reviews are opinions from members; they are not proof of a verified booking.
+    - if @received_reviews.empty?
+      %p.text-muted No reviews yet.
+    - @received_reviews.each do |review|
+      .card.border-0.shadow-sm.mb-3
+        .card-body
+          %h3.h6= "Review by #{review.profile.user.full_name}"
+          %p= review.body
+          = link_to "Dispute this review", new_usr_report_path(subject_type: "Review", subject_id: review.id, category: "incorrect_review"), class: "btn btn-outline-secondary"
+  .col-lg-4
+    %h2.h5 Blocked people
+    %p.small.text-muted Blocking stops connection requests, job shares, new invitations, and offers in both directions. Existing job conversations stay available to coordinate work and report concerns. Unblocking does not restore a connection.
+    - if @blocks.empty?
+      %p.text-muted You have not blocked anyone.
+    - @blocks.each do |block|
+      .card.border-0.shadow-sm.mb-3
+        .card-body
+          %h3.h6= block.blocked_user.full_name
+          = button_to "Unblock", usr_user_block_path(block), method: :delete, class: "btn btn-outline-secondary"

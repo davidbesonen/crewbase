@@ -67,7 +67,8 @@ class Usr::ConversationsControllerTest < ActionDispatch::IntegrationTest
         as: :turbo_stream
     end
 
-    assert_response :no_content
+    assert_response :success
+    assert_select "turbo-stream[action='append']"
   end
 
   test "outsider cannot view or post to a conversation" do
@@ -83,6 +84,70 @@ class Usr::ConversationsControllerTest < ActionDispatch::IntegrationTest
       }
     end
     assert_response :not_found
+  end
+
+  test "completed conversations remain readable but reject messages" do
+    @application.job.update!(status: :completed)
+    sign_in @applicant, scope: :user
+    get usr_conversation_path(@conversation)
+    assert_response :success
+    assert_select "textarea", count: 0
+    assert_select "[data-conversation-archived]"
+    assert_no_difference("ContextualMessage.count") do
+      post usr_conversation_contextual_messages_path(@conversation), params: { contextual_message: { body: "Too late" } }, as: :turbo_stream
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "attachment only messages are supported" do
+    sign_in @applicant, scope: :user
+    file = Rack::Test::UploadedFile.new(StringIO.new("Call sheet"), "text/plain", false, original_filename: "call-sheet.txt")
+    post usr_conversation_contextual_messages_path(@conversation), params: { contextual_message: { body: "", files: [ file ] } }
+    assert_response :redirect
+    assert_equal "call-sheet.txt", @conversation.messages.last.files.sole.filename.to_s
+  end
+
+  test "former owners lose access even with a conversation membership" do
+    @application.job.company.company_assignments.where(user: @owner).destroy_all
+    sign_in @owner, scope: :user
+    get usr_conversation_path(@conversation)
+    assert_response :not_found
+  end
+
+  test "message files require live participant authorization and have no public storage route" do
+    @message.files.attach(io: StringIO.new("Private call sheet"), filename: "private.txt", content_type: "text/plain")
+    blob = @message.files.sole.blob
+    sign_in @applicant, scope: :user
+    get "/files/#{blob.signed_id}/private.txt"
+    assert_response :success
+    assert_equal "Private call sheet", response.body
+    assert_includes response.headers["Cache-Control"], "no-store"
+    sign_in @outsider, scope: :user
+    get "/files/#{blob.signed_id}/private.txt"
+    assert_response :not_found
+    get "/rails/active_storage/blobs/redirect/#{blob.signed_id}/private.txt"
+    assert_response :not_found
+  end
+
+  test "signed file IDs cannot be attached to a different conversation" do
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("secret"), filename: "secret.txt", content_type: "text/plain")
+    sign_in @applicant, scope: :user
+    assert_no_difference("ContextualMessage.count") do
+      post usr_conversation_contextual_messages_path(@conversation), params: { contextual_message: { body: "stolen", files: [ blob.signed_id ] } }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "past end dates archive conversations without needing a scheduled job" do
+    @application.job.update!(ends_at: 1.minute.ago)
+    sign_in @applicant, scope: :user
+    get usr_conversation_path(@conversation)
+    assert_response :success
+    assert_select "[data-conversation-archived]"
+    assert_no_difference("ContextualMessage.count") do
+      post usr_job_application_contextual_messages_path(@application), params: { contextual_message: { body: "late" } }, as: :turbo_stream
+    end
+    assert_response :unprocessable_entity
   end
 
   private

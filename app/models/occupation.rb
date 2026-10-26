@@ -1,4 +1,6 @@
 class Occupation < ApplicationRecord
+  scope :categories, -> { where.not(category_key: nil) }
+
   has_many :occupation_assignments, dependent: :destroy
   has_many :profile_occupation_assignments, -> { where(assignable_type: "Profile") }, class_name: "OccupationAssignment"
   has_many :profiles, through: :profile_occupation_assignments, source: :assignable, source_type: "Profile"

@@ -24,7 +24,7 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-company-owner-nav]", count: 1 do
-      assert_select "a[href='#{usr_company_manager_path(@company)}'].btn-primary", text: /Manager/
+      assert_select "a[href='#{usr_company_manager_path(@company)}'][aria-current='page']", text: /Manager/
       assert_select "a[href='#{usr_company_path(@company)}']", text: /Profile/
       assert_select "a[href='#{new_usr_company_job_path(@company)}']", text: /Post a Job/
       assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Manage Projects/
@@ -33,11 +33,11 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /Company Manager/
     assert_select "[data-company-manager-metric]", minimum: 6
     assert_select "[data-studio-benefit]", count: 0
-    assert_select ".card", text: /Upgrade to Studio/
+    assert_select ".card", text: /Next steps/
     assert_select "canvas[data-controller='admin-chart']", count: 1
   end
 
-  test "Studio owner can open the company manager dashboard with Studio benefits" do
+  test "Studio owner can open the company manager dashboard with actionable next steps" do
     studio = Plan.create!(name: "Studio", key: "studio", monthly_price_cents: 9_900, annual_price_cents: 99_000, active: true, position: 3)
     @company.company_plans.create!(plan: studio)
     sign_in @owner, scope: :user
@@ -45,7 +45,8 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
     get usr_company_manager_path(@company)
 
     assert_response :success
-    assert_select "[data-studio-benefit]", count: 3
+    assert_select "[data-studio-benefit]", count: 0
+    assert_select "a[href='#{usr_company_applications_path(@company)}']", text: "Review applications"
   end
 
   test "non-owner cannot open the company manager dashboard" do

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "files/:signed_id/*filename", to: "secure_files#show", as: :rails_service_blob
+  post "uploads", to: "uploads#create", as: :rails_direct_uploads
   draw :admin
   draw :usr
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

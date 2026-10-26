@@ -1,0 +1,246 @@
+# Core duties are represented by the occupation, not additional checkboxes.
+# Shared titles use a conservative common core. Equipment always requires confirmation.
+Actor:
+  Core: [acting_voice]
+  Skill: [rehearsal_management, training, talent_direction]
+  Equipment: [microphones_recorders, remote_collaboration]
+Artist Manager:
+  Core: [artist_development, coordination]
+  Skill: [release_coordination, rights_administration]
+  Equipment: [music_business_software, production_software, review_software]
+Audio Engineer:
+  Core: [audio]
+  Skill: [foh_mixing, studio_recording, studio_mixing, audio_editing, location_sound, system_tuning, stage_patching, troubleshooting]
+  Equipment: [mixing_consoles, microphones_recorders, audio_interfaces, audio_workstations, pa_systems, audio_networks]
+Audio Systems Engineer:
+  Core: [system_tuning]
+  Skill: [stage_patching, networking, rf_coordination, power, troubleshooting, production_advancing]
+  Equipment: [pa_systems, audio_measurement, audio_networks, mixing_consoles, power_systems, intercom_systems]
+Audio Technician:
+  Core: [stage_patching, setup]
+  Skill: [foh_mixing, rf_coordination, troubleshooting]
+  Equipment: [mixing_consoles, microphones_recorders, pa_systems, wireless_audio, audio_networks, intercom_systems]
+Backline Technician:
+  Core: [stage_changeovers, troubleshooting]
+  Skill: [stage_patching, live_playback, production_advancing]
+  Equipment: [instruments, playback_systems, shop_tools, intercom_systems, audio_interfaces]
+Boom Operator:
+  Core: [boom_operation]
+  Skill: [location_sound, stage_patching, rf_coordination]
+  Equipment: [microphones_recorders, wireless_audio, playback_systems]
+Broadcast Engineer:
+  Core: [signal_routing, networking, troubleshooting, documentation]
+  Skill: [streaming, camera_shading]
+  Equipment: [video_switchers, streaming_encoders, broadcast_cameras, network_systems, intercom_systems, image_monitoring]
+Camera Operator:
+  Core: [camera_operation, setup]
+  Skill: [cinematic_lighting, camera_shading, documentation]
+  Equipment: [cinema_cameras, broadcast_cameras, camera_support, lens_control, image_monitoring, intercom_systems]
+Catalog Manager:
+  Core: [music_metadata, documentation]
+  Skill: [rights_administration, release_coordination, media_management]
+  Equipment: [music_business_software, review_software, media_storage]
+Cinematographer:
+  Core: [camera_operation, cinematic_lighting]
+  Skill: [on_set_color, technical_drafting, talent_direction]
+  Equipment: [cinema_cameras, camera_support, lens_control, lighting_fixtures, grip_equipment, image_monitoring]
+Colorist:
+  Core: [color_grading]
+  Skill: [conform_delivery, media_management]
+  Equipment: [color_grading_software, image_monitoring, media_storage, review_software]
+Composer:
+  Core: [composition]
+  Skill: [music_arrangement, music_programming, studio_recording, music_metadata]
+  Equipment: [notation_software, audio_workstations, instruments, audio_interfaces, review_software]
+Digital Imaging Technician:
+  Core: [on_set_color, media_management]
+  Skill: [camera_shading, conform_delivery, troubleshooting]
+  Equipment: [image_monitoring, media_storage, color_grading_software, cinema_cameras]
+Director:
+  Core: [talent_direction, creative_development]
+  Skill: [show_calling, camera_operation, rehearsal_management]
+  Equipment: [image_monitoring, intercom_systems, production_software, review_software]
+Director of Photography:
+  Core: [cinematic_lighting, camera_operation, leadership]
+  Skill: [on_set_color, technical_drafting]
+  Equipment: [cinema_cameras, lens_control, image_monitoring, lighting_fixtures, grip_equipment, camera_support]
+Editor:
+  Core: [picture_editing, media_management]
+  Skill: [conform_delivery, audio_editing, motion_graphics]
+  Equipment: [editing_software, review_software, media_storage, image_monitoring, audio_workstations]
+Event Producer:
+  Core: [creative_development, production_coordination, production_advancing, budgeting, coordination]
+  Skill: [show_calling, venue_operations]
+  Equipment: [production_software, media_servers, intercom_systems, cad_software]
+FOH Engineer:
+  Core: [foh_mixing]
+  Skill: [stage_patching, system_tuning, production_advancing, troubleshooting]
+  Equipment: [mixing_consoles, pa_systems, audio_networks, wireless_audio, audio_measurement, intercom_systems]
+First Assistant Camera:
+  Core: [focus_pulling]
+  Skill: [camera_operation, media_management, troubleshooting]
+  Equipment: [cinema_cameras, lens_control, camera_support, image_monitoring, media_storage]
+Gaffer:
+  Core: [cinematic_lighting, lighting_installation, power, leadership]
+  Skill: [lighting_programming, production_advancing]
+  Equipment: [lighting_fixtures, power_systems, lighting_consoles, lighting_networks, measurement, intercom_systems]
+Graphics Operator:
+  Core: [live_graphics, documentation]
+  Skill: [media_playback, signal_routing, motion_graphics]
+  Equipment: [graphics_playout, compositing_software, video_switchers, intercom_systems, media_servers]
+Hair & Makeup Artist:
+  Core: [hair_makeup, documentation]
+  Skill: [wardrobe, coordination]
+  Equipment: [makeup_tools, image_monitoring, review_software]
+Instructor:
+  Core: [workshop_instruction, learning_assessment]
+  Skill: [instructional_design, online_instruction]
+  Equipment: [learning_platforms, remote_collaboration, media_servers, microphones_recorders]
+Key Grip:
+  Core: [camera_grip, leadership, safety]
+  Skill: [staging, technical_drafting, cinematic_lighting]
+  Equipment: [camera_support, grip_equipment, shop_tools, measurement, intercom_systems]
+LED Technician:
+  Core: [led_processing, setup, troubleshooting]
+  Skill: [signal_routing, media_playback, networking]
+  Equipment: [led_walls, video_switchers, media_servers, network_systems, image_monitoring, power_systems]
+Lighting Designer:
+  Core: [lighting_design, technical_drafting]
+  Skill: [lighting_programming, production_advancing]
+  Equipment: [lighting_consoles, lighting_visualization, lighting_fixtures, cad_software, lighting_networks]
+Lighting Technician:
+  Core: [lighting_installation, setup]
+  Skill: [lighting_programming, power, troubleshooting]
+  Equipment: [lighting_fixtures, lighting_consoles, lighting_networks, power_systems, measurement, intercom_systems]
+Line Producer:
+  Core: [budgeting, production_coordination, coordination, leadership]
+  Skill: [production_advancing, safety]
+  Equipment: [production_software, intercom_systems]
+Mastering Engineer:
+  Core: [mastering, documentation]
+  Skill: [audio_editing]
+  Equipment: [audio_workstations, audio_interfaces, audio_measurement, media_storage, review_software]
+Mixing Engineer:
+  Core: [studio_mixing, documentation]
+  Skill: [audio_editing, studio_recording]
+  Equipment: [audio_workstations, audio_interfaces, mixing_consoles, audio_measurement, review_software]
+Monitor Engineer:
+  Core: [monitor_mixing]
+  Skill: [rf_coordination, stage_patching, production_advancing, troubleshooting]
+  Equipment: [mixing_consoles, stage_monitors, wireless_audio, audio_networks, intercom_systems, rf_software]
+Motion Graphics Designer:
+  Core: [motion_graphics]
+  Skill: [cg_creation, compositing, live_graphics, conform_delivery]
+  Equipment: [compositing_software, animation_software, editing_software, review_software, image_monitoring]
+Music Producer:
+  Core: [music_programming, creative_development]
+  Skill: [studio_recording, studio_mixing, music_arrangement, artist_development]
+  Equipment: [audio_workstations, audio_interfaces, microphones_recorders, instruments, notation_software]
+Musician:
+  Core: [performance]
+  Skill: [live_performance, session_performance, music_arrangement, composition, music_programming]
+  Equipment: [instruments, stage_monitors, audio_workstations, notation_software, audio_interfaces]
+Playback Technician:
+  Core: [live_playback]
+  Skill: [audio_editing, music_programming, networking, troubleshooting]
+  Equipment: [playback_systems, audio_workstations, audio_interfaces, audio_networks, intercom_systems]
+Podcaster:
+  Core: [performance, creative_development]
+  Skill: [interviewing_reporting, studio_recording, audio_editing, streaming]
+  Equipment: [microphones_recorders, audio_interfaces, audio_workstations, streaming_encoders, remote_collaboration]
+Post-Production Supervisor:
+  Core: [post_supervision, production_coordination, coordination]
+  Skill: [media_management, conform_delivery, budgeting]
+  Equipment: [production_software, review_software, media_storage, editing_software]
+Producer:
+  Core: [creative_development, budgeting, coordination]
+  Skill: [production_coordination, talent_direction, post_supervision]
+  Equipment: [production_software, review_software, intercom_systems]
+Production Assistant:
+  Core: [logistics, documentation]
+  Skill: [production_coordination, stage_changeovers]
+  Equipment: [intercom_systems, production_software, vehicles, shop_tools]
+Production Coordinator:
+  Core: [production_coordination, coordination, documentation]
+  Skill: [production_advancing, tour_logistics, budgeting]
+  Equipment: [production_software, intercom_systems, review_software]
+Production Designer:
+  Core: [scenic_design, coordination]
+  Skill: [technical_drafting, creative_development, budgeting]
+  Equipment: [cad_software, review_software, shop_tools]
+Production Manager:
+  Core: [production_advancing, production_coordination, budgeting, leadership]
+  Skill: [venue_operations, safety, post_supervision]
+  Equipment: [production_software, cad_software, intercom_systems]
+Production Sound Mixer:
+  Core: [location_sound, documentation]
+  Skill: [boom_operation, rf_coordination, stage_patching]
+  Equipment: [microphones_recorders, wireless_audio, mixing_consoles, playback_systems, rf_software]
+RF Technician:
+  Core: [rf_coordination, troubleshooting]
+  Skill: [networking, stage_patching, production_advancing]
+  Equipment: [wireless_audio, rf_software, stage_monitors, intercom_systems, measurement]
+Re-recording Mixer:
+  Core: [re_recording, documentation]
+  Skill: [audio_editing, sound_design]
+  Equipment: [audio_workstations, mixing_consoles, audio_interfaces, audio_measurement, review_software]
+Replay Operator:
+  Core: [replay]
+  Skill: [media_management, signal_routing, media_playback]
+  Equipment: [replay_servers, video_switchers, media_storage, intercom_systems]
+Reporter:
+  Core: [interviewing_reporting]
+  Skill: [creative_development, location_sound, picture_editing]
+  Equipment: [microphones_recorders, broadcast_cameras, editing_software, streaming_encoders, intercom_systems]
+Rigger:
+  Core: [suspended_rigging, safety]
+  Skill: [staging, technical_drafting, logistics]
+  Equipment: [rigging_hoists, stage_decks, shop_tools, measurement, intercom_systems]
+Set Designer:
+  Core: [scenic_design, technical_drafting]
+  Skill: [fabrication, staging, budgeting]
+  Equipment: [cad_software, shop_tools, stage_decks]
+Show Caller:
+  Core: [show_calling]
+  Skill: [rehearsal_management, production_advancing, production_coordination, coordination]
+  Equipment: [intercom_systems, production_software, playback_systems, media_servers]
+Sound Designer:
+  Core: [sound_design]
+  Skill: [audio_editing, studio_recording, live_playback, re_recording]
+  Equipment: [audio_workstations, microphones_recorders, audio_interfaces, playback_systems, review_software]
+Stage Manager:
+  Core: [rehearsal_management, show_calling, leadership]
+  Skill: [stage_changeovers, production_coordination, safety]
+  Equipment: [intercom_systems, production_software, playback_systems, stage_decks]
+Stagehand:
+  Core: [staging, stage_changeovers, setup, logistics]
+  Skill: [lighting_installation, stage_patching]
+  Equipment: [stage_decks, shop_tools, vehicles, intercom_systems, lighting_fixtures]
+Technical Director:
+  Core: [leadership]
+  Skill: [live_switching, signal_routing, production_advancing, technical_drafting, staging, safety]
+  Equipment: [video_switchers, intercom_systems, image_monitoring, cad_software, production_software, stage_decks]
+Tour Manager:
+  Core: [tour_logistics, production_advancing, budgeting, coordination, leadership]
+  Skill: [production_coordination]
+  Equipment: [production_software, music_business_software, intercom_systems]
+Venue Manager:
+  Core: [venue_operations, coordination, budgeting, leadership]
+  Skill: [production_advancing, production_coordination, safety]
+  Equipment: [production_software, intercom_systems, hospitality_tools]
+Video Engineer:
+  Core: [signal_routing, troubleshooting]
+  Skill: [camera_shading, streaming, led_processing, projection, networking]
+  Equipment: [video_switchers, image_monitoring, broadcast_cameras, network_systems, led_walls, projection_systems, streaming_encoders]
+Videographer:
+  Core: [camera_operation]
+  Skill: [cinematic_lighting, location_sound, picture_editing, media_management]
+  Equipment: [cinema_cameras, camera_support, microphones_recorders, lighting_fixtures, editing_software, media_storage]
+Visual Effects Artist:
+  Core: [design]
+  Skill: [compositing, cg_creation, motion_graphics, on_set_color, conform_delivery]
+  Equipment: [compositing_software, animation_software, image_monitoring, media_storage, review_software]
+Wardrobe Stylist:
+  Core: [wardrobe, documentation]
+  Skill: [hair_makeup, coordination, budgeting]
+  Equipment: [wardrobe_tools, review_software]

@@ -15,8 +15,21 @@ class JobRequirementsUpdater
   def call
     desired_requirements = build_desired_requirements
 
-    job.job_requirements.where.not(id: desired_requirements.filter_map(&:id)).destroy_all
-    desired_requirements.each(&:save!)
+    job.transaction do
+      SELECTIONS.each do |parameter, (model, importance)|
+        next unless selections.key?(parameter)
+
+        job.job_requirements.where(requirement_type: model.name, importance: importance)
+          .where.not(id: desired_requirements.filter_map(&:id)).destroy_all
+        field = JobExperienceRequirements::TEXT_FIELDS.key([ model.name, importance.to_s ])
+        if field
+          names = desired_requirements.select { |entry| entry.requirement_type == model.name && entry.importance == importance.to_s }.map { |entry| entry.requirement.name }
+          job[field] = ExperienceTerms.new(names).values.join("\n")
+        end
+      end
+      desired_requirements.each(&:save!)
+      job.save! if job.changed?
+    end
     true
   end
 
@@ -26,6 +39,7 @@ class JobRequirementsUpdater
 
   def build_desired_requirements
     SELECTIONS.flat_map do |parameter, (model, importance)|
+      next [] unless selections.key?(parameter)
       ids = Array(selections[parameter]).compact_blank.map(&:to_i).uniq
       model.where(id: ids).map do |requirement|
         job.job_requirements.find_or_initialize_by(requirement:, importance:).tap do |record|

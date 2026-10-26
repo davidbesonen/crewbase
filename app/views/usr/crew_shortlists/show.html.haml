@@ -3,7 +3,7 @@
     %h1.fw-bold.mb-1= @crew_shortlist.name
     %p.text-muted.mb-0= @crew_shortlist.company.name
   .d-flex.gap-2
-    = link_to "Find Crew", usr_profiles_path, class: "btn btn-outline-primary"
+    = link_to "Find Crew", usr_profiles_path, class: "btn btn-primary"
     = button_to "Delete List", usr_crew_shortlist_path(@crew_shortlist), method: :delete, class: "btn btn-outline-danger"
 
 - if @crew_shortlist.profiles.any?

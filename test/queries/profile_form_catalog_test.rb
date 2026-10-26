@@ -3,7 +3,7 @@ require "test_helper"
 class ProfileFormCatalogTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
-  test "returns ordered skills and equipment relevant to the profile occupations" do
+  test "does not require occupation links for selected legacy experience" do
     user = User.create!(
       first_name: "Query",
       last_name: "Tester",
@@ -20,11 +20,13 @@ class ProfileFormCatalogTest < ActiveSupport::TestCase
     matching_skill.occupations << occupation
     matching_equipment.occupations << occupation
     profile.occupations << occupation
+    profile.skills << matching_skill
+    profile.equipment << matching_equipment
 
     catalog = ProfileFormCatalog.new(profile)
 
     assert_equal [ occupation ], catalog.profile_occupations.to_a
-    assert_equal [ matching_skill ], catalog.skills.to_a
-    assert_equal [ matching_equipment ], catalog.equipment.to_a
+    assert_includes catalog.occupations, occupation
+    assert_includes catalog.occupations, other_occupation
   end
 end

@@ -18,13 +18,16 @@ class Marketing::HomepageComponentTest < ViewComponent::TestCase
     assert_selector "a[href='/users/sign_up']", text: "Join Crewbase", minimum: 2
     assert_selector "a[href='/users/sign_in']", text: /Sign in/
     assert_selector "#how-it-works article", count: 3
+    assert_selector "#how-it-works h3", text: "Confirm bookings together"
     assert_selector "#for-crew .marketing-feature", count: 3
     assert_selector "#for-crew h2", text: "Show what you can do. Find work that fits."
     assert_selector "#for-companies .marketing-feature", count: 3
-    assert_selector "#pricing .marketing-price-card", count: 3
-    assert_selector "#pricing", text: /Free forever for crew/
-    assert_selector "#pricing", text: /Founding Compan/
+    assert_selector "#pricing .marketing-price-card", count: 2
+    assert_selector "#pricing", text: /Free for crew/
+    assert_selector "#pricing", text: /\$19/
+    assert_no_text(/Founding Company|\$99|\$49/)
     assert_selector "#platform", text: /clear, job-relevant details/
+    assert_selector "#platform", text: /Private crew connections/
     assert_no_text(/deterministic signals/)
     assert_selector ".marketing-crew-reason", count: 3
     assert_no_text(/% match/)

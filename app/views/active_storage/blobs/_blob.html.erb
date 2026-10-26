@@ -1,14 +1,9 @@
-<figure class="attachment attachment--<%= blob.representable? ? "preview" : "file" %> attachment--<%= blob.filename.extension %>">
-  <% if blob.representable? %>
-    <%= image_tag blob.representation(resize_to_limit: local_assigns[:in_gallery] ? [ 800, 600 ] : [ 1024, 768 ]) %>
+<figure class="attachment attachment--file">
+  <% if UploadPolicy::IMAGE_TYPES.include?(blob.content_type) %>
+    <%= image_tag main_app.rails_service_blob_path(blob.signed_id, blob.filename, inline: "1"), alt: blob.filename.to_s, loading: "lazy" %>
   <% end %>
-
   <figcaption class="attachment__caption">
-    <% if caption = blob.try(:caption) %>
-      <%= caption %>
-    <% else %>
-      <span class="attachment__name"><%= blob.filename %></span>
-      <span class="attachment__size"><%= number_to_human_size blob.byte_size %></span>
-    <% end %>
+    <%= link_to blob.filename.to_s, main_app.rails_service_blob_path(blob.signed_id, blob.filename) %>
+    <span class="attachment__size"><%= number_to_human_size blob.byte_size %></span>
   </figcaption>
 </figure>

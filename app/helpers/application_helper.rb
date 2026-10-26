@@ -1,4 +1,8 @@
 module ApplicationHelper
+  def workspace_navigation_visible?
+    current_user && (current_user.onboarding_completed_at.present? || current_user.has_completed_user_profile?)
+  end
+
   def crewbase_credit_badge(variant: :blue, compact: false)
     classes = [ "crewbase-credit-badge", "crewbase-credit-badge-#{variant}" ]
     options = { class: classes.join(" ") }
@@ -12,6 +16,10 @@ module ApplicationHelper
 
   include Pagy::Frontend
 
+  def search_results_summary(pagy, noun:)
+    "Showing #{number_with_delimiter(pagy.from)}–#{number_with_delimiter(pagy.to)} of #{pluralize(pagy.count, noun)}"
+  end
+
   def remote_modal(title = nil, &block)
     turbo_frame_tag("remote_modal") do
       render("application/remote_modal", title: title, &block)
@@ -21,7 +29,7 @@ module ApplicationHelper
   def bootstrap_pagy_nav(pagy)
     return if pagy.pages <= 1
 
-    content_tag(:nav, aria: { label: "Jobs pagination" }) do
+    content_tag(:nav, aria: { label: "Results pagination" }) do
       content_tag(:ul, class: "pagination mb-0") do
         safe_join([
           bootstrap_pagy_prev_link(pagy),

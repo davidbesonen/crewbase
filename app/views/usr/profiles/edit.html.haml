@@ -27,7 +27,11 @@
 
           .card.border-0.shadow-sm.mb-4{ id: "skill_equipment_form", class: ("d-none" if !@completed_profile_mode && visible_form != "skill_equipment_form") }
             .card-body
-              = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, skills: @skills, equipment: @equipment, profile_occupations: @profile_occupations, profile_skills: @profile_skills, profile_equipment: @profile_equipment, f: f, show_navigation: !@completed_profile_mode, source: @source)
+              = render Usr::ProfileConfig::SkillEquipmentFormComponent.new(profile: @profile, f: f, show_navigation: !@completed_profile_mode, source: @source) do |section|
+                - section.with_categories do
+                  = render Usr::ExperienceCategoryFieldsComponent.new(record: @profile, scope: :profile, occupations: @occupations, selected_occupation_ids: @profile_occupations.map(&:id)) do |fields|
+                    - fields.with_suggestions do
+                      = render Usr::ExperienceCategorySuggestionsComponent.new(suggestions: @category_suggestions)
 
           - if @completed_profile_mode
             .card.border-0.shadow-sm.mb-4{ id: "experience_form" }

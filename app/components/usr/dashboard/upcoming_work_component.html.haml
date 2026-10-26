@@ -1,0 +1,41 @@
+.card.h-100
+  .card-body
+    %section{ aria: { labelledby: "booked-work-heading" } }
+      %h5#booked-work-heading.card-title.fw-semibold.mb-2 Booked Work
+      - if booked_jobs.any?
+        %p.small.text-muted Confirmed offers and existing bookings.
+        .d-flex.flex-column.gap-3{ data: { booked_work: true } }
+          - booked_jobs.each do |job|
+            .pb-3.border-bottom
+              - if public_job?(job)
+                = link_to job.title, helpers.usr_job_path(job), class: "fw-semibold text-dark text-decoration-none"
+              - else
+                .fw-semibold= job.title
+              .text-muted.small.mt-1= job.company&.name
+              .text-muted.small
+                = start_label(job)
+                = l(job.starts_at.to_date, format: :long)
+                - if job.ends_at.present?
+                  %div
+                    Ends
+                    = l(job.ends_at.to_date, format: :long)
+      - else
+        %p.card-text.text-muted You have no booked work scheduled. Confirmed offers and existing bookings will appear here.
+      .mt-3
+        = link_to "View Applications & Invitations", helpers.usr_job_applications_path, class: "text-muted text-decoration-none fw-semibold"
+    %section.border-top.pt-3.mt-3{ aria: { labelledby: "upcoming-opportunities-heading" } }
+      %h6#upcoming-opportunities-heading.fw-semibold Upcoming Opportunities
+      %p.small.text-muted Openings with upcoming start dates. These are not bookings.
+      - if opportunities.any?
+        .d-flex.flex-column.gap-3{ data: { upcoming_opportunities: true } }
+          - opportunities.each do |job|
+            .pb-3.border-bottom
+              = link_to job.title, helpers.usr_job_path(job), class: "fw-semibold text-dark text-decoration-none"
+              .text-muted.small.mt-1= job.company&.name
+              .text-muted.small
+                Starts
+                = l(job.starts_at.to_date, format: :long)
+      - else
+        %p.card-text.text-muted There are no upcoming openings right now.
+      .mt-3
+        = link_to "Browse Jobs", helpers.usr_jobs_path, class: "text-muted text-decoration-none fw-semibold"

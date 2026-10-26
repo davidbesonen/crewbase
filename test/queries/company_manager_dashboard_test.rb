@@ -56,6 +56,12 @@ class CompanyManagerDashboardTest < ActiveSupport::TestCase
     assert_equal 0.0, result[:rates][:invitation_acceptance]
   end
 
+  test "ended postings do not inflate the active jobs metric" do
+    company = companies(:one)
+    create_job(company:, title: "Finished shoot", starts_at: 3.days.ago).update_columns(ends_at: 2.days.ago)
+    assert_equal 0, CompanyManagerDashboard.new(company:).call[:summary][:active_jobs]
+  end
+
   private
 
   def create_job(company:, title:, status: :published, is_active: true, starts_at: 2.days.from_now)

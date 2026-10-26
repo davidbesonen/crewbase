@@ -1,4 +1,5 @@
 require "test_helper"
+require Rails.root.join("db/catalogs/experience_v1")
 
 class WorkerJobRecommenderTest < ActiveSupport::TestCase
   self.fixture_table_names = []
@@ -53,7 +54,7 @@ class WorkerJobRecommenderTest < ActiveSupport::TestCase
     results = WorkerJobRecommender.new(profile:, limit: nil).results
 
     assert_equal [ available ], results.map(&:job)
-    assert_equal "Available for job dates", results.first.availability_label
+    assert_equal "No known conflict", results.first.availability_label
   end
 
   test "adds transparent remote compensation and date reasons" do
@@ -75,7 +76,7 @@ class WorkerJobRecommenderTest < ActiveSupport::TestCase
     assert_equal job, result.job
     assert_includes result.match_reasons, "Remote role"
     assert_includes result.match_reasons, "$500.00 - $700.00 daily"
-    assert_includes result.match_reasons, "Available for job dates"
+    assert_includes result.match_reasons, "Availability unknown"
   end
 
   test "does not recommend jobs at companies the worker owns" do
@@ -114,6 +115,24 @@ class WorkerJobRecommenderTest < ActiveSupport::TestCase
     assert_equal [ "A1 Audio Engineer", "Dante" ], results.first.matched_terms
     assert_includes results.first.match_reasons, "Matches A1 Audio Engineer and Dante"
     assert_not_includes results.first.matched_terms, "GrandMA3"
+  end
+
+  test "shared categories recommend differently titled jobs without assuming specific tools" do
+    ExperienceV1.install!
+    profile = create_worker("CategoryWorker")
+    category = Occupation.find_by!(category_key: "audio")
+    profile.occupations << category
+    profile.equipment << Equipment.find_by!(category_key: "audio_systems")
+    profile.update!(work_examples: "Specific Console")
+    company = create_company("Broad Category Company")
+    matching = create_job(company, title: "Touring FOH mixer", description: "Mix live sound")
+    matching.job_requirements.create!(requirement: category, importance: :required)
+    narrow = create_job(company, title: "Touring console operator", description: "Specific console needed")
+    narrow.job_requirements.create!(requirement: Equipment.create!(name: "Specific Console"), importance: :required)
+
+    results = WorkerJobRecommender.new(profile: profile).results
+    assert_equal [ matching ], results.map(&:job)
+    assert_equal [ "Audio & sound" ], results.first.matched_terms
   end
 
   private

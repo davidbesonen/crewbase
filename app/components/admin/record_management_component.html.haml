@@ -1,0 +1,64 @@
+%header.d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+  %div
+    %p.text-muted.small.mb-1= "#{@record.model_name.human} ##{@record.id}"
+    %h1.h3.mb-2= title
+    %span.badge{ class: @record.restricted_at? ? "text-bg-danger" : "text-bg-success" }= @record.restricted_at? ? "Restricted" : "Unrestricted"
+  = link_to "Back to #{@record.model_name.human.pluralize.downcase}", polymorphic_path([:admin, @record.class]), class: "btn btn-outline-secondary"
+- if @error.present?
+  .alert.alert-danger{ role: "alert" }= @error
+.row.g-4
+  .col-lg-7
+    .card.mb-4
+      .card-body
+        %h2.h5.mb-3 Overview
+        %dl.row.mb-0
+          - @details.fetch(:facts).each do |label, value|
+            %dt.col-sm-4= label
+            %dd.col-sm-8.text-break= value.presence || "Not provided"
+    - if @details.fetch(:links).any?
+      .card.mb-4
+        .card-body
+          %h2.h5 Linked records
+          %p.small.text-muted Recent records, up to 20 of each type. Use the indexes for the full history.
+          %ul.list-group.list-group-flush
+            - @details.fetch(:links).each do |label, record|
+              %li.list-group-item.px-0= link_to "#{record.model_name.human}: #{label}", polymorphic_path([:admin, record])
+    - if @details.fetch(:subscriptions).any?
+      .card.mb-4
+        .card-body
+          %h2.h5 Subscription history
+          %p.small.text-muted Read-only billing records. Suspension does not cancel subscriptions or issue refunds.
+          - @details.fetch(:subscriptions).each do |subscription|
+            .border-top.py-3
+              %p.fw-semibold.mb-1= "#{subscription[:plan]} · #{subscription[:status]}"
+              %p.small.text-muted.mb-1= [subscription[:interval], subscription[:created]].compact.join(" · ")
+              %p.small.text-break.mb-0= subscription[:stripe_id].presence || "No Stripe subscription"
+    - if @details.fetch(:reports).any?
+      .card.mb-4
+        .card-body
+          %h2.h5 Related reports
+          - @details.fetch(:reports).each do |report|
+            %p= link_to "#{report.subject_label} · #{report.status.humanize}", admin_report_path(report)
+  .col-lg-5
+    .card.border-primary
+      .card-body
+        %h2.h5 Manage this record
+        %p.small.text-muted Every change requires a reason and is recorded with your name. Details are changed only when you choose “Correct details”.
+        - if @record.is_a?(User)
+          %p.small Suspension blocks sign-in and hides profiles. Existing records are retained. Staff accounts are protected from suspension.
+        - else
+          %p.small A hold hides public listings and stops new applications and offers. Owners and existing crew retain access to their records. Restoring a hold preserves the original publishing status.
+        = form_with url: polymorphic_path([:admin, @record]), method: :patch, scope: :management, builder: ActionView::Helpers::FormBuilder do |form|
+          .mb-3
+            = form.label :action, "Action", class: "form-label"
+            = form.select :action, action_options, { selected: @submitted[:action] }, class: "form-select"
+          %fieldset.border.rounded.p-3.mb-3
+            %legend.float-none.w-auto.fs-6.px-1 Correctable details
+            - @details.fetch(:fields).each do |field|
+              .mb-3
+                = form.label field, class: "form-label"
+                = form.text_field field, value: field_value(field), class: "form-control"
+          .mb-3
+            = form.label :reason, "Reason (internal only)", class: "form-label"
+            = form.text_area :reason, value: @submitted[:reason], required: true, maxlength: 5000, rows: 3, class: "form-control", placeholder: "Explain what you reviewed and why this change is needed."
+          = form.button "Apply change", class: "btn btn-primary", data: { turbo_confirm: "Apply this administrative change? It will be recorded in the audit log." }

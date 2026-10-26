@@ -23,3 +23,15 @@ development: &calendar_sync
 
 production:
   <<: *calendar_sync
+  daily_matching_job_alerts:
+    class: ScheduleWorkerNotificationsJob
+    args: [job_alert]
+    schedule: every day at 9am
+  weekly_role_recommendations:
+    class: ScheduleWorkerNotificationsJob
+    args: [recommended_role]
+    schedule: every Monday at 10am
+  upcoming_booking_reminders:
+    class: ScheduleWorkerNotificationsJob
+    args: [upcoming_job_reminder]
+    schedule: every hour

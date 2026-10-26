@@ -1,0 +1,23 @@
+%article.card
+  .card-body
+    %p.small.text-muted.mb-2
+      - if share.sender_id == viewer.id
+        = "You shared a job with #{share.recipient.full_name}"
+      - else
+        = "#{share.sender.full_name} shared a job with you"
+      %span.mx-1 ·
+      = helpers.l(share.created_at.to_date, format: :long)
+    - if share.job.network_shareable?
+      %h2.h5.mb-1= share.job.title
+      %p.text-muted.small= share.job.company&.name
+    - else
+      %h2.h5 Job no longer available
+      %p.text-muted.small This posting is closed or no longer accepting applications.
+    - if share.note.present?
+      %p.network-person__note= share.note
+    - if detail
+      - if share.job.network_shareable?
+        = link_to "View job", helpers.usr_job_path(share.job), class: "btn btn-primary"
+      = link_to "My Network", helpers.usr_network_path, class: "btn btn-quiet"
+    - else
+      = link_to "View shared job", helpers.usr_network_job_share_path(share), class: "btn btn-sm btn-quiet"

@@ -24,7 +24,7 @@ class Usr::CalendarEventsControllerTest < ActionDispatch::IntegrationTest
 
   test "toggle cannot add an event to another users profile" do
     assert_no_difference "CalendarEvent.count" do
-      get toggle_date_selection_usr_profile_calendar_events_path(@other_profile),
+      post toggle_date_selection_usr_profile_calendar_events_path(@other_profile),
         params: { date: "07/25/2026", month: "2026-07-01", toggle_action: "add" },
         as: :turbo_stream
     end
@@ -41,7 +41,7 @@ class Usr::CalendarEventsControllerTest < ActionDispatch::IntegrationTest
     )
 
     assert_no_difference "CalendarEvent.count" do
-      get toggle_date_selection_usr_profile_calendar_events_path(@profile),
+      post toggle_date_selection_usr_profile_calendar_events_path(@profile),
         params: {
           date: "2026-07-25",
           month: "2026-07-01",
@@ -56,7 +56,7 @@ class Usr::CalendarEventsControllerTest < ActionDispatch::IntegrationTest
 
   test "toggle rejects an invalid date instead of raising" do
     assert_no_difference "CalendarEvent.count" do
-      get toggle_date_selection_usr_profile_calendar_events_path(@profile),
+      post toggle_date_selection_usr_profile_calendar_events_path(@profile),
         params: { date: "not-a-date", month: "2026-07-01", toggle_action: "add" },
         as: :turbo_stream
     end
@@ -64,7 +64,35 @@ class Usr::CalendarEventsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "JSON calendar endpoints accept the ISO dates sent by the calendar controller" do
+  test "GET requests cannot create or clear availability" do
+    date = Date.current
+    assert_no_difference "CalendarEvent.count" do
+      get toggle_date_selection_usr_profile_calendar_events_path(@profile),
+        params: { date: date.iso8601, month: date.beginning_of_month.iso8601, toggle_action: "add" }, as: :turbo_stream
+    end
+    assert_response :not_found
+    @profile.calendar_events.create!(provider: :manual, external_id: "manual-blockout", event_type: "blockout", to_date: date)
+    assert_no_difference "CalendarEvent.count" do
+      get destroy_all_usr_profile_calendar_events_path(@profile), as: :turbo_stream
+    end
+    assert_response :not_found
+  end
+
+  test "POST selects a blockout and DELETE clears blockouts" do
+    date = Date.current
+    assert_difference "CalendarEvent.count", 1 do
+      post toggle_date_selection_usr_profile_calendar_events_path(@profile),
+        params: { date: date.iso8601, month: date.beginning_of_month.iso8601, toggle_action: "add" }, as: :turbo_stream
+    end
+    assert_response :success
+    assert_equal "blockout", @profile.calendar_events.last.event_type
+    assert_difference "CalendarEvent.count", -1 do
+      delete destroy_all_usr_profile_calendar_events_path(@profile), as: :turbo_stream
+    end
+    assert_response :success
+  end
+
+  test "JSON calendar endpoints accept ISO dates" do
     assert_difference "CalendarEvent.count", 1 do
       post usr_profile_calendar_events_path(@profile),
         params: { date: "2026-07-26" },

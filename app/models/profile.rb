@@ -2,6 +2,7 @@ class Profile < ApplicationRecord
   require "ipaddr"
   require "uri"
   belongs_to :user
+  scope :network_visible, -> { where(profile_type: "user", user_id: User.where(restricted_at: nil).select(:id)).where.not(completed_at: nil) }
 
   has_many :job_applications, dependent: :destroy
   has_many :job_invitations, dependent: :destroy
@@ -11,6 +12,12 @@ class Profile < ApplicationRecord
   has_many :credits, dependent: :destroy
   has_many :calendar_events, dependent: :destroy
 
+  validates :skills_text, :equipment_text, experience_terms: true
+  ExperienceCategories::PROFILE_FIELDS.each do |field, type|
+    normalizes field, with: ->(values) { Array(values).compact_blank.uniq }
+    validates field, experience_category_keys: { type: type }
+  end
+  validates :work_examples, length: { maximum: 2000 }
   validate :ical_feed_url_must_be_public
   has_many :crew_shortlist_memberships, dependent: :destroy
   has_many :crew_shortlists, through: :crew_shortlist_memberships
@@ -41,6 +48,22 @@ class Profile < ApplicationRecord
       attributes["start_year"].blank? &&
       attributes["end_year"].blank?
   }
+
+  def reported_skills
+    ExperienceTerms.new(skills_text.nil? ? skills.map(&:name) : skills_text).values
+  end
+
+  def capability_names
+    ExperienceCategories.selected("Skill", capability_keys).map(&:name)
+  end
+
+  def equipment_family_names
+    ExperienceCategories.selected("Equipment", equipment_family_keys).map(&:name)
+  end
+
+  def reported_equipment
+    ExperienceTerms.new(equipment_text.nil? ? equipment.map(&:name) : equipment_text).values
+  end
 
   def normalized_ical_feed_url
     ical_feed_url.to_s.sub(/\Awebcal:\/\//i, "https://")
@@ -131,7 +154,7 @@ class Profile < ApplicationRecord
     when :occupations
       occupations.any?
     when :skills
-      skills.any? || equipment.any?
+      ExperienceCategories.profile_keys(self, "Skill").any? || equipment_family_keys.any? || reported_skills.any? || reported_equipment.any?
     when :bio
       bio.present?
     when :experience

@@ -18,10 +18,6 @@ class Usr::Company::ManagerDashboardComponent < ApplicationComponent
 
   attr_reader :company, :plan, :dashboard
 
-  def studio?
-    plan&.key == "studio"
-  end
-
   def chart_data
     activity = dashboard[:daily_activity]
     {

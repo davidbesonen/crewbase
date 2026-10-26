@@ -6,10 +6,10 @@
     - selectable = in_month && !past_day
     - day_key = @date.strftime("%Y-%m-%d")
     - if selectable && @calendar_events.key?(day_key)
-      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: @date, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: @date, toggle_action: "remove", calendar_event_id: @calendar_events[day_key], month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-danger rounded-pill px-3 py-2 fw-normal availability-date-pill" do
         = @date.day
     - elsif selectable
-      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: @date, toggle_action: "add", month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
+      = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: @date, toggle_action: "add", month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-outline-secondary rounded-pill px-3 py-2 fw-normal availability-date-pill" do
         = @date.day
     - else
       %button.btn.btn-outline-secondary.rounded-pill.px-3.py-2.fw-normal.availability-date-pill.text-muted{ type: "button", disabled: true }
@@ -34,7 +34,7 @@
             .col-sm-6
               %p.text-muted="#{@calendar_events_sorted.size} blockout date#{'s' if @calendar_events_sorted.size != 1}"
             .col-sm-6.text-end
-              = link_to destroy_all_usr_profile_calendar_events_path(profile_id: @profile.id, month: month_start.strftime("%Y-%m-%d")), method: :delete, class: "btn btn-sm btn-outline-danger" do
+              = link_to destroy_all_usr_profile_calendar_events_path(profile_id: @profile.id, month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :delete }, class: "btn btn-sm btn-outline-danger" do
                 %i.bi.bi-trash
                 Clear all
             .col-sm-12
@@ -48,6 +48,6 @@
                           %i.bi.bi-x-circle-fill.text-danger.me-2
                           = date.strftime("%A, %B %d, %Y")
                       %td.text-end
-                        = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: date, toggle_action: "remove", calendar_event_id: event_id, month: month_start.strftime("%Y-%m-%d")), method: :post, class: "btn btn-sm btn-outline-danger my-1" do
+                        = link_to toggle_date_selection_usr_profile_calendar_events_path(profile_id: @profile.id, date: date, toggle_action: "remove", calendar_event_id: event_id, month: month_start.strftime("%Y-%m-%d")), data: { turbo_method: :post }, class: "btn btn-sm btn-outline-danger my-1" do
                           %i.bi.bi-trash
                           Remove

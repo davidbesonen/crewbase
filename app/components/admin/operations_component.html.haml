@@ -1,0 +1,61 @@
+.d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.mb-4
+  %div
+    %h1.mb-1 Operations
+    %p.text-muted.mb-0 Delivery status and checks requiring operator attention.
+  = link_to "Refresh", helpers.admin_operations_path, class: "btn btn-outline-primary"
+.row.g-4
+  .col-xl-6
+    .card.border-0.shadow-sm.h-100
+      .card-body.p-4
+        %h2.h5 Notification delivery
+        %p.text-muted.small Emails marked sent were accepted by the mail transport; this does not confirm inbox placement. Failed or interrupted sends require provider-log review before replay.
+        .d-flex.flex-wrap.gap-2.mb-3
+          - NotificationDelivery.statuses.each_key do |status|
+            %span.badge.bg-light.text-dark.border= "#{status.humanize}: #{operations[:delivery_counts].fetch(status, 0)}"
+        %p.mb-0= "Interrupted sends over 15 minutes: #{operations[:uncertain_deliveries]}"
+  .col-xl-6
+    .card.border-0.shadow-sm.h-100
+      .card-body.p-4
+        %h2.h5 Background work and billing
+        - if operations[:queue][:available]
+          %p= "Workers with a recent heartbeat: #{operations[:queue][:workers]}"
+          %p= "Schedulers with a recent heartbeat: #{operations[:queue][:schedulers]}"
+          %p= "Failed background jobs: #{operations[:queue][:failed]}"
+        - else
+          %p.text-danger Queue status could not be read. Check the queue database connection.
+        %p.mb-0= "Unprocessed Stripe events: #{operations[:unprocessed_stripe_events]}"
+  .col-12
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h2.h5 Deployment readiness
+        %p.text-muted Configuration checks are separate from live verification. Use the operations runbook for delivery, billing recovery, and restoration drills.
+        - operations[:checks].each do |check|
+          .border-top.py-3
+            .d-flex.flex-wrap.align-items-center.gap-2.mb-1
+              %h3.h6.mb-0= check.name
+              %span.badge{ class: check.ready? ? "bg-success" : "bg-warning text-dark" }= check.ready? ? "Configured" : "Needs verification"
+            %p.text-muted.mb-0= check.detail
+  .col-12
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h2.h5 Recent email activity
+        - if operations[:recent_deliveries].empty?
+          %p.text-muted.mb-0 No scheduled notification deliveries yet.
+        - else
+          .table-responsive
+            %table.table.align-middle
+              %thead
+                %tr
+                  %th{ scope: "col" } ID
+                  %th{ scope: "col" } Type
+                  %th{ scope: "col" } Status
+                  %th{ scope: "col" } Created
+                  %th{ scope: "col" } Failure
+              %tbody
+                - operations[:recent_deliveries].each do |delivery|
+                  %tr
+                    %td= delivery.id
+                    %td= delivery.kind.humanize
+                    %td= delivery.status.humanize
+                    %td= helpers.l(delivery.created_at, format: :short)
+                    %td= delivery.failure_class.presence || "—"

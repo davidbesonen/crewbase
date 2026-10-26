@@ -2,60 +2,79 @@
   .mb-4
     %p.text-uppercase.text-primary.fw-semibold.small.mb-1 Billing and access
     %h1.mb-1 Manage Plan
-    %p.text-muted.mb-0 Upgrade #{company.name} to increase capacity and unlock additional staffing tools.
+    %p.text-muted.mb-0 Clear limits, predictable pricing. All prices are in USD, per company.
 
   .card.border-0.shadow-sm.mb-4{ data: { current_plan: true } }
-    .card-body.d-flex.flex-wrap.align-items-center.gap-3
-      .plan-feature-icon
-        %i.bi.bi-check-circle-fill
-      %div
-        %p.text-muted.small.text-uppercase.fw-semibold.mb-1 Current plan
-        %h2.h4.mb-1= current_plan&.name || "No active plan"
+    .card-body.p-4
+      .d-flex.flex-wrap.align-items-center.gap-3
+        .plan-feature-icon
+          %i.bi.bi-building-check{ aria: { hidden: true } }
+        %div
+          %p.text-muted.small.text-uppercase.fw-semibold.mb-1 Current access
+          %h2.h4.mb-1= current_plan&.name || "No active plan"
+          - if current_plan
+            %p.text-muted.mb-0= current_plan.free? ? "Free · no card required" : "#{current_plan.monthly_price}/month or #{current_plan.annual_price}/year"
         - if current_plan
-          %p.text-muted.mb-0= "#{current_plan.monthly_price}/month · #{current_plan.annual_price}/year"
-      %span.badge.text-bg-success.ms-lg-auto Active
-      - if company.stripe_customer_id.present?
-        = button_to "Manage payment method and invoices", usr_company_billing_portal_path(company), method: :post, class: "btn btn-outline-primary"
+          %span.badge.text-bg-success.ms-lg-auto Active
+        - else
+          %span.badge.text-bg-secondary.ms-lg-auto Setup incomplete
+        - if company.stripe_customer_id.present?
+          = button_to "Manage billing or cancel", usr_company_billing_portal_path(company), method: :post, class: "btn btn-outline-primary", data: { turbo: false }
+      - if current_plan
+        .d-flex.flex-wrap.gap-3.mt-3
+          - current_plan.capacity_items.each do |item|
+            %span.small.text-muted
+              %i.bi.me-1{ class: item[:icon], aria: { hidden: true } }
+              = item[:label]
+        - unless current_plan.active?
+          %p.small.text-muted.mt-3.mb-0 You are on a previous plan. Your existing subscription and limits are unchanged. Use billing management to review or cancel your subscription.
 
   - if upgrade_plans.any?
     .row.g-4
       - upgrade_plans.each do |plan|
         .col-12.col-xl-6
-          .card.border-0.shadow-sm.h-100.company-plan-card{ class: "company-plan-card--#{plan.key}" }
+          .card.border-0.shadow-sm.h-100.company-plan-card.company-plan-card--team
             .company-plan-card__accent
             .card-body.p-4.d-flex.flex-column
               %h2.h3.fw-bold= plan.name
               %p.text-muted= plan.description
-              %p.h4.fw-bold.mb-3
-                = plan.monthly_price
-                %span.fs-6.fw-normal.text-muted /month
+              %p.h4.fw-bold.mb-1
+                = plan.free? ? "Free" : plan.monthly_price
+                - unless plan.free?
+                  %span.fs-6.fw-normal.text-muted /month
+              - unless plan.free?
+                %p.small.text-muted.mb-3 #{plan.annual_price} billed yearly · save #{plan.annual_savings}
               %ul.list-unstyled.vstack.gap-2.mb-4
                 - plan.capacity_items.each do |item|
                   %li.d-flex.gap-2
-                    %i.bi.text-primary{ class: item.fetch(:icon) }
+                    %i.bi.text-primary{ class: item.fetch(:icon), aria: { hidden: true } }
                     = item.fetch(:label)
                 - included_features(plan).each do |feature|
                   %li.d-flex.gap-2
-                    %i.bi.bi-check-lg.text-success
+                    %i.bi.bi-check-lg.text-success{ aria: { hidden: true } }
                     = feature.fetch(:label)
-              = form_with url: usr_company_billing_checkout_path(company), method: :post, class: "mt-auto", data: { turbo: false } do |form|
-                = form.hidden_field :plan_id, value: plan.id
-                %fieldset.mb-3
-                  %legend.visually-hidden Billing interval
-                  .form-check
-                    = form.radio_button :billing_interval, "monthly", checked: true, class: "form-check-input", id: "plan_#{plan.id}_monthly"
-                    = form.label :billing_interval_monthly, "#{plan.monthly_price}/month", class: "form-check-label", for: "plan_#{plan.id}_monthly"
-                  .form-check
-                    = form.radio_button :billing_interval, "annual", class: "form-check-input", id: "plan_#{plan.id}_annual"
-                    = form.label :billing_interval_annual, "#{plan.annual_price}/year", class: "form-check-label", for: "plan_#{plan.id}_annual"
-                = form.submit "Continue to secure checkout", class: "btn btn-primary w-100"
-  - else
+              - if plan.checkout_available?("monthly") || plan.checkout_available?("annual")
+                = form_with url: usr_company_billing_checkout_path(company), method: :post, class: "mt-auto", data: { turbo: false } do |form|
+                  = form.hidden_field :plan_id, value: plan.id
+                  %fieldset.mb-3
+                    %legend.h6 Billing interval
+                    - if plan.checkout_available?("monthly")
+                      .form-check
+                        = form.radio_button :billing_interval, "monthly", checked: true, class: "form-check-input", id: "plan_#{plan.id}_monthly"
+                        = form.label :billing_interval_monthly, "#{plan.monthly_price}/month", class: "form-check-label", for: "plan_#{plan.id}_monthly"
+                    - if plan.checkout_available?("annual")
+                      .form-check
+                        = form.radio_button :billing_interval, "annual", checked: !plan.checkout_available?("monthly"), class: "form-check-input", id: "plan_#{plan.id}_annual"
+                        = form.label :billing_interval_annual, "#{plan.annual_price} billed yearly", class: "form-check-label", for: "plan_#{plan.id}_annual"
+                  = form.submit "Continue to secure checkout", class: "btn btn-primary w-100"
+                  %p.small.text-muted.mt-2.mb-0 Renews automatically. Cancel future renewals in billing management.
+              - elsif !plan.free?
+                %p.small.text-muted.mb-0 Paid upgrades are not available yet. Your current access stays unchanged; check back when billing opens.
+  - elsif current_plan
     .card.border-0.shadow-sm
-      .card-body.p-4.text-center
-        %i.bi.bi-stars.fs-1.text-primary
-        %h2.h4.mt-3 You are on the highest plan
-        %p.text-muted.mb-0 Your company has access to every currently available Crewbase company feature.
+      .card-body.p-4
+        %h2.h4 Your plan is ready for work
+        %p.text-muted.mb-3 Manage jobs and applications from your company workspace.
+        = link_to "Go to company", usr_company_path(company), class: "btn btn-primary"
 
-  .alert.alert-info.mt-4.mb-0
-    %i.bi.bi-shield-lock.me-2
-    Payment details are collected securely by Stripe. Your new plan activates only after Stripe confirms the subscription.
+  %p.small.text-muted.mt-4.mb-0 Paid plans activate only after payment confirmation. Existing subscription prices are preserved unless you choose a change.

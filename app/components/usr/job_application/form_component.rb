@@ -16,6 +16,10 @@ class Usr::JobApplication::FormComponent < ApplicationComponent
     Array(job.questions).map(&:to_s).map(&:strip).reject(&:blank?)
   end
 
+  def attachment_extensions
+    UploadPolicy::EXTENSIONS.map { |extension| ".#{extension}" }.join(",")
+  end
+
   def answer_for(question)
     job_application.question_answers.to_h[question]
   end

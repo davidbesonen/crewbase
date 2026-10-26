@@ -1,0 +1,49 @@
+.network-person {
+  border-color: #dce7f0;
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.85rem;
+    background: #e6f1f8;
+    color: #426e8d;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  &__history {
+    padding: 0.85rem;
+    border-radius: 0.75rem;
+    background: #f5f8fb;
+  }
+
+  .min-width-0 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.network-person__note {
+  padding: 0.8rem 1rem;
+  border-left: 3px solid #b5cfdf;
+  background: #f5f9fc;
+  border-radius: 0 0.5rem 0.5rem 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.network-tabs .nav-link {
+  font-weight: 600;
+}
+
+.network-form {
+  max-width: 42rem;
+  margin-inline: auto;
+}
+
+.network-search {
+  width: 100%;
+  max-width: 25rem;
+}
