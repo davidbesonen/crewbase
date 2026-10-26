@@ -52,8 +52,8 @@
   transition: border-color .2s, color .2s;
 }
 .concert-scene__toggle[hidden] { display: none; }
-.concert-scene__toggle:hover { border-color: #8fcaff; color: #fff; }
-.concert-scene__toggle:focus-visible { outline: 3px solid #8fcaff; outline-offset: 3px; }
+.concert-scene__toggle:hover { border-color: $brand-ice; color: #fff; }
+.concert-scene__toggle:focus-visible { outline: 3px solid $brand-ice; outline-offset: 3px; }
 .concert-scene__toggle i { font-size: 1rem; }
 @keyframes concert-drift { 0%, 100% { transform: translateY(0) rotate(-.3deg); } 50% { transform: translateY(-5px) rotate(.3deg); } }
 @keyframes concert-glow { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }

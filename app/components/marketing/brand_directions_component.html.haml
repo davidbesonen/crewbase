@@ -1,17 +1,17 @@
 %main.brand-directions
   .brand-directions__header
     = link_to "knowshow / brand directions", welcome_path, class: "brand-directions__back"
-    %p.brand-directions__eyebrow Round two / Signal meets Afterhours
-    %h1 Clean shape. A little more edge.
-    %p Three hybrids, from subtle movement to a heavier forward lean. Same lowercase wordmark. Two shades of blue.
-    %span.brand-directions__note Momentum is the suggested middle ground. Signal remains the app default until you choose.
+    %p.brand-directions__eyebrow KnowShow / Brand direction
+    %h1= "#{selected_brand_name}. KnowShow’s new look."
+    %p A bold lowercase wordmark in cobalt and ice blue, on a black foundation.
+    %span.brand-directions__note= "#{selected_brand_name} is the selected brand direction across KnowShow. The other designs remain available to preview."
     .brand-directions__references
       %span Compare the originals:
       = link_to "Signal", welcome_path(concept: "signal")
       = link_to "Afterhours", welcome_path(concept: "afterhours")
   .brand-directions__grid
     - concepts.each_with_index do |concept, index|
-      %article.brand-direction{ data: { brand_direction: concept.key } }
+      %article.brand-direction{ data: { brand_direction: concept.key, selected: selected?(concept).to_s } }
         .brand-direction__stage.brand-surface-dark
           %span.brand-direction__number= "0#{index + 1}"
           = wordmarks[index]
@@ -20,6 +20,8 @@
           %span Light surface
         .brand-direction__body
           %h2= "#{index + 1}. #{concept.name}"
+          - if selected?(concept)
+            %span.brand-direction__selected Selected for KnowShow
           %p.brand-direction__character= concept.character
           %p= concept.description
           .brand-direction__actions

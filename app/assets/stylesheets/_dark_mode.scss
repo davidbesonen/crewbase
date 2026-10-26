@@ -26,10 +26,10 @@
   --bs-tertiary-bg-rgb: 27, 37, 55;
   --bs-border-color: #2b3951;
   --bs-border-color-translucent: rgba(110, 139, 169, .3);
-  --bs-primary: #95bbff;
+  --bs-primary: #{$brand-ice};
   --bs-light: #1b2537;
-  --bs-link-color: #95bbff;
-  --bs-link-color-rgb: 149, 187, 255;
+  --bs-link-color: #{$brand-ice};
+  --bs-link-color-rgb: #{to-rgb($brand-ice)};
   --bs-link-hover-color: #c8e5ff;
   --bs-link-hover-color-rgb: 200, 229, 255;
   --app-surface-navy: #1b2537;
@@ -104,7 +104,7 @@
     border-color: var(--bs-border-color);
     &:hover, &:focus-visible, &:active { background: var(--bs-tertiary-bg); color: var(--bs-emphasis-color); border-color: #779bbd; }
   }
-  @each $kind, $ink in (primary: #95bbff, secondary: #b3c7db, danger: #f5a9b4, success: #93d5b6, info: #91d2e0, warning: #edcc87) {
+  @each $kind, $ink in (primary: $brand-ice, secondary: #b3c7db, danger: #f5a9b4, success: #93d5b6, info: #91d2e0, warning: #edcc87) {
     .btn-outline-#{$kind} {
       color: $ink;
       border-color: $ink;
@@ -152,7 +152,7 @@
   .message-bubble-received { background: var(--bs-secondary-bg); color: var(--bs-body-color); border-color: var(--bs-border-color); }
   .message-composer { border-color: var(--bs-border-color); }
   .conversation-list-item:hover { background: var(--bs-tertiary-bg); }
-  .dashboard .profile-completion-wheel { background: conic-gradient(#95bbff var(--profile-completion), #30455b 0); }
+  .dashboard .profile-completion-wheel { background: conic-gradient($brand-ice var(--profile-completion), #30455b 0); }
   .dashboard .profile-completion-wheel__center { color: var(--bs-primary); }
   .profile-show #profile-skills .text-bg-primary { color: var(--bs-primary) !important; background-color: var(--bs-tertiary-bg) !important; border-color: var(--bs-border-color); }
   .company-plan-card--team, .company-plan-card--studio { background: var(--bs-secondary-bg); }
@@ -169,7 +169,7 @@
   .flatpickr-day, .flatpickr-weekday { color: var(--bs-body-color); }
   .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay, .flatpickr-day.flatpickr-disabled { color: #7e91a5; }
   .flatpickr-day:hover { background: var(--bs-tertiary-bg); border-color: var(--bs-border-color); }
-  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #315f86; border-color: #95bbff; color: #fff; }
+  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: #315f86; border-color: $brand-ice; color: #fff; }
   .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month { fill: var(--bs-body-color); color: var(--bs-body-color); }
 }
 

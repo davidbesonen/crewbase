@@ -11,6 +11,8 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select "title", text: /KnowShow/
       assert_select "[aria-label='KnowShow']", minimum: 1
+      assert_select "img[src*='knowshow-drive-on-']", minimum: 1
+      assert_select "meta[property='og:image'][content*='knowshow-drive-social.png']"
       assert_select "meta[property='og:title'][content*='KnowShow']"
       assert_select "link[rel='icon'][href*='icon.svg']"
       assert_no_match(/Crewbase|crewbase/i, response.body)
@@ -21,6 +23,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     get "/brand"
     assert_response :success
     assert_select "[data-brand-direction]", count: 3
+    assert_select "[data-brand-direction='drive'][data-selected='true']"
     assert_select "a[href*='/welcome?concept=']", count: 5
     assert_select "a[download][href$='.svg']", count: 6
     %w[tempo momentum drive].each do |key|
@@ -80,6 +83,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
       email: "marketing-member@example.com",
       password: "password123"
     )
+    user.roles << Role.find_or_create_by!(name: "user")
     user.profiles.create!(profile_type: "user", completed_at: Time.current)
     user.visits.create!
     sign_in user, scope: :user
@@ -87,6 +91,10 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_redirected_to usr_dashboards_path
+
+    get usr_dashboards_path
+    assert_response :success
+    assert_select ".navbar-brand img[src*='knowshow-drive-on-']", minimum: 1
   end
 
   test "meet the team introduces both founders" do

@@ -7,6 +7,7 @@ class MarketingConcertTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1440, 1100)
     set_reduced_motion(false)
     visit welcome_path
+    assert_selector ".marketing-nav img[src*='knowshow-drive-on-dark']"
 
     assert_selector ".concert-scene img[alt*='saxophonist']"
     assert page.evaluate_script("document.querySelector('.concert-scene img').complete && document.querySelector('.concert-scene img').naturalWidth > 0")
