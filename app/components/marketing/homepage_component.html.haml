@@ -5,8 +5,8 @@
         = brand
       .marketing-nav__links
         = link_to "How it works", "#how-it-works", class: "marketing-nav__anchor"
-        = link_to "For crew", "#for-crew", class: "marketing-nav__anchor"
         = link_to "For companies", "#for-companies", class: "marketing-nav__anchor"
+        = link_to "For crew", "#for-crew", class: "marketing-nav__anchor"
         = link_to "Pricing", "#pricing", class: "marketing-nav__anchor"
         = link_to "Meet the Team", meet_the_team_path, class: "marketing-nav__anchor"
         = link_to "What’s new", change_log_entries_path, class: "marketing-nav__anchor"
@@ -21,37 +21,37 @@
       .marketing-hero__copy{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
         .marketing-eyebrow
           %span.marketing-eyebrow__dot
-          The live music touring network
+          Crew staffing for live music
         %h1
-          Know your crew.
+          Staff your gigs.
           %span Own the show.
         %p.marketing-hero__lede
-          Your people. Your next show. Connect with touring crew, musicians and engineers who know the work, then keep every booking moving.
+          Create your production company in KnowShow, find touring crew, musicians and engineers, and manage hiring from the first invite to confirmed bookings.
         .marketing-hero__actions
           = link_to primary_cta_label, primary_cta_path, class: "btn btn-primary btn-lg"
-          = link_to "See how it works", "#how-it-works", class: "btn btn-outline-primary btn-lg"
+          = link_to "Looking for gigs?", "#for-crew", class: "btn btn-outline-primary btn-lg"
         .marketing-proof{ aria: { label: "KnowShow benefits" } }
           %span
             %i.bi.bi-check-circle-fill
-            Profiles built for touring
+            Create your company
           %span
             %i.bi.bi-check-circle-fill
-            Clear, explainable matches
+            Find crew by experience
           %span
             %i.bi.bi-check-circle-fill
-            Staffing through show day
+            Keep bookings organized
 
-      .marketing-hero__scene{ data: { marketing_motion_target: "reveal parallax", marketing_motion_direction: "right" } }
+      .marketing-hero__scene
         = concert_scene
 
   %section.marketing-trust-strip
     .marketing-container{ data: { marketing_motion_target: "reveal" } }
-      %p One practical workspace for the people who take live music on the road.
+      %p Built for production companies staffing concerts, festivals and tours — and the people who make them happen.
       .marketing-trust-strip__items
         %span Concerts
         %span Festivals
         %span Touring crew
-        %span Touring
+        %span Production companies
         %span Musicians
         %span Engineers
 
@@ -59,34 +59,68 @@
     .marketing-container
       .marketing-section-heading{ data: { marketing_motion_target: "reveal" } }
         %span.marketing-kicker From search to show day
-        %h2 Staffing should feel organized from the start.
-        %p KnowShow replaces scattered posts, texts, and spreadsheets with a workflow everyone can understand.
+        %h2 Your company. Your gigs. Your crew.
+        %p Set up your production company, post gigs, and bring the right people together. Keep the hiring details attached to the work.
       .marketing-steps
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
           %span.marketing-step__number 01
           %i.bi.bi-person-vcard
-          %h3 Show what you do
-          %p Build a useful professional profile or company presence with occupations, broad capabilities, equipment families, specific experience, verified KnowShow Credits, and availability.
+          %h3 Create your company
+          %p Create a company presence in KnowShow and give your team one place to organize job postings, projects and crew hiring.
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
           %span.marketing-step__number 02
           %i.bi.bi-search-heart
-          %h3 Find the right fit
-          %p Search people and jobs, see relevant recommendations, and understand exactly why each opportunity or crew member matches.
+          %h3 Post a gig. Find your crew.
+          %p Post the roles you need, search people by occupation and equipment experience, and review crew recommendations with clear reasons for each match.
         %article.marketing-step{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
           %span.marketing-step__number 03
           %i.bi.bi-kanban
           %h3 Confirm bookings together
-          %p Invite, apply, and shortlist, then send clear offer terms for crew to review and accept before a booking is confirmed.
+          %p Invite candidates, review applications and build your shortlist. Send clear offer terms for crew to review and accept before a booking is confirmed.
 
-  %section.marketing-section.marketing-section--tinted#for-crew
+  %section.marketing-section.marketing-section--tinted#for-companies
+    .marketing-container
+      .marketing-audience-heading{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "right" } }
+        .marketing-audience-icon.marketing-audience-icon--navy
+          %i.bi.bi-buildings
+        %div
+          %span.marketing-kicker For production companies
+          %h2 Run crew hiring from your company workspace.
+          %p Create a company, post the roles you need, and manage crew recommendations, applications and bookings from one place.
+      .marketing-bento
+        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
+          .marketing-feature__icon
+            %i.bi.bi-people
+          %h3 Find people with the right experience
+          %p Search touring roles and named equipment experience, including MA3 / grandMA3 lighting consoles. Use recommendations and match explanations to focus your outreach.
+        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
+          .marketing-feature__icon
+            %i.bi.bi-ui-checks-grid
+          %h3 Post one role or staff a whole gig
+          %p Post a single role or organize a multi-position gig, with clear requirements, dates, location, compensation, and application questions.
+        %article.marketing-feature.marketing-feature--wide{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
+          .marketing-feature__icon
+            %i.bi.bi-diagram-3
+          %h3 Keep hiring moving
+          %p Invite candidates, review applications, build shortlists, and send offers for crew to accept. Keep confirmed bookings and conversations connected to the work.
+          .marketing-flow
+            %span Post
+            %i.bi.bi-arrow-right
+            %span Match
+            %i.bi.bi-arrow-right
+            %span Review
+            %i.bi.bi-arrow-right
+            %span Crew
+
+  %section.marketing-section#for-crew
     .marketing-container
       .marketing-audience-heading{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
         .marketing-audience-icon
           %i.bi.bi-headset
         %div
-          %span.marketing-kicker For crew members
-          %h2 Show what you can do. Find work that fits.
-          %p Make it easy for the right production teams to understand your experience and know when you can work.
+          %span.marketing-kicker For crew, musicians and engineers
+          %h2 Looking for your next gig?
+          %p Show production companies what you do and find live music touring work that fits your experience and availability.
       .marketing-bento
         %article.marketing-feature.marketing-feature--wide{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
           .marketing-feature__icon
@@ -109,46 +143,18 @@
           %h3 Jobs worth seeing
           %p Browse structured postings, save roles, and receive recommendations grounded in your profile. Hide suggestions that miss the mark and review offer terms before accepting work.
 
-  %section.marketing-section#for-companies
-    .marketing-container
-      .marketing-audience-heading{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "right" } }
-        .marketing-audience-icon.marketing-audience-icon--navy
-          %i.bi.bi-buildings
-        %div
-          %span.marketing-kicker For production companies
-          %h2 Build trusted crews with less friction.
-          %p Move quickly without sacrificing context, consistency, or control over your staffing process.
-      .marketing-bento
-        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "0" } }
-          .marketing-feature__icon
-            %i.bi.bi-people
-          %h3 Find qualified people
-          %p Search touring roles and named equipment experience, including MA3 / grandMA3 lighting consoles. Use recommendations and match explanations to focus your outreach.
-        %article.marketing-feature{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "1" } }
-          .marketing-feature__icon
-            %i.bi.bi-ui-checks-grid
-          %h3 Structured job postings
-          %p Post a single role or organize a multi-position gig, with clear requirements, dates, location, compensation, and application questions.
-        %article.marketing-feature.marketing-feature--wide{ data: { marketing_motion_target: "reveal", marketing_motion_stagger: "2" } }
-          .marketing-feature__icon
-            %i.bi.bi-diagram-3
-          %h3 One hiring workflow, end to end
-          %p Invite candidates, review applications, build shortlists, and send offers for crew to accept. Keep confirmed bookings and conversations connected to the work.
-          .marketing-flow
-            %span Post
-            %i.bi.bi-arrow-right
-            %span Match
-            %i.bi.bi-arrow-right
-            %span Review
-            %i.bi.bi-arrow-right
-            %span Crew
+      .mt-4
+        - if show_auth_links
+          = link_to "Create your free profile", primary_cta_path, class: "btn btn-primary"
+        - else
+          = link_to "Browse gigs", usr_jobs_path, class: "btn btn-primary"
 
   %section.marketing-section.marketing-section--tinted#pricing
     .marketing-container
       .marketing-section-heading{ data: { marketing_motion_target: "reveal" } }
         %span.marketing-kicker Simple, affordable pricing
-        %h2 Free for crew. Room for your company to grow.
-        %p Build your profile, apply, message, and manage availability for free. Companies can start without a card and upgrade when they need more capacity. All prices are in USD, per company.
+        %h2 Start staffing free. Grow when you need to.
+        %p Create your company and start hiring without a card. Upgrade when you need more jobs, team members or projects. Crew profiles, applications, messaging and availability stay free. All prices are in USD, per company.
       .marketing-price-grid
         - pricing_plans.each_with_index do |plan, index|
           %article.marketing-price-card{ class: ("marketing-price-card--featured" unless plan.free?), data: { marketing_motion_target: "reveal", marketing_motion_stagger: index } }
@@ -170,16 +176,16 @@
       .marketing-founder-offer{ data: { marketing_motion_target: "reveal" } }
         %i.bi.bi-shield-check{ aria: { hidden: true } }
         %div
-          %span.marketing-kicker Work comes first
-          %h3 No fees to apply. No paid ranking boosts.
+          %span.marketing-kicker Straightforward company pricing
+          %h3 More room for your company when you need it.
           %p.mb-0 Both plans include applications, messaging, recommendations, multi-position staffing, and availability-aware crew planning. Team gives you more jobs, team members, and projects. Paid upgrades open once billing is available; you can start free now.
 
   %section.marketing-section.marketing-platform#platform
     .marketing-container.marketing-platform__grid
       .marketing-platform__copy{ data: { marketing_motion_target: "reveal", marketing_motion_direction: "left" } }
         %span.marketing-kicker Built around real operations
-        %h2 The network gets you connected. The tools keep you there.
-        %p KnowShow stays useful after a match is made, keeping the context for each company, opportunity, and working relationship close at hand.
+        %h2 Keep every gig and working relationship organized.
+        %p Keep your company’s postings, crew shortlists, hiring conversations and confirmed bookings connected to the gig.
         %p KnowShow bases recommendations on clear, job-relevant details: occupations, skills, equipment experience, location, requirements and known availability.
         %ul.marketing-check-list
           %li
@@ -208,8 +214,8 @@
     .marketing-container
       .marketing-cta__inner{ data: { marketing_motion_target: "reveal" } }
         %span.marketing-kicker Your next crew starts here
-        %h2 Spend less time chasing replies. Build with confidence.
-        %p Join the shared workspace designed for the people who make live music happen.
+        %h2 Set up your company. Staff your next gig.
+        %p Build your production company’s presence in KnowShow and bring the right crew together for the next show.
         .marketing-cta__actions
           = link_to primary_cta_label, primary_cta_path, class: "btn btn-light btn-lg"
           - if show_auth_links

@@ -2,7 +2,7 @@
 
 The selected brand direction is **Drive**: a bold lowercase wordmark, cobalt and ice blue, and a black foundation. `BrandIdentity` owns the default direction and brand asset paths.
 
-The live music touring network for crew, musicians, engineers and companies.
+Crew staffing for production companies in live music touring, with free profiles and gig discovery for crew, musicians and engineers.
 
 The product was previously named Crewbase. Existing infrastructure names, environment
 variables, database names, demo URLs, account addresses and stable calendar IDs retain

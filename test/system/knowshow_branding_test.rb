@@ -16,7 +16,7 @@ class KnowshowBrandingTest < ApplicationSystemTestCase
     within("[data-brand-direction='momentum']") { click_link "Preview site" }
     page.driver.browser.manage.window.resize_to(1440, 1000)
     assert_selector "main[data-brand-concept='momentum']"
-    assert_selector "h1", text: "Know your crew."
+    assert_selector "h1", text: "Staff your gigs."
     assert_selector ".marketing-nav img[src*='knowshow-momentum-on-dark']"
     page.driver.browser.manage.window.resize_to(1890, 1000)
     page.evaluate_async_script("document.fonts.ready.then(() => arguments[0](true))")

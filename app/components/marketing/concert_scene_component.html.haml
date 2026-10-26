@@ -1,10 +1,2 @@
-%figure.concert-scene{ data: { controller: "concert-scene", motion: "paused" } }
-  .concert-scene__halo{ aria: { hidden: true } }
-  .concert-scene__stage
-    = image_tag "/brand/knowshow-concert-1254.webp", alt: self.class::DESCRIPTION, width: 1254, height: 1254, srcset: "/brand/knowshow-concert-640.webp 640w, /brand/knowshow-concert-1254.webp 1254w", sizes: "(max-width: 991px) 90vw, 640px", fetchpriority: "high", decoding: "async", class: "concert-scene__artwork"
-    .concert-scene__lighting{ aria: { hidden: true } }
-      %span.concert-scene__beam.concert-scene__beam--blue
-      %span.concert-scene__beam.concert-scene__beam--warm
-  %button.concert-scene__toggle{ type: "button", hidden: true, data: { concert_scene_target: "toggle", action: "concert-scene#toggle" } }
-    %i.bi.bi-pause-fill{ aria: { hidden: true }, data: { concert_scene_target: "icon" } }
-    %span{ data: { concert_scene_target: "label" } } Pause animation
+%figure.concert-scene
+  = image_tag "/brand/knowshow-concert-1254.webp", alt: self.class::DESCRIPTION, width: 1254, height: 1254, srcset: "/brand/knowshow-concert-640.webp 640w, /brand/knowshow-concert-1254.webp 1254w", sizes: "(max-width: 991px) 90vw, 640px", fetchpriority: "high", decoding: "async", class: "concert-scene__artwork"

@@ -48,8 +48,8 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "body.vh-100", count: 0
     assert_select "#userSidenav", count: 0
     assert_select "nav.navbar", count: 0
-    assert_select "h1", text: /Know your crew/
-    assert_select "a[href='#{new_user_registration_path}']", text: /Join KnowShow/
+    assert_select "h1", text: /Staff your gigs/
+    assert_select "a[href='#{new_user_registration_path}']", text: /Start staffing/
     assert_select "a[href='#{new_user_session_path}']", text: /Sign in/
     assert_select "#how-it-works"
     assert_select "#for-crew"
@@ -65,6 +65,22 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select ".marketing-crew-reason", minimum: 3
     assert_select ".marketing-product-preview", text: /% match/, count: 0
     assert_select ".marketing-product-preview", text: /\d+%/, count: 0
+  end
+
+  test "marketing leads with company staffing and keeps a clear path for people seeking gigs" do
+    get root_path
+
+    assert_response :success
+    assert_select ".marketing-hero", text: /production company/
+    assert_select ".marketing-hero a[href='#for-crew']", text: "Looking for gigs?"
+    assert_select "#how-it-works h3", text: "Create your company"
+    assert_select "#how-it-works ~ #for-companies ~ #for-crew"
+    assert_select "#for-crew a[href='#{new_user_registration_path}']", text: "Create your free profile"
+    labels = css_select(".marketing-nav__links a").map(&:text)
+    assert_operator labels.index("For companies"), :<, labels.index("For crew")
+    assert_select ".concert-scene button", count: 0
+    assert_select ".concert-scene[data-controller]", count: 0
+    assert_select "meta[name='description'][content*='Create your company'][content*='free profiles']"
   end
 
   test "concert artwork leads the homepage and the workspace preview remains in the product section" do

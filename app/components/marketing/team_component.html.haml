@@ -4,9 +4,9 @@
       = link_to root_path, class: "marketing-brand", aria: { label: "KnowShow home" } do
         = brand
       .marketing-nav__links
-        = link_to "How it works", root_path(anchor: "how-it-works"), class: "marketing-nav__anchor"
-        = link_to "For crew", root_path(anchor: "for-crew"), class: "marketing-nav__anchor"
-        = link_to "For companies", root_path(anchor: "for-companies"), class: "marketing-nav__anchor"
+        = link_to "How it works", welcome_path(anchor: "how-it-works"), class: "marketing-nav__anchor"
+        = link_to "For companies", welcome_path(anchor: "for-companies"), class: "marketing-nav__anchor"
+        = link_to "For crew", welcome_path(anchor: "for-crew"), class: "marketing-nav__anchor"
         = link_to "Meet the Team", meet_the_team_path, class: "marketing-nav__anchor", aria: { current: "page" }
         = link_to "What’s new", change_log_entries_path, class: "marketing-nav__anchor"
       .marketing-nav__actions
@@ -19,7 +19,7 @@
     .marketing-container
       %span.marketing-kicker Built by people who know the work
       %h1 Meet the Team
-      %p KnowShow brings software engineering and firsthand touring experience together to build better tools for the people behind live entertainment.
+      %p KnowShow brings production company experience, touring work and software engineering together to help owners staff gigs and help crew find the right work.
 
   %section.marketing-section
     .marketing-container
@@ -47,8 +47,8 @@
     .marketing-container
       .marketing-cta__inner
         %span.marketing-kicker Built for the people behind the show
-        %h2 Join the KnowShow community.
-        %p Find your next opportunity, build a trusted crew, and keep every part of the work connected.
+        %h2 Build your company’s next crew.
+        %p Create your company, post gigs, and keep hiring organized. Crew, musicians and engineers can build free profiles and find work too.
         = link_to primary_cta_label, primary_cta_path, class: "btn btn-light btn-lg"
 
   %footer.marketing-footer
