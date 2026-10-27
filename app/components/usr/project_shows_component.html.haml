@@ -19,6 +19,10 @@
                 %h3.h6.fw-semibold.mb-1= show.name
                 .small.text-muted= [show.city, show.state, show.venue_name].compact_blank.join(" · ")
                 .small.text-muted= [show.starts_on.to_fs(:long), show.ends_on&.to_fs(:long)].compact.uniq.join(" – ")
+                - if show.show_time
+                  .small.text-muted= "Show Time: #{show.show_time_label}"
+                - if show.show_count > 1
+                  .small.text-muted= pluralize(show.show_count, "show")
                 .small.mt-2= coverage(show)
               .d-flex.flex-wrap.align-items-start.gap-2
                 = link_to "Add Role For This Show", posting_path(show), class: "btn btn-sm btn-outline-primary"

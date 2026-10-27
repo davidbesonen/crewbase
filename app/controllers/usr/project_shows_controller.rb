@@ -8,7 +8,7 @@ class Usr::ProjectShowsController < ApplicationController
 
   def create
     @rows = params.fetch(:shows, ActionController::Parameters.new).values.first(51)
-      .map { |row| row.permit(*show_fields).to_h }.reject { |row| row.values.all?(&:blank?) }
+      .map { |row| row.permit(*show_fields).to_h }.reject { |row| row.except("show_count", "show_count_choice").values.all?(&:blank?) }
     save_shows
   end
 
@@ -36,7 +36,7 @@ class Usr::ProjectShowsController < ApplicationController
   end
 
   def set_show = @show = @project.project_shows.find(params[:id])
-  def show_fields = %i[name city state country venue_name starts_on ends_on]
+  def show_fields = %i[name city state country venue_name starts_on ends_on show_time show_count show_count_choice]
 
   def save_shows
     result = SaveProjectShows.new(project: @project, rows: @rows, show: @show).call

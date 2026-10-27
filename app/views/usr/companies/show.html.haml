@@ -53,6 +53,10 @@
               %i.bi.bi-chat-square-text.me-1{ aria: { hidden: true } }
               Write a Review
 
+- if @can_upload_roster
+  .mt-3
+    = render Usr::Company::CrewRosterUploadComponent.new(company: @company, can_browse: @can_browse_roster)
+
 .row.mt-3
   .col-sm-12
     .card.border-0.shadow-sm.card-accent.card-accent-cyan

@@ -1,0 +1,25 @@
+KnowShow U.S. Venue Catalog
+
+Source: Overture Maps Foundation Places release 2026-10-21.0
+https://docs.overturemaps.org/guides/places/
+
+Download the filtered catalog: /data/us-venues.json
+
+This extract includes U.S. music venues, theaters, arenas, stadiums,
+amphitheaters, performing arts venues, fairgrounds, and selected concert
+landmarks. Low-confidence and incomplete listings are filtered, and nearby
+records with equivalent names are deduplicated. Coverage and addresses are
+not guaranteed complete or current. Manual entries remain available.
+
+Each record retains its Overture identifier and source license identifiers.
+This filtered snapshot is distributed under CDLA-Permissive-2.0 as identified
+in each record. The data license does not apply to
+KnowShow's application code or companies' private contacts and venue notes.
+
+License text:
+/data/CDLA-Permissive-2.0.txt
+
+Dataset sources and notices:
+https://docs.overturemaps.org/attribution/
+
+Refresh instructions: docs/product/venue-catalog.md in the KnowShow source.

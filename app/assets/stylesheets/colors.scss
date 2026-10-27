@@ -3,6 +3,21 @@
 @import "theme_variables";
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  vertical-align: middle;
+  white-space: normal;
+
+  > .bi {
+    flex-shrink: 0;
+    line-height: 1;
+    margin-inline: 0 !important;
+  }
+
   font-weight: $btn-font-weight;
   border-radius: $btn-border-radius;
   cursor: pointer;
@@ -185,6 +200,26 @@
       color: #fff;
     }
   }
+}
+
+// Rails button_to wraps actions in a form; keep those aligned with adjacent links.
+form.button_to {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  max-width: 100%;
+  margin: 0;
+
+  &:has(> .btn.w-100) {
+    width: 100%;
+  }
+}
+
+// These controls intentionally share the height of their group or input.
+.input-group > .btn,
+.btn-group > .btn,
+.btn-group-vertical > .btn {
+  align-self: stretch;
 }
 
 .btn-sm {

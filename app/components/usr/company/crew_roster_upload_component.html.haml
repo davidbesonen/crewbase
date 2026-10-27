@@ -1,0 +1,15 @@
+.card.border-0.shadow-sm{ data: { crew_roster_upload: true } }
+  .card-body.p-4.d-flex.flex-column.flex-lg-row.align-items-lg-center.justify-content-between.gap-3
+    .d-flex.align-items-start.gap-3
+      %span.icon-orb.icon-orb-sky.flex-shrink-0
+        %i.bi.bi-file-earmark-spreadsheet{ aria: { hidden: true } }
+      %div
+        %h2.h5.fw-bold.mb-1 Bring Your Crew With You
+        %p.text-muted.mb-1 Upload an Excel or CSV roster, then review and edit contacts before adding them to #{@company.name}.
+        %p.small.text-muted.mb-0 Up to 500 people per upload. Each person needs an email or phone number. Importing does not send invitations or create accounts.
+    .d-flex.flex-wrap.flex-lg-nowrap.gap-2.flex-shrink-0
+      = link_to new_usr_company_crew_import_path(@company), class: "btn btn-primary" do
+        %i.bi.bi-upload.me-2{ aria: { hidden: true } }
+        Upload Crew Roster
+      - if @can_browse
+        = link_to "View Crew Roster", usr_company_crew_members_path(@company), class: "btn btn-outline-primary"

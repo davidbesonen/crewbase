@@ -26,7 +26,7 @@ class Usr::CrewImportsController < ApplicationController
   end
 
   def show
-    return redirect_to usr_company_crew_members_path(@company), notice: "This import is already complete." if @import.imported_at?
+    return redirect_to @roster_return_path, notice: "This import is already complete." if @import.imported_at?
     return redirect_to new_usr_company_crew_import_path(@company), alert: "This review expired. Upload the spreadsheet again." if @import.expired?
 
     @review = CrewRosterReview.new(company: @company, rows: @import.rows)
@@ -37,7 +37,7 @@ class Usr::CrewImportsController < ApplicationController
     selected = rows.reject { |row| row["include"] == "0" }
     result = CrewRosterImport.new(import: @import, rows: selected).call
     if result.success?
-      redirect_to usr_company_crew_members_path(@company), notice: "Added #{@import.imported_count} crew to your private roster. No accounts or invitations were sent."
+      redirect_to @roster_return_path, notice: "Added #{@import.imported_count} crew to your private roster. No accounts or invitations were sent."
     else
       @import.update!(rows:) unless @import.imported_at?
       @review = CrewRosterReview.new(company: @company, rows:)
@@ -53,7 +53,10 @@ class Usr::CrewImportsController < ApplicationController
   private
 
   def set_company
-    @company = current_user.owned_companies.find(params[:company_id])
+    @company = Company.roster_uploadable_by(current_user).find(params[:company_id])
+    @roster_owner = @company.is_owner?(current_user)
+    @roster_return_path = @roster_owner ? usr_company_crew_members_path(@company) : usr_company_path(@company)
+    @roster_return_label = @roster_owner ? "Back To Roster" : "Back To Company"
     @entitlement = CompanyPlanEntitlement.new(@company)
     response.headers["Cache-Control"] = "private, no-store"
   end

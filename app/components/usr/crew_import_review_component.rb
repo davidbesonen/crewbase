@@ -1,7 +1,10 @@
 class Usr::CrewImportReviewComponent < ApplicationComponent
-  def initialize(company:, import:, review:)
+  def initialize(company:, import:, review:, cancel_path: nil, cancel_label: "Cancel Import")
     @company, @import, @review = company, import, review
+    @cancel_path, @cancel_label = cancel_path, cancel_label
   end
+
+  def cancel_path = @cancel_path || usr_company_crew_members_path(@company)
 
   def primary_fields = CrewRosterColumns::LABELS.slice("first_name", "last_name", "email", "phone", "role", "city", "state")
   def additional_fields = CrewRosterColumns::LABELS.except(*primary_fields.keys)

@@ -1,7 +1,7 @@
 .staffing-form.staffing-form--project
   %p.small.text-muted.mb-2= @project.name
-  %h1.fw-bold.mb-2 Plan A Crew Member Or Open Role
-  %p.text-muted.mb-4 Choose where this person is needed. Each plan creates one private draft role; you can add requirements, publish it or send an offer later.
+  %h1.fw-bold.mb-2 Add a Crew Role
+  %p.text-muted.mb-4 Add the role you need, choose its shows, and optionally select someone from your crew roster. This creates a private draft; you can publish the role or send an offer later.
   = form_with url: usr_project_crew_plans_path(@project), scope: :crew_plan, builder: ActionView::Helpers::FormBuilder do |form|
     .card.border-0.shadow-sm.mb-4
       .card-body.p-4
@@ -13,7 +13,7 @@
           = form.select :crew_member_id, @members.map { |member| [member.full_name, member.id] }, { include_blank: "Leave open — find crew later", selected: @values["crew_member_id"] }, class: "form-select"
           %p.form-text Selecting someone from your roster is a tentative plan, not a confirmed booking.
         %fieldset{ data: { controller: "show-coverage" } }
-          %legend.h5.fw-semibold Shows For This Person
+          %legend.h5.fw-semibold Show Coverage
           = form.label :show_coverage, "Coverage", class: "form-label"
           = form.select :show_coverage, [["Entire run — including shows added later", "all_shows"], ["Selected shows / cities", "selected_shows"]], { selected: @values["show_coverage"] }, class: "form-select", data: { show_coverage_target: "choice", action: "show-coverage#update" }
           .mt-3{ data: { show_coverage_target: "shows" } }
@@ -26,4 +26,4 @@
               %p.form-text.mb-0 Add shows to choose individual cities. An entire-run role will pick them up as you add them.
     .staffing-form__actions
       = link_to "Back To Crew By Show", usr_project_path(@project, view: "crew"), class: "btn btn-quiet"
-      = form.submit "Add Crew Need", class: "btn btn-primary"
+      = form.submit "Add Crew Role", class: "btn btn-primary"

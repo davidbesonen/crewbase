@@ -12,6 +12,7 @@ class ProjectStaffingOverview
   end
 
   def shows = @shows ||= project.project_shows.chronological.to_a
+  def performance_count = shows.sum(&:show_count)
 
   def jobs
     @jobs ||= project.jobs.includes(:locations, :project_shows,

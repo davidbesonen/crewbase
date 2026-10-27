@@ -6,6 +6,10 @@ class Company < ApplicationRecord
     user ? public_companies.or(where(id: user.company_assignments.select(:company_id))) : public_companies
   }
 
+  scope :roster_uploadable_by, ->(user) {
+    joins(:company_assignments).where(company_assignments: { user_id: user.id, role: CompanyAssignment::ROSTER_UPLOAD_ROLES }).distinct
+  }
+
   has_many :company_assignments, dependent: :destroy
   has_many :users, through: :company_assignments
 

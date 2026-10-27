@@ -87,6 +87,8 @@ class Usr::CompaniesController < ApplicationController
 
   def show
     @company = visible_companies.find(params[:id])
+    @can_upload_roster = Company.roster_uploadable_by(current_user).where(id: @company.id).exists?
+    @can_browse_roster = @company.is_owner?(current_user)
     @entitlement = CompanyPlanEntitlement.new(@company)
     @company_plan = @company.company_plans.includes(:plan).order(created_at: :desc, id: :desc).first&.plan
     @ratings = @company.ratings

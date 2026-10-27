@@ -1,6 +1,6 @@
 .staffing-form.staffing-form--project
   %p.small.text-muted.mb-2= @company.name
-  %h1.fw-bold.mb-2 Post A Job
+  %h1.fw-bold.mb-2 Post a Job
   %p.text-muted.mb-4 First, choose where this role belongs. Tours, festivals and multi-show events start as Projects; one-off gigs can stand on their own.
   = form_with url: usr_company_job_placement_path(@company), scope: :placement, builder: ActionView::Helpers::FormBuilder, data: { controller: "job-placement" } do |form|
     .card.border-0.shadow-sm

@@ -1,5 +1,7 @@
 require_relative "seed_engine"
 
+ImportVenueCatalog.new.call
+
 engine = SeedEngine.new
 engine.reset_mock_data
 engine.create_industries

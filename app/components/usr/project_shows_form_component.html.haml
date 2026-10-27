@@ -5,19 +5,40 @@
   = form_with url: form_url, method: @show ? :patch : :post, builder: ActionView::Helpers::FormBuilder, data: { controller: "tour-stops" } do |form|
     .d-flex.flex-column.gap-3{ data: { tour_stops_target: "rows" } }
       - @rows.each do |row|
-        .card.border-0.shadow-sm{ data: { tour_stop_row: true } }
+        .card.border-0.shadow-sm{ data: { tour_stop_row: true, controller: "show-details venue-search", venue_search_url_value: usr_venue_catalog_index_path } }
           .card-body.p-4
             .row.g-3
               - fields.each do |field, (label, placeholder)|
                 .col-12.col-md-6
                   = label_tag row.id(field), label, class: "form-label"
-                  = text_field_tag row.name(field), row.values[field.to_s], id: row.id(field), class: "form-control", required: field.in?([:name, :city]), maxlength: 150, placeholder: placeholder
-              .col-12.col-md-6
-                = label_tag row.id(:starts_on), "Show Date", class: "form-label"
-                = date_field_tag row.name(:starts_on), row.values["starts_on"], id: row.id(:starts_on), class: "form-control", required: true
-              .col-12.col-md-6
-                = label_tag row.id(:ends_on), "End Date (If Several Days)", class: "form-label"
-                = date_field_tag row.name(:ends_on), row.values["ends_on"], id: row.id(:ends_on), class: "form-control"
+                  - if field == :venue_name
+                    = text_field_tag row.name(field), row.values[field.to_s], id: row.id(field), class: "form-control", maxlength: 150, placeholder: placeholder, list: row.id(:venue_results), autocomplete: "off", data: { venue_search_target: "input", action: "input->venue-search#search change->venue-search#select" }
+                    %datalist{ id: row.id(:venue_results), data: { venue_search_target: "list" } }
+                    %p.form-text.mb-0{ role: "status", data: { venue_search_target: "status" } } Search U.S. venues by name or city, or enter your own.
+                    %p.form-text.mb-0
+                      = helpers.venue_catalog_attribution
+                  - else
+                    = text_field_tag row.name(field), row.values[field.to_s], id: row.id(field), class: "form-control", required: field == :city, maxlength: 150, placeholder: placeholder, data: { venue_field: field == :name ? nil : field }
+              .col-12
+                .row.g-3
+                  .col-12.col-md-6
+                    = label_tag row.id(:starts_on), "Show Date", class: "form-label"
+                    = date_field_tag row.name(:starts_on), row.values["starts_on"], id: row.id(:starts_on), class: "form-control", required: true
+                  .col-12.col-md-6
+                    = label_tag row.id(:show_time), "Show Time (Optional)", class: "form-label"
+                    = time_field_tag row.name(:show_time), row.show_time_value, id: row.id(:show_time), class: "form-control", step: 60
+                    %p.form-text.mb-0 Performance start in the venue’s local time.
+                  .col-12.col-md-6
+                    = label_tag row.id(:ends_on), "End Date (Optional)", class: "form-label"
+                    = date_field_tag row.name(:ends_on), row.values["ends_on"], id: row.id(:ends_on), class: "form-control"
+                    %p.form-text.mb-0 Leave blank for a single day.
+                  .col-12.col-md-6
+                    = label_tag row.id(:show_count_choice), "Number Of Shows (Optional)", class: "form-label"
+                    = select_tag row.name(:show_count_choice), options_for_select([["1", "1"], ["2", "2"], ["3", "3"], ["Other", "other"]], row.show_count_choice), id: row.id(:show_count_choice), class: "form-select", data: { show_details_target: "choice", action: "show-details#change" }
+                    %p.form-text.mb-0 Performances at this stop, including multiple shows on one day.
+                  .col-12.col-md-6{ hidden: !row.custom_show_count?, data: { show_details_target: "custom" } }
+                    = label_tag row.id(:show_count), "How Many Shows?", class: "form-label"
+                    = number_field_tag row.name(:show_count), row.show_count, id: row.id(:show_count), class: "form-control", min: 1, max: 100, step: 1, data: { show_details_target: "count" }
             - unless @show
               %button.btn.btn-sm.btn-quiet.mt-3{ type: "button", data: { action: "tour-stops#remove" } } Remove Show
     .staffing-form__actions.mt-4

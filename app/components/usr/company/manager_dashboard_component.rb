@@ -1,4 +1,5 @@
 class Usr::Company::ManagerDashboardComponent < ApplicationComponent
+  renders_one :crew_roster_upload
   METRICS = {
     company_users: [ "Company users", "bi-people" ],
     active_jobs: [ "Active jobs", "bi-briefcase" ],

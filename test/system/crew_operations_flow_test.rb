@@ -17,6 +17,49 @@ class CrewOperationsFlowTest < ApplicationSystemTestCase
     login_as @owner, scope: :user
   end
 
+  test "company roster uploads are discoverable on desktop and usable by employees on mobile" do
+    page.driver.browser.manage.window.resize_to(1440, 1100)
+    visit usr_company_path(@company)
+    within("[data-crew-roster-upload]") { assert_link "Upload Crew Roster", href: new_usr_company_crew_import_path(@company) }
+    page.execute_script("document.querySelector('[data-crew-roster-upload]').scrollIntoView({block: 'center', behavior: 'instant'})")
+    page.save_screenshot("/private/tmp/knowshow-company-roster-upload.png")
+    visit usr_company_manager_path(@company)
+    within("[data-crew-roster-upload]") { assert_link "Upload Crew Roster" }
+    page.save_screenshot("/private/tmp/knowshow-dashboard-roster-upload.png")
+
+    employee = User.create!(first_name: "Staff", last_name: "Employee", email: "upload-employee-browser@example.com", password: "password123")
+    employee.assignments.create!(role: Role.find_or_create_by!(name: "user"))
+    employee.profiles.create!(profile_type: "user", completed_at: Time.current)
+    employee.visits.create!
+    @company.company_assignments.create!(user: employee, role: "employee")
+    logout(:user)
+    login_as employee, scope: :user
+    page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 390, height: 1000, deviceScaleFactor: 1, mobile: true)
+    visit usr_company_path(@company)
+    within("[data-crew-roster-upload]") do
+      assert_no_link "View Crew Roster"
+      click_link "Upload Crew Roster"
+    end
+    assert_text "Upload Your Crew Spreadsheet"
+    assert_no_selector "[data-company-owner-nav]"
+    assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, 390
+    file = Tempfile.new([ "employee-mobile", ".csv" ])
+    file.write("First Name,Last Name,Email\nAlex,Audio,mobile-crew@example.com\n")
+    file.close
+    attach_file "Excel (.xlsx) or CSV file", file.path
+    click_button "Upload And Review"
+    assert_text "Review Crew Import"
+    assert_link "Back To Company"
+    click_button "Add Selected Crew To Roster"
+    assert_current_path usr_company_path(@company)
+    assert_text "Added 1 crew to your private roster"
+    assert_equal "mobile-crew@example.com", @company.crew_members.sole.email
+  ensure
+    file&.unlink
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+    Warden.test_reset!
+  end
+
   test "an owner reviews an Excel roster and a crew member completes their imported account" do
     file = Tempfile.new([ "crew-operations", ".xlsx" ])
     package = Axlsx::Package.new

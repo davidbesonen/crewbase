@@ -23,7 +23,7 @@ class StaffAGigFlowTest < ApplicationSystemTestCase
       assert_link "Staff a Gig"
       click_link "Staff a Gig"
     end
-    assert_text "Staff A Gig"
+    assert_text "Staff a Gig"
     page.save_screenshot("/private/tmp/knowshow-staff-a-gig-desktop.png")
     choose "staffing_kind_single"
     click_button "Continue"
@@ -54,12 +54,12 @@ class StaffAGigFlowTest < ApplicationSystemTestCase
     project = @company.projects.find_by!(name: "Northern Lights Tour")
     assert project.multi_show?
     assert_empty project.jobs
-    fill_in "Show / Event Name", with: "Opening Night"
+    fill_in "Show Name (Optional)", with: "Opening Night"
     fill_in "City", with: "Austin"
     fill_in "Show Date", with: Date.new(2030, 10, 1)
     click_button "Add Another Show"
     within all("[data-tour-stop-row]").last do
-      fill_in "Show / Event Name", with: "Second Night"
+      fill_in "Show Name (Optional)", with: "Second Night"
       fill_in "City", with: "Dallas"
       fill_in "Show Date", with: Date.new(2030, 10, 3)
     end
@@ -69,16 +69,16 @@ class StaffAGigFlowTest < ApplicationSystemTestCase
     assert_empty project.jobs
     page.save_screenshot("/private/tmp/knowshow-tour-shows-desktop.png")
     click_link "Crew By Show"
-    click_link "Plan Crew / Add Open Role"
+    click_link "Add Crew Role"
     fill_in "Role", with: "Tour Manager"
-    click_button "Add Crew Need"
+    click_button "Add Crew Role"
     assert_current_path usr_project_path(project, view: "crew")
-    click_link "Plan Crew / Add Open Role"
+    click_link "Add Crew Role"
     fill_in "Role", with: "Local Stagehand"
     select member.full_name, from: "Crew Member (Optional)"
     select "Selected shows / cities", from: "Coverage"
     check project.project_shows.find_by!(city: "Dallas").display_name
-    click_button "Add Crew Need"
+    click_button "Add Crew Role"
     assert_current_path usr_project_path(project, view: "crew")
     assert_selector "[data-crew-show-row]", count: 2
     manager = project.jobs.find_by!(title: "Tour Manager")

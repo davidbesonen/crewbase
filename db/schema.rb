@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_201000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -719,12 +719,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_201000) do
     t.date "ends_on"
     t.string "name", null: false
     t.bigint "project_id", null: false
+    t.integer "show_count", default: 1, null: false
+    t.time "show_time"
     t.date "starts_on", null: false
     t.string "state"
     t.datetime "updated_at", null: false
     t.string "venue_name"
     t.index ["project_id", "starts_on"], name: "index_project_shows_on_project_id_and_starts_on"
     t.index ["project_id"], name: "index_project_shows_on_project_id"
+    t.check_constraint "show_count > 0 AND show_count <= 100", name: "project_shows_valid_show_count"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -903,6 +906,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_201000) do
     t.index ["restricted_at"], name: "index_users_on_restricted_at"
   end
 
+  create_table "venue_catalog_entries", force: :cascade do |t|
+    t.string "address"
+    t.string "category"
+    t.string "city"
+    t.string "country", default: "US", null: false
+    t.datetime "created_at", null: false
+    t.decimal "latitude", precision: 10, scale: 7
+    t.decimal "longitude", precision: 10, scale: 7
+    t.string "name", null: false
+    t.string "postal_code"
+    t.text "search_text", null: false
+    t.string "source_key", null: false
+    t.string "state"
+    t.datetime "updated_at", null: false
+    t.index ["search_text"], name: "index_venue_catalog_entries_on_search_text", opclass: :gin_trgm_ops, using: :gin
+    t.index ["source_key"], name: "index_venue_catalog_entries_on_source_key", unique: true
+  end
+
   create_table "venues", force: :cascade do |t|
     t.string "address"
     t.string "city"
@@ -918,7 +939,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_201000) do
     t.string "postal_code"
     t.string "state"
     t.datetime "updated_at", null: false
+    t.bigint "venue_catalog_entry_id"
     t.index ["company_id"], name: "index_venues_on_company_id"
+    t.index ["venue_catalog_entry_id"], name: "index_venues_on_venue_catalog_entry_id"
   end
 
   create_table "visits", force: :cascade do |t|
@@ -998,4 +1021,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_201000) do
   add_foreign_key "user_subscriptions", "user_plans"
   add_foreign_key "user_subscriptions", "users"
   add_foreign_key "venues", "companies"
+  add_foreign_key "venues", "venue_catalog_entries"
 end

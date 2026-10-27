@@ -4,6 +4,9 @@ class CompanyAssignment < ApplicationRecord
   belongs_to :profile, optional: true
 
   ROLES = %w[owner member].freeze
+  # Earlier employee assignments were stored as "member". Both represent
+  # company staff; a CrewMember roster contact alone grants no staff access.
+  ROSTER_UPLOAD_ROLES = %w[owner employee member].freeze
 
   validate :company_user_must_be_within_plan_limit, on: :create
 

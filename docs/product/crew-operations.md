@@ -42,6 +42,13 @@ Project schedule is flagged on the offer; revised bookings require a new offer.
 
 ## Spreadsheet imports and account claims
 
+Company pages show an Upload Crew Roster card to company owners and employees;
+the owner Company Manager dashboard shows the same direct entry point. Only
+company staff can open templates, upload, review or confirm imports. Legacy
+`member` assignments represent employees; roster contacts alone grant no access.
+Employees return to the Company page after importing. Existing owner-only roster
+management and Company Manager permissions are unchanged.
+
 - Upload `.xlsx` (first worksheet) or UTF-8 `.csv`, up to 5 MB and 500 people.
 - Download the Excel template from Upload Spreadsheet. Recognized column aliases
   include Job Title, Role, Email Address, Phone Number, Years Worked With, Skills,

@@ -11,7 +11,7 @@ class SaveProjectShows
     @project.with_lock do
       @rows.each do |attributes|
         show = @show || @project.project_shows.new
-        show.update!(attributes)
+        show.update!(show_attributes(attributes))
         shows << show
       end
       schedule = ProjectShowSchedule.new(project: @project)
@@ -23,5 +23,18 @@ class SaveProjectShows
     Result.new(success?: true, shows:, error: nil)
   rescue ActiveRecord::RecordInvalid => error
     Result.new(success?: false, shows:, error: error.record.errors.full_messages.to_sentence)
+  end
+
+  private
+
+  def show_attributes(attributes)
+    attributes = attributes.stringify_keys
+    choice = attributes.delete("show_count_choice")
+    if choice.in?(%w[1 2 3])
+      attributes["show_count"] = choice
+    elsif choice.blank? && attributes["show_count"].blank?
+      attributes.delete("show_count")
+    end
+    attributes
   end
 end

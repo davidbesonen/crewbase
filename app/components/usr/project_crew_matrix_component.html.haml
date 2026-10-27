@@ -4,7 +4,7 @@
       %div
         %h2.h5.fw-bold.mb-1 Crew By Show
         %p.text-muted.small.mb-0 Plan touring crew for the entire run and local crew for selected cities. A tentative plan becomes confirmed only when the worker accepts an offer.
-      = link_to "Plan Crew / Add Open Role", new_usr_project_crew_plan_path(@project), class: "btn btn-primary"
+      = link_to "Add Crew Role", new_usr_project_crew_plan_path(@project), class: "btn btn-primary"
     = form_with url: usr_project_path(@project), method: :get, class: "d-flex flex-wrap gap-2 align-items-end mb-4", builder: ActionView::Helpers::FormBuilder do |form|
       = hidden_field_tag :view, "crew"
       %div
@@ -24,9 +24,10 @@
             %tr
               %th{ scope: "col" } Role & Crew
               - shows.each do |show|
-                %th.text-center{ scope: "col" }
+                %th.text-center{ scope: "col", data: { crew_show_column: show.id } }
                   .small= show.city
-                  .small.fw-normal= show.starts_on.strftime("%b %-d")
+                  - column_details(show).each do |detail|
+                    .small.fw-normal= detail
               %th{ scope: "col" } Manage
           %tbody
             - rows.each do |row|

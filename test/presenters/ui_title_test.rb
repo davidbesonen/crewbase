@@ -1,6 +1,14 @@
 require "test_helper"
 
 class UiTitleTest < ActiveSupport::TestCase
+  test "keeps the article a lowercase inside titles" do
+    assert_equal "Add a Crew Role", UiTitle.format("add a crew role")
+    assert_equal "Start a Tour / Festival Project", UiTitle.format("Start A Tour / Festival Project")
+    assert_equal "A Place To Start", UiTitle.format("a place to start")
+    assert_equal "Use A/V & MA3", UiTitle.format("use A/V & MA3")
+    assert_equal "Plan A", UiTitle.format("plan A")
+  end
+
   test "capitalizes heading words while preserving punctuation and contractions" do
     assert_equal "When, Where & Pay", UiTitle.format("When, where & pay")
     assert_equal "Invite To Apply", UiTitle.format("Invite to apply")

@@ -1,2 +1,4 @@
 = render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :manager, entitlement: CompanyPlanEntitlement.new(@company))
-= render Usr::Company::ManagerDashboardComponent.new(company: @company, plan: @plan, dashboard: @dashboard)
+= render Usr::Company::ManagerDashboardComponent.new(company: @company, plan: @plan, dashboard: @dashboard) do |dashboard|
+  - dashboard.with_crew_roster_upload do
+    = render Usr::Company::CrewRosterUploadComponent.new(company: @company, can_browse: true)

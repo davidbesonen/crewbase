@@ -16,10 +16,18 @@
       .card-body.p-4
         %h2.h5.fw-bold.mb-3 Venue & Show Information
         %p.small.text-muted Shared with confirmed crew in the show brief. Keep company-private notes in your roster instead.
-        = form_with model: @job, url: usr_job_production_path(@job), builder: ActionView::Helpers::FormBuilder do |form|
+        = form_with model: @job, url: usr_job_production_path(@job), builder: ActionView::Helpers::FormBuilder, data: { controller: "venue-search", venue_search_url_value: usr_venue_catalog_index_path } do |form|
+          .mb-3
+            = label_tag "production_venue_search", "Find A U.S. Venue", class: "form-label"
+            = text_field_tag :venue_search, nil, id: "production_venue_search", class: "form-control", list: "production_venue_results", autocomplete: "off", placeholder: "Search venue name or city", data: { venue_search_target: "input", action: "input->venue-search#search change->venue-search#select" }
+            = hidden_field_tag :venue_catalog_entry_id, nil, data: { venue_field: "venue_catalog_entry_id" }
+            %datalist#production_venue_results{ data: { venue_search_target: "list" } }
+            %p.form-text.mb-0{ role: "status", data: { venue_search_target: "status" } } Choose a venue to save it for this company and use its location on this gig.
+            %p.form-text.mb-0
+              = helpers.venue_catalog_attribution
           = turbo_frame_tag "venue_picker_#{@job.id}", class: "d-block mb-3" do
             = form.label :venue_id, "Saved venue", class: "form-label"
-            = form.collection_select :venue_id, @venues, :id, :name, { include_blank: "Use posting location" }, class: "form-select"
+            = form.collection_select :venue_id, @venues, :id, :name, { include_blank: "Use posting location" }, class: "form-select", data: { venue_field: "saved_venue_id", action: "venue-search#clear" }
             .d-flex.flex-wrap.gap-3.mt-2
               = link_to "Manage Venues & Contacts (New Tab)", usr_company_venues_path(@job.company), class: "small", target: "_blank", rel: "noopener"
               = link_to "Refresh Venue List", usr_job_production_path(@job), class: "small", data: { turbo_frame: "venue_picker_#{@job.id}" }

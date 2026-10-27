@@ -1,1 +1,1 @@
-= render Usr::CrewImportReviewComponent.new(company: @company, import: @import, review: @review)
+= render Usr::CrewImportReviewComponent.new(company: @company, import: @import, review: @review, cancel_path: @roster_return_path, cancel_label: @roster_owner ? "Cancel Import" : @roster_return_label)

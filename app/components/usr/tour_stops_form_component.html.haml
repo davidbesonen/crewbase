@@ -16,7 +16,7 @@
         %p.form-text.mb-0 Add up to 50 stops. Dates shift together, preserving the original gig’s length and phases. No applicants or bookings are copied.
     .d-flex.flex-column.gap-3{ data: { tour_stops_target: "rows" } }
       - @rows.each do |row|
-        .card.border-0.shadow-sm{ data: { tour_stop_row: true } }
+        .card.border-0.shadow-sm{ data: { tour_stop_row: true, controller: "venue-search", venue_search_url_value: usr_venue_catalog_index_path } }
           .card-body.p-4
             .row.g-3.align-items-end
               .col-12.col-md-5
@@ -27,7 +27,14 @@
                 = date_field_tag row.name("starts_on"), row.values["starts_on"], id: row.id("starts_on"), required: true, class: "form-control"
               .col-12.col-md-4
                 = label_tag row.id("venue_id"), "Venue (optional)", class: "form-label"
-                = select_tag row.name("venue_id"), options_from_collection_for_select(@venues, :id, :name, row.values["venue_id"]), include_blank: "Choose venue", id: row.id("venue_id"), class: "form-select"
+                = select_tag row.name("venue_id"), options_from_collection_for_select(@venues, :id, :name, row.values["venue_id"]), include_blank: "Choose venue", id: row.id("venue_id"), class: "form-select", data: { venue_field: "saved_venue_id", action: "venue-search#clear" }
+              .col-12
+                = label_tag row.id("venue_search"), "Or Find A U.S. Venue", class: "form-label"
+                = text_field_tag row.name("venue_search"), row.values["venue_search"], id: row.id("venue_search"), class: "form-control", list: row.id("venue_results"), autocomplete: "off", data: { venue_search_target: "input", action: "input->venue-search#search change->venue-search#select" }
+                = hidden_field_tag row.name("venue_catalog_entry_id"), row.values["venue_catalog_entry_id"], data: { venue_field: "venue_catalog_entry_id" }
+                %datalist{ id: row.id("venue_results"), data: { venue_search_target: "list" } }
+                %p.form-text.mb-0{ role: "status", data: { venue_search_target: "status" } } Search U.S. venues by name or city.
+                %p.form-text.mb-0= helpers.venue_catalog_attribution
             %button.btn.btn-sm.btn-quiet.mt-3{ type: "button", data: { action: "tour-stops#remove" } }= remove_label
     .d-flex.flex-wrap.gap-2.mt-4
       %button.btn.btn-outline-primary{ type: "button", data: { action: "tour-stops#add" } }= add_row_label

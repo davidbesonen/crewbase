@@ -97,4 +97,21 @@ class Usr::ProductionPlanningFlowTest < ActionDispatch::IntegrationTest
     assert_select "input[value='Austin']"
     assert_select ".alert", text: /Choose a gig or template/
   end
+
+  test "selecting a catalog venue creates a company copy and preserves private notes on reuse" do
+    entry = VenueCatalogEntry.create!(source_key: "way/99", name: "National Music Hall", city: "Austin", state: "TX", country: "US", address: "100 Music Lane")
+    assert_difference "@company.venues.count", 1 do
+      patch usr_job_production_path(@job), params: { venue_catalog_entry_id: entry.id, job: { briefing_notes: "Arrive early" } }
+    end
+    assert_redirected_to usr_job_production_path(@job)
+    venue = @job.reload.venue
+    assert_equal entry, venue.venue_catalog_entry
+    assert_equal "Austin", @job.locations.sole.city
+    venue.update!(load_in_notes: "Private loading entrance", contact_email: "private@example.com")
+    assert_no_difference "Venue.count" do
+      patch usr_job_production_path(@job), params: { venue_catalog_entry_id: entry.id, job: { briefing_notes: "Updated" } }
+    end
+    assert_equal "Private loading entrance", venue.reload.load_in_notes
+    assert_equal "private@example.com", venue.contact_email
+  end
 end

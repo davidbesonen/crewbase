@@ -1,4 +1,5 @@
 namespace :usr do
+  resources :venue_catalog, only: :index
   get "staff-a-gig", to: "staffing_starts#new", as: :new_staffing_start
   post "staff-a-gig", to: "staffing_starts#create", as: :staffing_start
   resource :onboarding, only: [ :show, :update ], controller: "onboarding"

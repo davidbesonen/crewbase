@@ -4,15 +4,22 @@
   .alert.alert-danger{ role: "alert" }= @venue.errors.full_messages.to_sentence
 .card.border-0.shadow-sm
   .card-body.p-4
-    = form_with model: @venue, url: form_url, builder: ActionView::Helpers::FormBuilder do |form|
+    = form_with model: @venue, url: form_url, builder: ActionView::Helpers::FormBuilder, data: { controller: "venue-search", venue_search_url_value: usr_venue_catalog_index_path } do |form|
+      = form.hidden_field :venue_catalog_entry_id, data: { venue_field: "venue_catalog_entry_id" }
       .row.g-3
         - Venue::FIELDS.each do |key|
           .col-12{ class: key.to_s.end_with?("notes") ? "col-lg-12" : "col-md-6" }
             = form.label key, key.to_s.humanize, class: "form-label"
-            - if key.to_s.end_with?("notes")
+            - if key == :name
+              = form.text_field key, required: true, class: "form-control", list: "saved_venue_results", autocomplete: "off", data: { venue_search_target: "input", action: "input->venue-search#search change->venue-search#select" }
+              %datalist#saved_venue_results{ data: { venue_search_target: "list" } }
+              %p.form-text.mb-0{ role: "status", data: { venue_search_target: "status" } } Search U.S. venues by name or city, or enter your own.
+              %p.form-text.mb-0
+                = helpers.venue_catalog_attribution
+            - elsif key.to_s.end_with?("notes")
               = form.text_area key, rows: 3, class: "form-control", maxlength: 4000
             - else
-              = form.public_send(input_type(key), key, required: key == :name, class: "form-control")
+              = form.public_send(input_type(key), key, class: "form-control", data: { venue_field: key })
       .d-flex.gap-2.mt-4
         = form.submit "Save Venue", class: "btn btn-primary"
         = link_to "Cancel", usr_company_venues_path(@company), class: "btn btn-quiet"

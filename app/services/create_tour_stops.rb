@@ -14,6 +14,10 @@ class CreateTourStops
       @stops.each_with_index.map do |stop, index|
         raise InvalidStop, "Stop #{index + 1}: add a title and start date." if stop["title"].blank? || stop["starts_on"].blank?
         venue = @project.company.venues.find(stop["venue_id"]) if stop["venue_id"].present?
+        if stop["venue_catalog_entry_id"].present?
+          entry = VenueCatalogEntry.find(stop["venue_catalog_entry_id"])
+          venue = CompanyVenueFromCatalog.new(company: @project.company, entry:).call
+        end
         result = ReuseGig.new(source: @source, actor: @actor, project: @project, venue:,
           title: stop["title"], starts_on: stop["starts_on"]).call
         raise InvalidStop, "Stop #{index + 1}: #{result.error}" unless result.success?

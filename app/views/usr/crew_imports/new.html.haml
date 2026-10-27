@@ -1,4 +1,5 @@
-= render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :roster, entitlement: @entitlement)
+- if @roster_owner
+  = render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :roster, entitlement: @entitlement)
 .mb-4
   %h1.fw-bold.mb-2 Upload Your Crew Spreadsheet
   %p.text-muted.mb-0 Bring your existing crew into #{@company.name}. Review and edit everyone before adding them.
@@ -6,7 +7,7 @@
   .col-12.col-lg-7
     .card.border-0.shadow-sm
       .card-body.p-4
-        %h2.h5.mb-3 Choose A Spreadsheet
+        %h2.h5.mb-3 Choose a Spreadsheet
         = form_with url: usr_company_crew_imports_path(@company), multipart: true do |form|
           = form.label :spreadsheet, "Excel (.xlsx) or CSV file", class: "form-label"
           = form.file_field :spreadsheet, accept: ".xlsx,.csv", required: true, class: "form-control mb-2"
@@ -20,4 +21,4 @@
         %p Optional columns include role, department, city, state, country, years worked with your company, years of experience, skills, equipment, and private notes. Unknown columns are ignored.
         %p.small.text-muted Use one skill or equipment name per line within a cell, up to 30 entries of 80 characters each.
         = link_to "Download Excel Template", template_usr_company_crew_imports_path(@company), class: "btn btn-outline-primary"
-.mt-4= link_to "Back To Roster", usr_company_crew_members_path(@company), class: "btn btn-quiet"
+.mt-4= link_to @roster_return_label, @roster_return_path, class: "btn btn-quiet"

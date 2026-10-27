@@ -5,6 +5,9 @@
       %h1.mb-1= "#{company.name} Company Manager"
       %p.text-muted.mb-0 Staffing totals and upcoming work, with an activity chart for the last 30 days.
 
+  - if crew_roster_upload?
+    .mb-4= crew_roster_upload
+
   .row.g-3.mb-4
     - self.class::METRICS.each do |key, (label, icon)|
       .col-6.col-xl-2

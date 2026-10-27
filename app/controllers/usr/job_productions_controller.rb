@@ -9,7 +9,8 @@ class Usr::JobProductionsController < ApplicationController
     attributes = params.require(:job).permit(:venue_id, :briefing_notes, :production_contact_name, :production_contact_email, :production_contact_phone).to_h
     attributes["venue"] = @job.company.venues.find(attributes.delete("venue_id")) if attributes["venue_id"].present?
     attributes["venue_id"] = nil if attributes["venue_id"] == ""
-    if UpdateProductionBrief.new(job: @job, actor: current_user, attributes:).call
+    catalog_entry = VenueCatalogEntry.find(params[:venue_catalog_entry_id]) if params[:venue_catalog_entry_id].present?
+    if UpdateProductionBrief.new(job: @job, actor: current_user, attributes:, catalog_entry:).call
       redirect_to usr_job_production_path(@job), notice: "Show information saved. Confirmed crew are notified of changes in KnowShow."
     else
       prepare

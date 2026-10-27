@@ -79,6 +79,10 @@ class Usr::ProjectShowPlanningTest < ActionDispatch::IntegrationTest
 
   test "crew planning supports different cities for each person without confirming bookings" do
     first, second = create_route
+    get new_usr_project_crew_plan_path(@project)
+    assert_select "h1", text: "Add a Crew Role"
+    assert_select "legend", text: "Show Coverage"
+    assert_select "input[type='submit'][value='Add Crew Role']"
     member = @company.crew_members.create!(first_name: "Alex", last_name: "Local", phone: "6155550170")
     assert_difference [ "Job.count", "CrewHold.count" ], 1 do
       post "/usr/projects/#{@project.id}/crew_plans", params: { crew_plan: {
@@ -200,6 +204,82 @@ class Usr::ProjectShowPlanningTest < ActionDispatch::IntegrationTest
     Location.create!(city: first.city, state: first.state, country: first.country, address_line_1: "Private home address")
     post usr_company_jobs_path(@company), params: { publication_action: "draft", job: job_values.merge(project_show_ids: [ first.id ]) }
     assert_nil @project.jobs.last.locations.sole.address_line_1
+  end
+
+  test "city supplies an optional show name and one day needs no end date" do
+    get new_usr_project_project_show_path(@project)
+    assert_select "input[name='shows[0][name]'][required]", count: 0
+    assert_select "input[name='shows[0][ends_on]'][required]", count: 0
+    assert_select "select[name='shows[0][show_count_choice]'] option[value='1'][selected]"
+    post usr_project_project_shows_path(@project), params: { shows: { "0" => { city: "Austin", starts_on: "2030-10-01" } } }
+    assert_redirected_to usr_project_path(@project)
+    show = @project.project_shows.sole
+    assert_equal "Austin", show.name
+    assert_equal 1, show.show_count
+    assert_equal [ Date.new(2030, 10, 1) ], show.work_dates
+  end
+
+  test "show counts support presets and custom counts without guessing additional dates" do
+    post usr_project_project_shows_path(@project), params: { shows: {
+      "0" => { city: "Austin", starts_on: "2030-10-01", show_count_choice: "2", show_count: "1" },
+      "1" => { name: "Festival", city: "Dallas", starts_on: "2030-10-03", ends_on: "2030-10-05", show_count_choice: "other", show_count: "5" }
+    } }
+    assert_redirected_to usr_project_path(@project)
+    first, last = @project.project_shows.chronological
+    assert_equal 2, first.show_count
+    assert_equal 1, first.work_dates.size
+    assert_includes first.display_name, "2 shows"
+    assert_not_includes first.display_name, "Austin · Austin"
+    assert_equal 5, last.show_count
+    assert_equal 3, last.work_dates.size
+    get usr_project_path(@project)
+    assert_select "[data-project-show='#{last.id}']", text: /5 shows/
+    assert_select "a", text: "Shows & Cities (7)"
+    patch usr_project_project_show_path(@project, first), params: { show: { show_count_choice: "other", show_count: "0" } }
+    assert_response :unprocessable_entity
+    assert_equal 2, first.reload.show_count
+    assert_select "input[name='show[show_count]'][value='0']"
+  end
+
+  test "unused show rows with default counts are ignored" do
+    post usr_project_project_shows_path(@project), params: { shows: {
+      "0" => { city: "Austin", starts_on: "2030-10-01", show_count_choice: "1", show_count: "1" },
+      "1" => { city: "", name: "", starts_on: "", show_count_choice: "1", show_count: "1" }
+    } }
+    assert_redirected_to usr_project_path(@project)
+    assert_equal 1, @project.project_shows.count
+  end
+
+  test "optional show time saves separately from dates and appears in staffing schedules" do
+    get new_usr_project_project_show_path(@project)
+    assert_select "input[type='time'][name='shows[0][show_time]']"
+    assert_select "input[name='shows[0][show_time]'][required]", count: 0
+    post usr_project_project_shows_path(@project), params: { shows: { "0" => { city: "Austin", starts_on: "2030-10-01", show_time: "19:30" } } }
+    assert_redirected_to usr_project_path(@project)
+    show = @project.project_shows.sole
+    assert_equal "19:30", show.show_time.strftime("%H:%M")
+    assert_equal [ Date.new(2030, 10, 1) ], show.work_dates
+    get usr_project_path(@project)
+    assert_select "[data-project-show='#{show.id}']", text: /7:30 PM/
+    post usr_company_jobs_path(@company), params: { publication_action: "draft", job: job_values.merge(project_show_ids: [ show.id ]) }
+    get usr_job_path(@project.jobs.last)
+    assert_select "[data-job-show-schedule]", text: /7:30 PM/
+    get edit_usr_project_project_show_path(@project, show)
+    assert_select "input[name='show[show_time]'][value='19:30']"
+    patch usr_project_project_show_path(@project, show), params: { show: { show_time: "07:05" } }
+    assert_redirected_to usr_project_path(@project)
+    assert_equal "07:05", show.reload.show_time.strftime("%H:%M")
+    assert_equal Date.new(2030, 10, 1), show.starts_on
+    patch usr_project_project_show_path(@project, show), params: { show: { show_time: "" } }
+    assert_redirected_to usr_project_path(@project)
+    assert_nil show.reload.show_time
+  end
+
+  test "invalid show times are rejected without saving a partial route" do
+    post usr_project_project_shows_path(@project), params: { shows: { "0" => { city: "Austin", starts_on: "2030-10-01", show_time: "not-a-time" } } }
+    assert_response :unprocessable_entity
+    assert_equal 0, @project.project_shows.count
+    assert_select ".alert", text: /Show time/
   end
 
   private

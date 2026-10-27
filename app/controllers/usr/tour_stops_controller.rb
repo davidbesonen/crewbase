@@ -7,7 +7,7 @@ class Usr::TourStopsController < ApplicationController
   end
 
   def create
-    @stops = params.fetch(:stops, ActionController::Parameters.new).values.first(50).map { |row| row.permit(:title, :starts_on, :venue_id).to_h }.reject { |row| row.values.all?(&:blank?) }
+    @stops = params.fetch(:stops, ActionController::Parameters.new).values.first(50).map { |row| row.permit(:title, :starts_on, :venue_id, :venue_search, :venue_catalog_entry_id).to_h }.reject { |row| row.values.all?(&:blank?) }
     result = CreateTourStops.new(project: @project, source:, actor: current_user, stops: @stops).call
     if result.success?
       label = @project.multi_show? ? "shows" : "tour stops"

@@ -23,7 +23,10 @@
 @media (max-width: 575.98px) {
   .staffing-form .card-body { padding: 1.25rem !important; }
   .staffing-form__actions > .d-flex { width: 100%; }
-  .staffing-form__actions > .d-flex > .btn { flex: 1; }
+  .staffing-form__actions > .d-flex > .btn {
+    flex: 1 0 100%;
+    width: 100%;
+  }
 }
 
 .staffing-choice {

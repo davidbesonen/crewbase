@@ -37,4 +37,12 @@ class CreateTourStopsTest < ActiveSupport::TestCase
       assert_not result.success?
     end
   end
+  test "reused tour setups accept a national catalog venue" do
+    entry = VenueCatalogEntry.create!(source_key: "overture/test-stop", name: "National Hall", city: "Nashville", state: "TN", country: "US")
+    result = CreateTourStops.new(project: @project, source: @job, actor: @owner,
+      stops: [ { "title" => "Nashville", "starts_on" => "2030-07-01", "venue_catalog_entry_id" => entry.id } ]).call
+    assert result.success?, result.error
+    assert_equal entry, result.jobs.sole.venue&.venue_catalog_entry
+    assert_equal "Nashville", result.jobs.sole.locations.sole.city
+  end
 end

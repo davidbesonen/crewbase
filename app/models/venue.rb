@@ -1,6 +1,7 @@
 class Venue < ApplicationRecord
   FIELDS = %i[name address city state country postal_code contact_name contact_email contact_phone load_in_notes parking_notes].freeze
   belongs_to :company
+  belongs_to :venue_catalog_entry, optional: true
   has_many :jobs, dependent: :nullify
   validates :name, presence: true, length: { maximum: 150 }
   validates :address, :city, :state, :country, :postal_code, :contact_name, :contact_phone, length: { maximum: 255 }

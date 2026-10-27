@@ -1,5 +1,5 @@
 = render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :projects, entitlement: @entitlement)
-= render Usr::ProjectDashboardComponent.new(project: @project, jobs: @jobs, workspace_view: @workspace_view, show_count: @overview.shows.size)
+= render Usr::ProjectDashboardComponent.new(project: @project, jobs: @jobs, workspace_view: @workspace_view, show_count: @overview.performance_count)
 - if @workspace_view == "shows"
   = render Usr::ProjectShowsComponent.new(overview: @overview)
 - elsif @workspace_view == "crew"

@@ -39,5 +39,5 @@ class Usr::VenuesController < ApplicationController
   end
 
   def set_venue = @venue = @company.venues.find(params[:id])
-  def venue_params = params.require(:venue).permit(*Venue::FIELDS)
+  def venue_params = params.require(:venue).permit(*Venue::FIELDS, :venue_catalog_entry_id)
 end

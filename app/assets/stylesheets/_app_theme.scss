@@ -3,11 +3,41 @@
   min-width: 0;
 }
 
-.app-content .btn:not(.btn-link):not(.btn-sm) {
+.app-content .btn:not(.btn-link):not(.btn-sm):not(.btn-lg) {
   min-height: 2.75rem;
   padding: 0.625rem 1rem;
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+.app-content .btn.btn-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  flex-shrink: 0;
+
+  &.btn-sm {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-height: 2.25rem;
+  }
+
+  &.btn-lg {
+    width: 3rem;
+    height: 3rem;
+    min-height: 3rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-content .btn.btn-icon.btn-sm,
+  .app-top-nav .btn.btn-icon.btn-sm {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+  }
 }
 
 .app-content :is(.btn, .page-link, summary, .social-link):focus-visible {

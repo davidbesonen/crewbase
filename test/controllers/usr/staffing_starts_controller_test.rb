@@ -20,7 +20,7 @@ class Usr::StaffingStartsControllerTest < ActionDispatch::IntegrationTest
       get "/usr/staff-a-gig"
     end
     assert_response :success
-    assert_select "h1", text: "Staff A Gig"
+    assert_select "h1", text: "Staff a Gig"
     assert_select "input[name='staffing[kind]']", count: 2
     assert_select "input[name='staffing[company_id]'][value='#{@company.id}']"
     assert_select "button", text: "Continue"
