@@ -1,0 +1,21 @@
+%h1.fw-bold.mb-2 Reuse Gig Setup
+%p.text-muted Copy roles, requirements, questions and production details into a new draft. Bookings, applicants and shared documents are not copied.
+.card.border-0.shadow-sm
+  .card-body.p-4
+    = form_with url: usr_company_gig_reuses_path(@company) do |form|
+      - if @source.is_a?(GigTemplate)
+        = hidden_field_tag :template_id, @source.id
+        %p.fw-semibold= @source.name
+      - else
+        = hidden_field_tag :source_job_id, @source.id
+        %p.fw-semibold= @source.title
+      .row.g-3
+        .col-12.col-md-8
+          = form.label :title, "New gig / job title", class: "form-label"
+          = form.text_field :title, value: params[:title], required: true, class: "form-control", styled: true
+        .col-12.col-md-4
+          = form.label :starts_on, "New start date (optional)", class: "form-label"
+          = form.date_field :starts_on, value: params[:starts_on], class: "form-control", styled: true
+      %p.form-text A new start date shifts the full schedule by the same number of days. Without one, the original dates are retained for review.
+      = form.submit "Create Draft", class: "btn btn-primary mt-2"
+      = link_to "Cancel", @source.is_a?(GigTemplate) ? usr_company_gig_templates_path(@company) : usr_job_production_path(@source), class: "btn btn-quiet mt-2"

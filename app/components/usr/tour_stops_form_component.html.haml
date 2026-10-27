@@ -1,0 +1,35 @@
+%h1.fw-bold.mb-2= heading
+%p.text-muted Reuse a gig setup across the shows in #{@project.name}. Each starts as an invite-only draft, with its own schedule and staffing.
+- unless setups?
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      %h2.h5.fw-bold Create Your First Gig Setup
+      %p.text-muted Create one gig with the roles and requirements you need, then reuse it for every tour stop.
+      = link_to "Create A Gig", new_usr_company_job_path(@project.company, project_id: @project.id, audience: "invite_only"), class: "btn btn-primary"
+      = link_to "Back To Project", usr_project_path(@project), class: "btn btn-quiet"
+- else
+  = form_with url: usr_project_tour_stops_path(@project), builder: ActionView::Helpers::FormBuilder, data: { controller: "tour-stops" } do |form|
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        = form.label :source, "Gig or template to reuse", class: "form-label"
+        = form.select :source, setup_options, { prompt: "Choose a setup", selected: params[:source] }, class: "form-select", required: true
+        %p.form-text.mb-0 Add up to 50 stops. Dates shift together, preserving the original gig’s length and phases. No applicants or bookings are copied.
+    .d-flex.flex-column.gap-3{ data: { tour_stops_target: "rows" } }
+      - @rows.each do |row|
+        .card.border-0.shadow-sm{ data: { tour_stop_row: true } }
+          .card-body.p-4
+            .row.g-3.align-items-end
+              .col-12.col-md-5
+                = label_tag row.id("title"), "Gig title", class: "form-label"
+                = text_field_tag row.name("title"), row.values["title"], id: row.id("title"), class: "form-control", required: true, maxlength: 150, placeholder: "e.g. Nashville — tour crew"
+              .col-12.col-md-3
+                = label_tag row.id("starts_on"), "Start date", class: "form-label"
+                = date_field_tag row.name("starts_on"), row.values["starts_on"], id: row.id("starts_on"), required: true, class: "form-control"
+              .col-12.col-md-4
+                = label_tag row.id("venue_id"), "Venue (optional)", class: "form-label"
+                = select_tag row.name("venue_id"), options_from_collection_for_select(@venues, :id, :name, row.values["venue_id"]), include_blank: "Choose venue", id: row.id("venue_id"), class: "form-select"
+            %button.btn.btn-sm.btn-quiet.mt-3{ type: "button", data: { action: "tour-stops#remove" } }= remove_label
+    .d-flex.flex-wrap.gap-2.mt-4
+      %button.btn.btn-outline-primary{ type: "button", data: { action: "tour-stops#add" } }= add_row_label
+      = form.submit create_label, class: "btn btn-primary"
+      = link_to "Cancel", usr_project_path(@project), class: "btn btn-quiet"

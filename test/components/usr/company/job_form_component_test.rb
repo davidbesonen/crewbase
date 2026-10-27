@@ -18,7 +18,7 @@ class Usr::Company::JobFormComponentTest < ViewComponent::TestCase
     %w[additional-experience screening-questions schedule-options street-address posting-options].each do |section|
       assert_selector "details[data-#{section}]:not([open])"
     end
-    assert_selector "button[name='publication_action'][value='publish']", text: "Publish job"
+    assert_selector "button[name='publication_action'][value='publish']", text: "Publish Job"
     assert_selector "button[name='publication_action'][value='draft']", text: "Save draft"
     assert_no_selector "select[name='job[status]']", visible: :all
   end

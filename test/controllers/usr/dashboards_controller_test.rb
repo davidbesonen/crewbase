@@ -111,12 +111,12 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
       assert_select "[data-controller='quick-search']"
       assert_select "[role='search'] + [data-company-tools]" do
         assert_select ".visually-hidden", text: "Company Tools"
-        assert_select "a[href='#{new_usr_company_job_path(company)}']", text: "Post a Job"
-        assert_select "a[href='#{new_usr_company_project_path(company)}']", text: "Create a Project"
+        assert_select "a[href='#{usr_new_staffing_start_path}']", text: "Staff a Gig"
+        assert_select "a[href='#{new_usr_company_project_path(company)}']", text: "Staff a Tour / Festival"
         assert_select "a[href='#{my_postings_usr_jobs_path}']", text: "Job Postings"
         assert_select "a[href='#{usr_company_projects_path(company)}']", text: "Projects"
         assert_select "a[href='#{usr_companies_path}']", text: "Companies"
-        assert_select "a i.bi", count: 5
+        assert_select "a i.bi", count: 6
       end
       assert_select "[aria-label='Dashboard actions']", count: 0
     end
@@ -214,7 +214,7 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-owned-job-postings-card]", count: 0
-    assert_select "[data-company-tools] a", text: "Post a Job"
+    assert_select "[data-company-tools] a", text: "Staff a Gig"
   end
 
   test "open postings show applicant and unlimited job recommendation counts" do
@@ -287,7 +287,7 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".dashboard-recommendations--paired > [data-open-jobs-card]"
     assert_select ".dashboard-recommendations--paired > [data-people-crews-card]", text: /Recommended Crew/
     assert_select "[data-people-crews-card]", text: /Post a job to receive tailored crew recommendations/
-    assert_select "[data-people-crews-card] a[href='#{new_usr_company_job_path(company)}']", text: "Post a Job"
+    assert_select "[data-people-crews-card] a[href='#{new_usr_company_job_placement_path(company)}']", text: "Post a Job"
   end
 
   test "dashboard shows personalized job matches and explains why they match" do
@@ -423,7 +423,7 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a.text-muted[href='#{usr_job_applications_path}']", text: "View Applications & Invitations"
   end
 
-  test "post a job opens a company selector when the user has multiple companies" do
+  test "staff a gig opens the company and event chooser when the user has multiple companies" do
     industry = Industry.create!(name: "Live Events")
     first_company = Company.create!(name: "First Production", contact_email: "first@example.com", industries: [ industry ])
     second_company = Company.create!(name: "Second Production", contact_email: "second@example.com", industries: [ industry ])
@@ -433,8 +433,8 @@ class Usr::DashboardsControllerTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "[data-company-tools] a[href='/usr/jobs/select_company']", text: "Post a Job"
-    assert_select "[data-company-tools] a[href='/usr/projects/select_company']", text: "Create a Project"
+    assert_select "[data-company-tools] a[href='#{usr_new_staffing_start_path}']", text: "Staff a Gig"
+    assert_select "[data-company-tools] a[href='/usr/projects/select_company']", text: "Staff a Tour / Festival"
   end
 
   test "dashboard shows profile progress next step and availability overview" do

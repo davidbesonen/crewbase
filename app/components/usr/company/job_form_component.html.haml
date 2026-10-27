@@ -1,17 +1,43 @@
-= helpers.simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields job-schedule" } do |f|
+= helpers.simple_form_for [ :usr, company, job ], data: { turbo: false, controller: "posting-type-fields job-schedule publication-fields show-coverage", posting_type_fields_multi_label_value: multi_title_label, publication_fields_private_label_value: private_publication_label } do |f|
+  - if staffing_kind
+    = hidden_field_tag :staffing_kind, staffing_kind
+  - if job.project
+    = hidden_field_tag "job[project_id]", job.project_id
   - if job.errors.any?
     .alert.alert-warning{ role: "alert", data: { plan_limit_message: job.errors[:base].any? } }
       %strong Please review these fields before saving:
       %ul.mb-0
         - job.errors.full_messages.each do |message|
           %li= message
+  - if new_multi_show?
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h2.h5.fw-semibold.mb-2 Your Tour Or Multi-Show Event
+        = label_tag :staffing_project_name, "Tour or event name", class: "form-label"
+        = text_field_tag :staffing_project_name, staffing_project_name, required: true, maxlength: 150, placeholder: "e.g. Summer tour or festival weekend", class: "form-control"
+        %p.form-text.mb-0 We’ll create a project with this name when you save this gig. The gig can cover one show or the full run. Add more shows and reuse the staffing setup from the project workspace.
+  - if job.project
+    .card.border-0.shadow-sm.mb-4{ data: { project_show_coverage: true } }
+      .card-body.p-4
+        %h2.h5.fw-semibold.mb-2 Shows For This Role
+        %p.text-muted.small This role belongs to #{job.project.name}. Show selections set the posting’s dates and cities automatically. Offers keep their own agreed schedule.
+        = f.input :show_coverage, collection: show_coverage_choices, include_blank: false, label: "Where Is This Crew Needed?", input_html: { data: { show_coverage_target: "choice", action: "show-coverage#update" } }
+        %div{ data: { show_coverage_target: "shows" } }
+          = hidden_field_tag "job[project_show_ids][]", ""
+          - project_shows.each do |show|
+            .form-check.mb-2
+              = check_box_tag "job[project_show_ids][]", show.id, selected_show?(show), id: "job_show_#{show.id}", class: "form-check-input"
+              = label_tag "job_show_#{show.id}", show.display_name, class: "form-check-label"
+          - if project_shows.empty?
+            %p.form-text Add shows to choose specific cities. An entire-run role will include shows as you add them.
+        = link_to "Manage Project Shows", new_usr_project_project_show_path(job.project), class: "small"
   .card.border-0.shadow-sm.mb-4
     .card-body.p-4
       .row.g-3
         .col-12
           %fieldset{ data: { posting_type_choice: true } }
-            %legend.h5.fw-semibold.mb-2 What Are You Posting?
-            %p.text-muted.mb-3 Start with one role, or switch to a gig with several positions.
+            %legend.h5.fw-semibold.mb-2= posting_choice_heading
+            %p.text-muted.mb-3= posting_choice_hint
             .row.g-3
               .col-md-6
                 .border.rounded-3.p-3.h-100
@@ -21,7 +47,7 @@
                       required: true,
                       data: { posting_type_fields_target: "choice", action: "posting-type-fields#change" }
                     = f.label :posting_type_single_role, class: "form-check-label fw-semibold" do
-                      Single job posting
+                      = single_role_label
                   %p.text-muted.small.mb-0.mt-2
                     Hire one person for one role.
               .col-md-6
@@ -33,9 +59,9 @@
                       disabled: !multi_position_available?,
                       data: { posting_type_fields_target: "choice", action: "posting-type-fields#change" }
                     = f.label :posting_type_multi_position, class: "form-check-label fw-semibold" do
-                      Multi-position gig
+                      = multi_role_label
                   %p.text-muted.small.mb-0.mt-2
-                    Staff several roles and headcounts in one gig.
+                    Staff several roles and headcounts together. All crew on this posting share its dates and shows.
                   - unless multi_position_available?
                     %p.small.text-primary.fw-semibold.mb-0.mt-2{ data: { feature_upgrade: "multi-position-gigs" } }
                       %i.bi.bi-lock-fill.me-1
@@ -66,9 +92,11 @@
                       input_html: { min: 1, step: 1, value: initial_crew_position.headcount || 1, disabled: !job.multi_position?, data: { posting_type_fields_target: "positionField" } }
               - if crew_position_error_messages.present?
                 .text-danger.small.mt-2= crew_position_error_messages
-        .col-12{ class: ("col-md-8" if projects.any?) }
+        .col-12{ class: ("col-md-8" if show_project_selector?) }
           = f.input :title, label: tag.span(posting_title_label, data: { posting_type_fields_target: "titleLabel" }), input_html: { autofocus: true, placeholder: posting_title_placeholder, data: { posting_type_fields_target: "title" } }
-        - if projects.any?
+        .col-12
+          = f.input :audience, collection: [["Public listing — accept applications", "public_listing"], ["Invite only — staff privately", "invite_only"]], include_blank: false, label: audience_label, hint: "Invite-only gigs are hidden from public search. Your company can plan crew and send personal invitations.", input_html: { data: { publication_fields_target: "audience", action: "change->publication-fields#update" } }
+        - if show_project_selector?
           .col-12.col-md-4
             = f.input :project_id,
               collection: projects.map { |project| [project.name, project.id] },
@@ -80,20 +108,20 @@
   .card.border-0.shadow-sm.mb-4
     .card-body.p-4
       %h2.h5.fw-semibold.mb-2 When, Where & Pay
-      %p.text-muted.mb-3 Add what you know now. Dates, location and pay can be updated later.
+      %p.text-muted.mb-3 Add what you know now. For roles linked to shows, dates and cities come from the Project schedule; choose custom dates above to enter them yourself.
       - if project_schedule_prefilled?
         %p.small.text-muted Dates start from your project schedule. Adjust them for this role.
       .row.g-3
         .col-md-6
-          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
+          = f.input :starts_at, as: :string, label: "Start date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.starts_at), data: { show_coverage_target: "manual", job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
         .col-md-6
-          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
+          = f.input :ends_at, as: :string, label: "End date (optional)", input_html: { type: schedule_input_type, value: schedule_input_value(job.ends_at), data: { show_coverage_target: "manual", job_schedule_target: "field", action: "input->job-schedule#datesChanged change->job-schedule#datesChanged" } }
         .col-12
           %details.staffing-form__options{ open: schedule_options_expanded?, data: { schedule_options: true } }
             %summary.fw-semibold Additional Schedule Options
             .row.g-3.mt-1
               .col-md-6
-                = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { job_schedule_target: "toggle", action: "job-schedule#change" } }
+                = f.input :schedule_has_times, label: "Include exact start and end times", input_html: { data: { show_coverage_target: "manual", job_schedule_target: "toggle", action: "job-schedule#change" } }
                 %p.form-text.mb-0 Times use #{Time.zone.name}. Confirm final work hours in the booking offer.
               .col-md-6
                 = f.input :application_deadline, as: :string, input_html: { type: "datetime-local", value: deadline_input_value }
@@ -105,7 +133,7 @@
                   .d-flex.flex-column.gap-2{ data: { work_date_fields_target: "container" } }
                     - work_date_fields.each do |work_date|
                       .input-group
-                        = date_field_tag "job[work_dates][]", work_date, id: nil, aria: { label: "Work date" }, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" }
+                        = date_field_tag "job[work_dates][]", work_date, id: nil, aria: { label: "Work date" }, class: "form-control", min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { show_coverage_target: "manual", job_schedule_target: "workDate" }
                         %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
                           %i.bi.bi-trash
                   %div
@@ -114,7 +142,7 @@
                       Add Work Date
                   %template{ data: { work_date_fields_target: "template" } }
                     .input-group
-                      %input.form-control{ type: "date", name: "job[work_dates][]", aria: { label: "Work date" }, min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { job_schedule_target: "workDate" } }
+                      %input.form-control{ type: "date", name: "job[work_dates][]", aria: { label: "Work date" }, min: job.starts_at&.to_date, max: job.ends_at&.to_date, data: { show_coverage_target: "manual", job_schedule_target: "workDate" } }
                       %button.btn.btn-outline-danger{ type: "button", aria: { label: "Remove work date" }, data: { action: "work-date-fields#remove" } }
                         %i.bi.bi-trash
         .col-md-6
@@ -123,11 +151,11 @@
           = f.input :requires_travel
         = f.simple_fields_for :locations, location do |location_fields|
           .col-md-4
-            = location_fields.input :city
+            = location_fields.input :city, input_html: { data: { show_coverage_target: "manual" } }
           .col-md-4
-            = location_fields.input :state
+            = location_fields.input :state, input_html: { data: { show_coverage_target: "manual" } }
           .col-md-4
-            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false
+            = location_fields.input :country, as: :select, collection: Location::COUNTRIES, include_blank: true, required: false, input_html: { data: { show_coverage_target: "manual" } }
           .col-12
             %details.staffing-form__options{ open: street_address_expanded?, data: { street_address: true } }
               %summary.fw-semibold Street Address (Optional)
@@ -280,7 +308,7 @@
             .col-md-6
               = f.input :status, collection: Job.statuses.keys.map { |value| [value.humanize, value] }, include_blank: false
           .col-md-6
-            = f.input :is_active, label: "Accept applications when published"
+            = f.input :is_active, label: "Accept applications or invitations when active"
           .col-md-6
             = f.input :editable_by_company, label: "Allow company editors to edit this job"
   .staffing-form__actions
@@ -288,10 +316,10 @@
     .d-flex.flex-wrap.gap-2
       - if job.new_record?
         = button_tag "Save draft", name: "publication_action", value: "draft", class: "btn btn-outline-primary"
-        = button_tag "Publish job", name: "publication_action", value: "publish", class: "btn btn-primary"
+        = button_tag publication_label, name: "publication_action", value: "publish", class: "btn btn-primary", data: { publication_fields_target: "submit" }
       - else
         = f.submit "Save changes", class: "btn btn-primary"
         - if job.draft?
-          = button_tag "Publish job", name: "publication_action", value: "publish", class: "btn btn-outline-primary"
+          = button_tag publication_label, name: "publication_action", value: "publish", class: "btn btn-outline-primary", data: { publication_fields_target: "submit" }
   - if job.new_record? || job.draft?
-    %p.small.text-muted.mt-2.mb-4 Drafts are private to your company. Publish when you are ready to receive applications.
+    %p.small.text-muted.mt-2.mb-4{ data: { publication_fields_target: "hint" } }= publication_hint

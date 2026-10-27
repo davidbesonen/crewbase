@@ -2,8 +2,8 @@
   .card.border-0.shadow-sm
     .card-body.p-4
       = f.error_notification
-      = f.input :name, label: "Project name", placeholder: "e.g. Summer tour or festival weekend", input_html: { autofocus: true }
-      %p.text-muted.small Group related job postings under a tour, event, or production. Only the project name is required.
+      = f.input :name, label: "Tour, festival or project name", placeholder: "e.g. Summer tour or festival weekend", input_html: { autofocus: true }
+      %p.text-muted.small A Project is your tour, festival or event. Name it, add the shows and cities, then staff roles for the entire run or selected shows. Only the name is required.
       %details.staffing-form__options.mt-4{ open: options_expanded?, data: { project_options: true } }
         %summary.fw-semibold Project Details (Optional)
         .row.g-3.mt-1
@@ -20,7 +20,8 @@
         = link_to "Cancel", project.persisted? ? usr_project_path(project) : usr_company_projects_path(company), class: "btn btn-quiet"
         .d-flex.flex-wrap.gap-2
           - if project.new_record?
-            = f.submit "Create project only", class: "btn btn-outline-primary"
-            = button_tag "Create project & post a job", name: "next_step", value: "post_job", class: "btn btn-primary"
+            = f.submit "Create project only", class: "btn btn-quiet"
+            = button_tag "Create project & post a job", name: "next_step", value: "post_job", class: "btn btn-outline-primary"
+            = button_tag "Create Project & Add Shows", name: "next_step", value: "add_shows", class: "btn btn-primary"
           - else
             = f.submit "Save changes", class: "btn btn-primary"

@@ -1,29 +1,18 @@
 .card.border-0.shadow-sm.mb-3{ data: { company_owner_nav: true } }
   .card-body.py-3
-    %nav.d-flex.flex-wrap.align-items-center.gap-2{ aria: { label: "Company workspace" } }
+    .d-md-none{ data: { controller: "workspace-navigation" } }
+      = label_tag "workspace_#{company.id}", "Company Workspace", class: "form-label small text-muted mb-1"
+      = select_tag "workspace_#{company.id}", options_for_select(mobile_options), class: "form-select", aria: { label: "Company workspace destination" }, data: { action: "change->workspace-navigation#navigate" }
+    %nav.company-workspace-nav.d-none.d-md-flex.flex-wrap.align-items-center.gap-2{ aria: { label: "Company workspace" } }
       %span.text-muted.fw-semibold.me-2
-        %i.bi.bi-building-gear.me-1
+        %i.bi.bi-building-gear.me-1{ aria: { hidden: true } }
         Company Workspace
-      = link_to usr_company_path(company), class: button_class(:profile), aria: { current: current_destination(:profile) } do
-        %i.bi.bi-card-heading.me-1
-        Profile
-      - if feature_available?(:staffing_analytics)
-        = link_to usr_company_manager_path(company), class: button_class(:manager), aria: { current: current_destination(:manager) } do
-          %i.bi.bi-speedometer2.me-1
-          Manager
-      - else
-        %span.btn.btn-sm.btn-outline-secondary.disabled{ aria: { disabled: "true" }, data: { feature_upgrade: "staffing-analytics" }, title: "Available on Team plans" }
-          %i.bi.bi-lock-fill.me-1
-          Manager
-      = link_to new_usr_company_job_path(company), class: button_class(:post_job), aria: { current: current_destination(:post_job) } do
-        %i.bi.bi-plus-square.me-1
-        Post a Job
-      = link_to usr_company_projects_path(company), class: button_class(:projects), aria: { current: current_destination(:projects) } do
-        %i.bi.bi-folder2-open.me-1
-        Manage Projects
-      = link_to edit_usr_company_path(company), class: "#{button_class(:edit, secondary: true)} ms-lg-auto", aria: { current: current_destination(:edit) } do
-        %i.bi.bi-pencil.me-1
-        Edit Company
-      = link_to usr_company_plan_path(company), class: button_class(:plan, secondary: true), aria: { current: current_destination(:plan) } do
-        %i.bi.bi-arrow-up-circle.me-1
-        = entitlement.tier == "studio" ? "Manage Plan" : "Upgrade Plan"
+      - destinations.each do |item|
+        - if item.disabled
+          %span.btn.btn-sm.btn-outline-secondary.disabled{ aria: { disabled: "true" }, data: { feature_upgrade: "staffing-analytics" }, title: "Available on Team plans" }
+            %i.bi.bi-lock-fill.me-1{ aria: { hidden: true } }
+            = item.label
+        - else
+          = link_to item.path, class: button_class(item.key, secondary: item.secondary), aria: { current: current_destination(item.key) } do
+            %i.me-1{ class: "bi bi-#{item.icon}", aria: { hidden: true } }
+            = item.label

@@ -13,9 +13,13 @@ class Usr::Company::OwnerNavigationComponentTest < ViewComponent::TestCase
     destinations = {
       profile: usr_company_path(@company),
       manager: usr_company_manager_path(@company),
-      post_job: new_usr_company_job_path(@company),
+      post_job: new_usr_company_job_placement_path(@company),
       projects: usr_company_projects_path(@company),
       edit: edit_usr_company_path(@company),
+      staffing: usr_company_staffing_path(@company),
+      roster: usr_company_crew_members_path(@company),
+      templates: usr_company_gig_templates_path(@company),
+      venues: usr_company_venues_path(@company),
       plan: usr_company_plan_path(@company)
     }
 
@@ -30,6 +34,7 @@ class Usr::Company::OwnerNavigationComponentTest < ViewComponent::TestCase
       assert_selector "a[aria-current='page']", count: 1
       assert_selector "a.btn-quiet[aria-current='page'][href='#{path}']"
       assert_no_selector "a.btn-primary"
+      assert_selector "select[aria-label='Company workspace destination'] option[selected][value='#{path}']", visible: :all
     end
   end
 

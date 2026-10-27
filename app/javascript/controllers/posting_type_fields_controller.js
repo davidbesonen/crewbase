@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static values = { multiLabel: { type: String, default: "Gig title" } }
   static targets = ["choice", "positions", "positionField", "titleLabel", "title"]
 
   connect() {
@@ -17,7 +18,7 @@ export default class extends Controller {
     ))
 
     if (this.hasTitleLabelTarget) {
-      this.titleLabelTarget.textContent = isMultiPosition ? "Gig title" : "Job title"
+      this.titleLabelTarget.textContent = isMultiPosition ? this.multiLabelValue : "Job title"
     }
     if (this.hasTitleTarget) {
       this.titleTarget.placeholder = isMultiPosition

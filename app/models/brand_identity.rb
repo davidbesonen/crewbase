@@ -1,6 +1,7 @@
 class BrandIdentity
   NAME = "KnowShow"
   DEFAULT_CONCEPT_KEY = "drive"
+  ICON_VERSION = 2
   DESCRIPTION = "Know your gigs. Own the show. Create your company and staff live music touring gigs in KnowShow. Crew, musicians and engineers can build free profiles and find work."
   Concept = Data.define(:key, :name, :character, :description, :colors)
   CONCEPTS = [
@@ -25,7 +26,7 @@ class BrandIdentity
   end
 
   def self.default_concept = CONCEPTS.find { |concept| concept.key == DEFAULT_CONCEPT_KEY }
-  def self.icon_path(format = "svg") = "/brand/knowshow-#{DEFAULT_CONCEPT_KEY}-icon.#{format}"
+  def self.icon_path(format = "svg") = "/brand/knowshow-#{DEFAULT_CONCEPT_KEY}-icon.#{format}?v=#{ICON_VERSION}"
   def self.social_image_path = "/brand/knowshow-#{DEFAULT_CONCEPT_KEY}-social.png"
 
   def self.refinements

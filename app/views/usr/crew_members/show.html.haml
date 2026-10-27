@@ -1,0 +1,41 @@
+.d-flex.flex-wrap.justify-content-between.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1= @member.full_name
+    %p.text-muted.mb-0 Private crew record for #{@company.name}
+  .d-flex.gap-2
+    = link_to "Edit", edit_usr_company_crew_member_path(@company, @member), class: "btn btn-outline-primary"
+    = link_to "Back To Roster", usr_company_crew_members_path(@company), class: "btn btn-quiet"
+.row.g-4
+  .col-12.col-lg-8
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h2.h5.mb-3 Crew Details
+        %dl.row.mb-0
+          - CrewRosterColumns::LABELS.each do |key, label|
+            %dt.col-sm-4= label
+            %dd.col-sm-8.text-break
+              - if key.start_with?("years_") && @member.public_send(key)
+                = number_with_precision(@member.public_send(key), precision: 1, strip_insignificant_zeros: true)
+              - else
+                = @member.public_send(key).presence || "Not set"
+  .col-12.col-lg-4
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h2.h5.mb-3 KnowShow Profile
+        - if @member.profile
+          %p They have claimed their profile. Their public experience and availability are managed by them.
+          - if @member.profile.completed_at?
+            = link_to "View Profile", usr_profile_path(@member.profile), class: "btn btn-primary"
+          - else
+            %p.small.text-muted They are still completing their personal profile. You can plan them on your staffing board.
+        - else
+          %p Invite this person to create an account and review the imported profile details. Your company notes and years worked with stay private.
+          = button_to "Create Invitation Link", invitation_usr_company_crew_member_path(@company, @member), method: :post, class: "btn btn-primary"
+          - if @invitation_url
+            .mt-3{ data: { controller: "clipboard" } }
+              = label_tag :crew_claim_link, "Invitation link", class: "form-label"
+              = text_field_tag :crew_claim_link, @invitation_url, readonly: true, class: "form-control", data: { clipboard_target: "source" }
+              %button.btn.btn-outline-primary.mt-2{ type: "button", data: { action: "clipboard#copy", clipboard_target: "button" } } Copy Link
+              %p.form-text Send this link directly to their email or phone. It expires in 7 days. Creating another link replaces this one.
+.mt-4
+  = button_to "Remove From Roster", usr_company_crew_member_path(@company, @member), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "Remove this private crew record? Their KnowShow account will remain." } }

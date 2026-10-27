@@ -21,6 +21,7 @@ class Profile < ApplicationRecord
   validate :ical_feed_url_must_be_public
   has_many :crew_shortlist_memberships, dependent: :destroy
   has_many :crew_shortlists, through: :crew_shortlist_memberships
+  has_many :crew_members, dependent: :nullify
 
   has_many :company_assignments, dependent: :destroy
   has_many :companies, through: :company_assignments

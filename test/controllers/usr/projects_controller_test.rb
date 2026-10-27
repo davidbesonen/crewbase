@@ -100,7 +100,7 @@ class Usr::ProjectsControllerTest < ActionDispatch::IntegrationTest
     get usr_project_path(project)
     assert_response :success
     assert_select "h1", text: "Festival Weekend"
-    assert_select "[data-project-jobs]", text: /No job postings/
+    assert_select "[data-project-schedule]", text: /Add Your First Show/
 
     patch usr_project_path(project), params: {
       project: { name: "Festival Weekend Updated", status: "completed" }
@@ -351,8 +351,8 @@ class Usr::ProjectsControllerTest < ActionDispatch::IntegrationTest
     get usr_dashboards_path
 
     assert_response :success
-    assert_select "a", text: "Create a Project"
-    assert_select "a[href='#{new_usr_company_project_path(@company)}']", text: "Create a Project"
+    assert_select "a", text: "Staff a Tour / Festival"
+    assert_select "a[href='#{new_usr_company_project_path(@company)}']", text: "Staff a Tour / Festival"
   end
 
   private

@@ -7,73 +7,88 @@
           %span.status-badge.status-draft Archived
         - else
           %span{ class: project_status_badge_class(project.status) }= project.status.humanize
+        - if project.multi_show?
+          %span.status-badge.status-draft Tour / Festival Project
       %p.text-muted.mb-0
         = project.company.name
         - if project.starts_on.present? || project.ends_on.present?
           %span.mx-1 •
           = [project.starts_on&.to_fs(:long), project.ends_on&.to_fs(:long)].compact.join(" – ")
     .d-flex.flex-wrap.gap-2
+      = link_to primary_staffing_label, primary_staffing_path, class: "btn #{project.multi_show? ? 'btn-primary' : 'btn-outline-primary'}"
+      - unless project.archived?
+        = link_to add_shows_label, project.multi_show? ? new_usr_project_project_show_path(project) : new_usr_project_tour_stops_path(project), class: "btn btn-outline-primary"
       = link_to "Edit Project", edit_usr_project_path(project), class: "btn btn-outline-primary"
       - if project.archived?
         = button_to "Restore Project", restore_usr_project_path(project), method: :patch, class: "btn btn-outline-primary"
       - else
         = button_to "Archive Project", archive_usr_project_path(project), method: :patch, class: "btn btn-quiet", form: { data: { turbo_confirm: "Archive this project? Existing jobs will remain unchanged." } }
-      - if jobs.any? && !project.archived?
-        = link_to "Add Job Posting", add_job_path, class: "btn btn-primary"
+      - if (jobs.any? || project.multi_show?) && !project.archived?
+        = link_to add_job_label, add_job_path, class: "btn #{project.multi_show? ? 'btn-outline-primary' : 'btn-primary'}"
 
-  .row.g-3.mb-4
-    .col-12.col-md-4
+  .row.g-3.mb-4.project-summary-metrics
+    .col-4
       .card.h-100.border-0.shadow-sm.card-accent.card-accent-cyan{ data: { project_metric: "postings" } }
         .card-body
-          .text-muted.small Job Postings
+          .text-muted.small= postings_label
           .fs-3.fw-bold= posting_count
-    .col-12.col-md-4
+    .col-4
       .card.h-100.border-0.shadow-sm.card-accent.card-accent-cyan{ data: { project_metric: "open-postings" } }
         .card-body
-          .text-muted.small Open Postings
+          .text-muted.small= open_postings_label
           .fs-3.fw-bold= open_posting_count
-    .col-12.col-md-4
+    .col-4
       .card.h-100.border-0.shadow-sm.card-accent.card-accent-navy{ data: { project_metric: "applications" } }
         .card-body
           .text-muted.small Applications
           .fs-3.fw-bold= link_to application_count, usr_company_applications_path(project.company, project_id: project.id), class: "text-dark text-decoration-none"
 
-  .card.border-0.shadow-sm.mb-4.card-accent.card-accent-cyan
-    .card-body.p-4
-      %h2.h5.fw-bold.mb-2 Overview
-      %p.mb-0= project.description.presence || "Add a description to give your team context about this project."
+  - if show_overview?
+    .card.border-0.shadow-sm.mb-4.card-accent.card-accent-cyan
+      .card-body.p-4
+        %h2.h5.fw-bold.mb-2 Overview
+        %p.mb-0= project.description.presence || "Add a description to give your team context about this project."
 
-  .card.border-0.shadow-sm.card-accent.card-accent-sky{ data: { project_jobs: true } }
-    .card-body.p-4
-      .d-flex.justify-content-between.align-items-center.mb-3
-        %div
-          %h2.h5.fw-bold.mb-1 Job Postings
-          %p.text-muted.small.mb-0 Create roles, review applicants, and keep each posting moving.
+  %nav.nav.nav-pills.gap-2.mb-4{ aria: { label: "Project Views" } }
+    = link_to "Shows & Cities (#{show_count})", usr_project_path(project), class: "nav-link #{'active' if workspace_view == 'shows'}", aria: { current: ("page" if workspace_view == "shows") }
+    = link_to "Roles & Postings", usr_project_path(project, view: "roles"), class: "nav-link #{'active' if workspace_view == 'roles'}", aria: { current: ("page" if workspace_view == "roles") }
+    = link_to "Crew By Show", usr_project_path(project, view: "crew"), class: "nav-link #{'active' if workspace_view == 'crew'}", aria: { current: ("page" if workspace_view == "crew") }
+  - if workspace_view == "roles"
+    .card.border-0.shadow-sm.card-accent.card-accent-sky{ data: { project_jobs: true } }
+      .card-body.p-4
+        .d-flex.justify-content-between.align-items-center.mb-3
+          %div
+            %h2.h5.fw-bold.mb-1= postings_label
+            %p.text-muted.small.mb-0= postings_hint
 
-      - if jobs.any?
-        .d-flex.flex-column.gap-3
-          - jobs.each do |job|
-            .border.rounded-3.p-3{ data: { project_job: job.id } }
-              .d-flex.flex-column.flex-lg-row.justify-content-between.gap-3
-                %div
-                  .d-flex.flex-wrap.align-items-center.gap-2.mb-1
-                    %h3.h6.fw-semibold.mb-0= job.title
-                    %span{ class: job_status_class(job) }= job.status.humanize
-                  .text-muted.small
-                    = job.employment_type.humanize
-                    %span.mx-1 •
-                    = job.formatted_location
-                  .text-muted.small.mt-1
-                    = link_to pluralize(job.job_applications.size, "applicant"), usr_company_applications_path(project.company, job_id: job.id), class: "text-muted"
-                .d-flex.flex-wrap.align-items-start.gap-2
-                  = link_to "View Posting", usr_job_path(job), class: "btn btn-quiet btn-sm"
-                  = link_to "Edit", edit_usr_company_job_path(project.company, job), class: "btn btn-outline-primary btn-sm"
-                  = link_to "Review Applicants", usr_company_applications_path(project.company, job_id: job.id), class: "btn btn-primary btn-sm"
-      - else
-        .text-center.py-5.empty-state.empty-state-sky{ data: { project_empty_state: true } }
-          %span.icon-orb.icon-orb-sky
-            %i.bi.bi-briefcase{ aria: { hidden: true } }
-          %h3.h5.fw-semibold.mt-3 Create The First Job Posting
-          %p.text-muted.mx-auto No job postings yet. Add a role to start recruiting and tracking applicants for this project.
-          - unless project.archived?
-            = link_to "Add Job Posting", add_job_path, class: "btn btn-primary"
+        - if jobs.any?
+          .d-flex.flex-column.gap-3
+            - jobs.each do |job|
+              .border.rounded-3.p-3{ data: { project_job: job.id } }
+                .d-flex.flex-column.flex-lg-row.justify-content-between.gap-3
+                  %div
+                    .d-flex.flex-wrap.align-items-center.gap-2.mb-1
+                      %h3.h6.fw-semibold.mb-0= job.title
+                      %span{ class: job_status_class(job) }= job_status_label(job)
+                    .text-muted.small
+                      = job.employment_type.humanize
+                      %span.mx-1 •
+                      = job.formatted_location
+                    .text-muted.small.mt-1
+                      = link_to pluralize(job.job_applications.size, "applicant"), usr_company_applications_path(project.company, job_id: job.id), class: "text-muted"
+                  .d-flex.flex-wrap.align-items-start.gap-2
+                    - if project.multi_show?
+                      = link_to "Staff Crew", staffing_path(job), class: "btn btn-primary btn-sm"
+                    = link_to "Production", usr_job_production_path(job), class: "btn btn-outline-primary btn-sm"
+                    = link_to "Show Brief", usr_job_brief_path(job), class: "btn btn-quiet btn-sm"
+                    = link_to "View Posting", usr_job_path(job), class: "btn btn-quiet btn-sm"
+                    = link_to "Edit", edit_usr_company_job_path(project.company, job), class: "btn btn-outline-primary btn-sm"
+                    = link_to "Review Applicants", usr_company_applications_path(project.company, job_id: job.id), class: "btn btn-sm #{project.multi_show? ? 'btn-outline-primary' : 'btn-primary'}"
+        - else
+          .text-center.py-5.empty-state.empty-state-sky{ data: { project_empty_state: true } }
+            %span.icon-orb.icon-orb-sky
+              %i.bi.bi-briefcase{ aria: { hidden: true } }
+            %h3.h5.fw-semibold.mt-3= empty_heading
+            %p.text-muted.mx-auto= empty_hint
+            - unless project.archived?
+              = link_to add_job_label, add_job_path, class: "btn btn-primary"

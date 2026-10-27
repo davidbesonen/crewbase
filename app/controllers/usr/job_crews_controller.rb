@@ -4,7 +4,8 @@ class Usr::JobCrewsController < ApplicationController
   before_action :require_staffing_feature
 
   def show
-    @positions = @job.crew_positions.includes(crew_assignments: { profile: :user }).order(:id)
+    @positions = @job.crew_positions.includes(:production_day, crew_assignments: { profile: :user }).order(:id)
+    @production_days = @job.production_days.order(:date, :starts_at, :id).to_a
     @candidates = JobCrewCandidateQuery.new(job: @job, user: current_user).candidates
     @schedule_rows = JobCrewSchedule.new(job: @job).rows
     @crew_search_results = JobCrewSearch.new(

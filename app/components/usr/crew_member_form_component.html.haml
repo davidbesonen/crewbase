@@ -1,0 +1,19 @@
+%h1.fw-bold.mb-3= @member.persisted? ? "Edit Crew Member" : "Add Crew Member"
+%p.text-muted These details are private to your company. Add an email or phone number so this person can claim their profile later.
+- if @member.errors.any?
+  .alert.alert-danger{ role: "alert" }= @member.errors.full_messages.to_sentence
+= form_with model: @member, url: form_url do |form|
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      .row.g-3
+        - CrewRosterColumns::LABELS.each do |key, label|
+          .col-12{ class: key.in?(%w[notes skills_text equipment_text]) ? "col-lg-12" : "col-md-6 col-lg-4" }
+            = form.label key, label, class: "form-label"
+            - if key.in?(%w[notes skills_text equipment_text])
+              = form.text_area key, rows: 2, maxlength: 2000, class: "form-control", styled: true
+            - else
+              = form.public_send(input_type(key), key, class: "form-control", styled: true, step: ("0.1" if key.start_with?("years_")), min: (0 if key.start_with?("years_")), max: (100 if key.start_with?("years_")), required: key.in?(%w[first_name last_name]))
+      %p.form-text.mt-3.mb-0 Years Worked With means years working with your company. Notes stay private and are never copied to their personal profile.
+  .d-flex.gap-2
+    = form.submit "Save Crew Member", class: "btn btn-primary"
+    = link_to "Cancel", usr_company_crew_members_path(@company), class: "btn btn-quiet"

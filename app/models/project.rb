@@ -1,7 +1,9 @@
 class Project < ApplicationRecord
   belongs_to :company
   has_many :jobs, dependent: :nullify
+  has_many :project_shows, dependent: :destroy
   has_many :credits, dependent: :nullify
+  enum :project_type, { general: 0, multi_show: 1 }
 
   enum :status, {
     planning: 0,

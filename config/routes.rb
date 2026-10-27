@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   get "brand", to: "marketing#brand", as: :brand_directions
   get "meet-the-team", to: "marketing#team", as: :meet_the_team
   get "job-postings/:id", to: "public_job_postings#show", as: :public_job_posting
+  get "crew-invitations/:token", to: "crew_claims#show", as: :crew_claim
+  post "crew-invitations/:token", to: "crew_claims#create"
+  post "crew-invitations/:token/switch-account", to: "crew_claims#switch_account", as: :switch_account_crew_claim
   get "job-invitations/:token", to: "public_job_invitations#show", as: :public_job_invitation
   patch "job-invitations/:token/accept", to: "public_job_invitations#accept", as: :accept_public_job_invitation
   resources :change_log_entries, only: :index, path: "changelog"

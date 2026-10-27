@@ -26,6 +26,9 @@
         - if notification.notifiable_type == "JobOffer"
           .notification-card__actions.mt-3
             = link_to "View offer", helpers.usr_job_offer_path(notification.notifiable_id), class: "notification-action-link"
+        - if notification.kind == "production_brief_updated" && notification.notifiable_type == "Job"
+          .notification-card__actions
+            = link_to "View Show Brief", helpers.usr_job_brief_path(notification.notifiable_id), class: "notification-action-link"
         - if notification.notifiable_type == "ContextualMessage"
           .notification-card__actions.mt-3
             = link_to "Open conversation", helpers.usr_conversation_path(notification.notifiable.conversation_id), class: "notification-action-link"

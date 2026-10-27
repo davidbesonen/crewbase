@@ -1,0 +1,20 @@
+= render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :templates, entitlement: @entitlement)
+.d-flex.flex-wrap.justify-content-between.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Gig Templates
+    %p.text-muted.mb-0 Reuse your standard staffing setups. Save a template from any gig’s Production workspace.
+  = link_to "Create A Gig", new_usr_company_job_path(@company), class: "btn btn-primary"
+.row.g-3
+  - @templates.each do |template|
+    .col-12.col-md-6
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-4
+          %h2.h5= template.name
+          .d-flex.flex-wrap.gap-2.mt-3
+            = link_to "Use Template", new_usr_company_gig_reuse_path(@company, template_id: template.id), class: "btn btn-primary"
+            = button_to "Remove", usr_company_gig_template_path(@company, template), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "Remove this template? Existing gigs will remain." } }
+- if @templates.empty?
+  .card.border-0.shadow-sm
+    .card-body.p-4
+      %h2.h5 Save Your First Setup
+      %p.text-muted.mb-0 Open an existing gig, choose Production, and save its setup as a template.

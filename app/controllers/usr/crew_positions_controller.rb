@@ -4,6 +4,7 @@ class Usr::CrewPositionsController < ApplicationController
 
   def create
     position = @job.crew_positions.new(position_params)
+    position.production_day = @job.production_days.find(params[:crew_position][:production_day_id]) if params[:crew_position][:production_day_id].present?
     if position.save
       redirect_to usr_job_crew_path(@job), notice: "Crew position added."
     else

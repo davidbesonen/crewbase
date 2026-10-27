@@ -14,6 +14,14 @@
           - if @offer.expires_at
             %dt.col-sm-4 Respond by
             %dd.col-sm-8= l(@offer.expires_at, format: :long)
+        - if @offer.show_itinerary.any?
+          .border.rounded-3.p-3.mb-3
+            %h2.h6 Agreed Shows & Cities
+            %p.small.text-muted This itinerary is saved with the offer. Days between shows are not reserved.
+            - @offer.show_itinerary.each do |show|
+              .small= [show["name"], show["city"], show["starts_on"], show["ends_on"]].compact_blank.join(" · ")
+        - if schedule_changed?
+          .alert.alert-warning The Project schedule has changed since this offer was sent. These agreed dates have not changed. Contact the other party to review the plan; changed terms require a new offer.
         - if @offer.terms.present?
           %h2.h6 Essential Terms
           = simple_format(@offer.terms)

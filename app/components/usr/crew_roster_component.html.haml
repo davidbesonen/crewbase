@@ -1,0 +1,51 @@
+.d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Crew Roster
+    %p.text-muted.mb-0 Your private crew list for #{@company.name}. Import contacts, plan gigs, and invite people to finish their profiles.
+  .d-flex.flex-wrap.gap-2
+    = link_to new_usr_company_crew_import_path(@company), class: "btn btn-primary" do
+      %i.bi.bi-file-earmark-spreadsheet.me-2{ aria: { hidden: true } }
+      Upload Spreadsheet
+    = link_to "Add Crew Member", new_usr_company_crew_member_path(@company), class: "btn btn-outline-primary"
+.card.border-0.shadow-sm
+  .card-body.p-4
+    = form_with url: usr_company_crew_members_path(@company), method: :get, class: "d-flex flex-wrap gap-2 mb-4" do |form|
+      = form.search_field :q, value: @query, placeholder: "Name, role, city, skills or equipment", class: "form-control crew-roster-search", aria: { label: "Search crew roster" }, styled: true
+      = form.submit "Search", class: "btn btn-outline-primary"
+      - if @query.present?
+        = link_to "Clear Search", usr_company_crew_members_path(@company), class: "btn btn-quiet"
+    - if @members.any?
+      .table-responsive
+        %table.table.align-middle.crew-roster-table
+          %thead
+            %tr
+              %th{ scope: "col" } Name
+              %th{ scope: "col" } Role
+              %th{ scope: "col" } Location
+              %th{ scope: "col" } Contact
+              %th{ scope: "col" } Profile
+          %tbody
+            - @members.each do |member|
+              %tr{ data: { crew_member: member.id } }
+                %td.fw-semibold.crew-roster-table__name= link_to member.full_name, usr_company_crew_member_path(@company, member)
+                %td{ data: { label: "Role" } }
+                  = member.role.presence || "Not set"
+                  .small.text-muted= member.department
+                %td{ data: { label: "Location" } }= member.location_label.presence || "Not set"
+                %td.text-break{ data: { label: "Contact" } }
+                  %div
+                    - if member.email.present?
+                      %div= mail_to member.email
+                    - if member.phone.present?
+                      .small= link_to member.phone, "tel:#{member.phone.gsub(/[^+\d]/, '')}"
+                %td{ data: { label: "Profile" } }
+                  %span.status-badge{ class: member.profile_id? ? "status-available" : "status-draft" }= member.profile_id? ? "Claimed" : "Not claimed"
+    - elsif @query.present?
+      .text-center.py-5
+        %h2.h5 No Matching Crew
+        %p.text-muted.mb-0 Try another name, role, city or equipment name, or clear your search to see everyone.
+    - else
+      .text-center.py-5
+        %i.bi.bi-people.fs-1.text-primary{ aria: { hidden: true } }
+        %h2.h5.mt-3 Bring Your Crew With You
+        %p.text-muted Upload your spreadsheet or add a person. Each contact needs an email or phone number.

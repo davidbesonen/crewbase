@@ -18,6 +18,10 @@ class MarketingConcertTest < ApplicationSystemTestCase
     assert_equal 0, scene_animation_count
     page.save_screenshot("/private/tmp/knowshow-company-marketing-desktop.png")
 
+    assert_selector "#tour-staffing article", count: 4
+    page.execute_script("document.querySelector('#tour-staffing').scrollIntoView({block: 'center', behavior: 'instant'})")
+    page.save_screenshot("/private/tmp/knowshow-tour-marketing-desktop.png")
+
     within(".marketing-hero") { click_link "Looking for gigs?" }
     assert_selector "#for-crew h2", text: "Looking For Your Next Gig?"
     within("#for-crew") { click_link "Create your free profile" }
@@ -32,6 +36,9 @@ class MarketingConcertTest < ApplicationSystemTestCase
     assert_equal 0, scene_animation_count
     assert_no_selector ".concert-scene button", visible: :all
     page.save_screenshot("/private/tmp/knowshow-company-marketing-mobile.png")
+
+    page.execute_script("document.querySelector('#tour-staffing').scrollIntoView({block: 'center', behavior: 'instant'})")
+    page.save_screenshot("/private/tmp/knowshow-tour-marketing-mobile.png")
 
     set_reduced_motion(true)
     page.refresh

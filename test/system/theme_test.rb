@@ -30,6 +30,8 @@ class ThemeTest < ApplicationSystemTestCase
   end
 
   test "dark mode covers admin records forms and the workspace on mobile" do
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+    page.driver.browser.manage.window.resize_to(1440, 1100)
     user = User.create!(first_name: "Theme", last_name: "Owner", email: "theme-system@example.com", password: "password123")
     user.roles << Role.find_or_create_by!(name: "app_owner")
     user.profiles.create!(profile_type: "user", completed_at: Time.current)

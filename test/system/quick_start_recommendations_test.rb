@@ -16,13 +16,13 @@ class QuickStartRecommendationsTest < ApplicationSystemTestCase
     visit usr_dashboards_path
     assert_text "What Brings You To KnowShow?"
     choose "Find work"
-    find("summary", text: "Choose your roles").click
+    find("summary", text: "Choose Your Roles").click
     check "FOH Engineer"
     click_button "Get started"
     assert_text "Find Your Next Role"
     within "[data-worker-job-recommendation]" do
       assert_text "Tour audio engineer"
-      find("summary", text: "Not interested?").click
+      find("summary", text: "Not Interested?").click
       select "Dates don't work", from: "Why hide this recommendation?"
       click_button "Hide recommendation"
     end

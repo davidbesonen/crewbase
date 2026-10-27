@@ -3,6 +3,7 @@
     %h1.fw-bold.mb-1 Crew For #{job.title}
     %p.text-muted.mb-0 Define the roles you need, staff them, and check availability for the job dates.
   .d-flex.flex-wrap.gap-2
+    = link_to "Production Schedule", usr_job_production_path(job), class: "btn btn-outline-primary"
     = link_to "Review Applications", usr_company_applications_path(job.company, job_id: job.id, return_to: "staffing"), class: "btn btn-primary"
     = link_to "Back to Job", usr_job_path(job), class: "btn btn-quiet"
 
@@ -11,7 +12,7 @@
     .card.border-0.shadow-sm.mb-4
       .card-body.p-4
         %h4.fw-semibold.mb-3 Required Positions
-        = form_with model: CrewPosition.new, url: usr_job_crew_positions_path(job), class: "row g-3 align-items-end mb-4" do |form|
+        = form_with model: CrewPosition.new, url: usr_job_crew_positions_path(job), id: "add-crew-position", class: "row g-3 align-items-end mb-4" do |form|
           .col-md-8
             = form.label :title, "Position title", class: "form-label"
             = form.text_field :title, class: "form-control", required: true, styled: true
@@ -21,6 +22,10 @@
           .col-12
             = form.label :description, "Position description", class: "form-label"
             = form.text_area :description, rows: 3, class: "form-control", placeholder: "Responsibilities, experience, and other role details", styled: true
+          - if @production_days.any?
+            .col-12
+              = form.label :production_day_id, "Required for (optional)", class: "form-label"
+              = form.select :production_day_id, @production_days.map { |day| [ day.display_name, day.id ] }, { include_blank: "Whole gig" }, class: "form-select"
           .col-md-4
             = form.label :pay_min, "Minimum pay", class: "form-label"
             .input-group
@@ -45,6 +50,8 @@
                   %div
                     %h5.fw-semibold.mb-1= position.title
                     %div.text-muted.small= "#{position.crew_assignments.size} of #{position.headcount} staffed"
+                    - if position.production_day
+                      %div.text-muted.small= position.production_day.display_name
                     - if position.compensation_range.present?
                       %div.text-muted.small= "#{position.compensation_range} #{position.pay_period&.humanize&.downcase}".strip
                     - if position.description.present?

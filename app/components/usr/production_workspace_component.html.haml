@@ -1,0 +1,91 @@
+.d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Production Workspace
+    %p.text-muted.mb-0= @job.title
+  .d-flex.flex-wrap.gap-2
+    = link_to "Show Brief", usr_job_brief_path(@job), class: "btn btn-primary"
+    = link_to "Staffing Board", usr_company_staffing_path(@job.company, from: @job.starts_at&.to_date || Date.current), class: "btn btn-outline-primary"
+    - if @job.multi_position?
+      = link_to "Manage Crew", usr_job_crew_path(@job), class: "btn btn-outline-primary"
+    = link_to "Back To Gig", usr_job_path(@job), class: "btn btn-quiet"
+- if @job.errors.any?
+  .alert.alert-danger{ role: "alert" }= @job.errors.full_messages.to_sentence
+.row.g-4
+  .col-12.col-xl-8
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h2.h5.fw-bold.mb-3 Venue & Show Information
+        %p.small.text-muted Shared with confirmed crew in the show brief. Keep company-private notes in your roster instead.
+        = form_with model: @job, url: usr_job_production_path(@job), builder: ActionView::Helpers::FormBuilder do |form|
+          = turbo_frame_tag "venue_picker_#{@job.id}", class: "d-block mb-3" do
+            = form.label :venue_id, "Saved venue", class: "form-label"
+            = form.collection_select :venue_id, @venues, :id, :name, { include_blank: "Use posting location" }, class: "form-select"
+            .d-flex.flex-wrap.gap-3.mt-2
+              = link_to "Manage Venues & Contacts (New Tab)", usr_company_venues_path(@job.company), class: "small", target: "_blank", rel: "noopener"
+              = link_to "Refresh Venue List", usr_job_production_path(@job), class: "small", data: { turbo_frame: "venue_picker_#{@job.id}" }
+            %p.form-text.mb-0 After adding a venue, refresh this list. Your other unsaved show details stay here.
+          .row.g-3.mb-3
+            .col-12.col-md-4
+              = form.label :production_contact_name, "Production contact", class: "form-label"
+              = form.text_field :production_contact_name, class: "form-control"
+            .col-12.col-md-4
+              = form.label :production_contact_email, "Contact email", class: "form-label"
+              = form.email_field :production_contact_email, class: "form-control"
+            .col-12.col-md-4
+              = form.label :production_contact_phone, "Contact phone", class: "form-label"
+              = form.telephone_field :production_contact_phone, class: "form-control"
+          .mb-3
+            = form.label :briefing_notes, "Show notes / instructions", class: "form-label"
+            = form.text_area :briefing_notes, rows: 4, maxlength: 8000, placeholder: "Arrival instructions, attire, meals, safety briefing, and other details the crew should know", class: "form-control"
+          = form.submit "Save Show Information", class: "btn btn-primary"
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h2.h5.fw-bold.mb-2 Production Schedule
+        %p.small.text-muted Add load-in, show, load-out, travel or off days. Times are optional and use #{Time.zone.name}. Accepted offer times remain the agreed booking terms.
+        - schedule_items.each do |day|
+          %details.schedule-editor.border.rounded-3.p-3.mb-3{ open: day.new_record? || day.errors.any? }
+            %summary
+              %span.fw-semibold= day.persisted? ? day.display_name : "Add Schedule Item"
+              - if day.persisted?
+                %span.small.text-muted.d-block.mt-1= schedule_time(day)
+            - if day.errors.any?
+              .alert.alert-danger.mt-3{ role: "alert" }= day.errors.full_messages.to_sentence
+            = form_with model: day, url: schedule_url(day), namespace: "day_#{day.id || 'new'}", class: "mt-3", builder: ActionView::Helpers::FormBuilder do |form|
+              .row.g-3
+                .col-12.col-md-6
+                  = form.label :date, "Date", class: "form-label"
+                  = form.date_field :date, required: true, min: @job.starts_at&.to_date, max: @job.ends_at&.to_date, class: "form-control"
+                .col-12.col-md-6
+                  = form.label :day_type, "Day / phase", class: "form-label"
+                  = form.select :day_type, day_types, {}, class: "form-select"
+                .col-12
+                  = form.label :label, "Label (optional)", class: "form-label"
+                  = form.text_field :label, placeholder: "e.g. Main stage or travel to next city", class: "form-control"
+                .col-md-6
+                  = form.label :starts_at, "Starts (optional)", class: "form-label"
+                  = form.datetime_local_field :starts_at, class: "form-control"
+                .col-md-6
+                  = form.label :ends_at, "Ends (optional)", class: "form-label"
+                  = form.datetime_local_field :ends_at, class: "form-control"
+                .col-12
+                  = form.label :notes, "Schedule notes", class: "form-label"
+                  = form.text_area :notes, rows: 2, class: "form-control"
+              = form.submit day.persisted? ? "Save Schedule Item" : "Add Schedule Item", class: "btn btn-outline-primary mt-3"
+            - if day.persisted?
+              = button_to "Remove Item", usr_job_production_day_path(@job, day), method: :delete, class: "btn btn-sm btn-quiet mt-2", form: { data: { turbo_confirm: "Remove this schedule item? Accepted booking times will remain unchanged." } }
+  .col-12.col-xl-4
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h2.h5.fw-bold.mb-2 Reuse This Setup
+        %p.small.text-muted Copy the setup to your next gig, or save a named template for future use. Bookings and applicants stay with this gig.
+        = link_to "Duplicate Gig", new_usr_company_gig_reuse_path(@job.company, source_job_id: @job.id), class: "btn btn-outline-primary mb-4"
+        = form_with url: usr_company_gig_templates_path(@job.company), builder: ActionView::Helpers::FormBuilder do |form|
+          = hidden_field_tag :source_job_id, @job.id
+          = form.label :name, "Template name", class: "form-label"
+          = form.text_field :name, required: true, maxlength: 150, placeholder: "e.g. Three-piece touring crew", class: "form-control mb-3"
+          = form.submit "Save As Template", class: "btn btn-primary"
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h2.h5.fw-bold.mb-2 Documents
+        %p.small.text-muted Uploaded agreements, stage plots and reference files are included as private download links in the brief.
+        = link_to "Manage Gig Documents", usr_job_path(@job, anchor: "job-contracts"), class: "btn btn-outline-primary"

@@ -40,6 +40,10 @@ class IssueJobOffer
     end
 
     offer = application.job_offers.build(attributes.merge(profile: application.profile, sender:, crew_position: position))
+    offer.assign_attributes(OfferShowSchedule.new(job: application.job, starts_at: offer.starts_at, ends_at: offer.ends_at).attributes)
+    if !application.job.independent? && offer.work_dates.empty?
+      return failure("Offer dates must include at least one of this role’s selected shows.", offer)
+    end
     return failure(offer.errors.full_messages.to_sentence, offer) unless offer.valid?
 
     application.job_offers.pending.each do |previous|

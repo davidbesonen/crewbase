@@ -13,4 +13,9 @@ class BrandIdentityTest < ActiveSupport::TestCase
     assert_equal "signal", BrandIdentity.concept("signal").key
     assert_equal "momentum", BrandIdentity.concept("momentum").key
   end
+
+  test "icon updates invalidate cached browser and home screen artwork" do
+    assert_equal "/brand/knowshow-drive-icon.svg?v=2", BrandIdentity.icon_path
+    assert_equal "/brand/knowshow-drive-icon.png?v=2", BrandIdentity.icon_path("png")
+  end
 end

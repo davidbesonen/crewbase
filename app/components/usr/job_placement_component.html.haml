@@ -1,0 +1,32 @@
+.staffing-form.staffing-form--project
+  %p.small.text-muted.mb-2= @company.name
+  %h1.fw-bold.mb-2 Post A Job
+  %p.text-muted.mb-4 First, choose where this role belongs. Tours, festivals and multi-show events start as Projects; one-off gigs can stand on their own.
+  = form_with url: usr_company_job_placement_path(@company), scope: :placement, builder: ActionView::Helpers::FormBuilder, data: { controller: "job-placement" } do |form|
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %fieldset
+          %legend.h5.fw-semibold.mb-3 Where Does This Job Belong?
+          .d-grid.gap-3
+            - choices.each do |key, title, hint, icon|
+              %div
+                %label.staffing-choice{ for: "placement_kind_#{key}" }
+                  = form.radio_button :kind, key, checked: @values["kind"] == key, required: true, class: "form-check-input", data: { action: "job-placement#update" }
+                  %span.staffing-choice__icon
+                    %i.bi{ class: "bi-#{icon}", aria: { hidden: true } }
+                  %span
+                    %span.d-block.fw-semibold.mb-1= title
+                    %span.d-block.small.text-muted= hint
+                - if key == "gig"
+                  .mt-3{ data: { job_placement_target: "gig" } }
+                    = form.label :job_id, "Existing Gig", class: "form-label"
+                    = form.select :job_id, @gigs.map { |gig| [gig.title, gig.id] }, { prompt: "Choose a gig", selected: @values["job_id"] }, class: "form-select"
+                    = link_to "Set Up A New Gig Instead", usr_new_staffing_start_path(company_id: @company.id, kind: "single"), class: "small d-inline-block mt-2"
+                - elsif key == "project"
+                  .mt-3{ data: { job_placement_target: "project" } }
+                    = form.label :project_id, "Tour / Festival Project", class: "form-label"
+                    = form.select :project_id, @projects.map { |project| [project.name, project.id] }, { prompt: "Choose a project", selected: @values["project_id"] }, class: "form-select"
+                    = link_to "Start A New Tour / Festival Project", new_usr_company_project_path(@company), class: "small d-inline-block mt-2"
+    .staffing-form__actions.mt-4
+      = link_to "Back To Company", usr_company_path(@company), class: "btn btn-quiet"
+      = form.submit "Continue", class: "btn btn-primary"

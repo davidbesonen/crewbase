@@ -1,3 +1,12 @@
+- if @job.invite_only?
+  .alert.alert-info{ role: "status" } Invite-only gig. This production is hidden from public search.
+- if @job.editable_by?(current_user)
+  .d-flex.flex-wrap.gap-2.mb-4
+    = link_to "Production Workspace", usr_job_production_path(@job), class: "btn btn-primary"
+    = link_to "Show Brief", usr_job_brief_path(@job), class: "btn btn-outline-primary"
+    = link_to "Duplicate Gig", new_usr_company_gig_reuse_path(@job.company, source_job_id: @job.id), class: "btn btn-quiet"
+- elsif @job.hired?(current_user)
+  .mb-4= link_to "Show Brief", usr_job_brief_path(@job), class: "btn btn-primary"
 - if @job.on_hold?
   .alert.alert-warning{ role: "status" }
     %strong This posting is on an administrative hold.
@@ -177,7 +186,7 @@
         - else
           %p.text-muted.mb-0 This job is not currently attached to a company profile.
 
-    - if @job.editable_by?(current_user) && @job.accepting_applications?
+    - if @job.editable_by?(current_user) && @job.invitable?
       .card.border-0.shadow-sm.mt-4.card-accent.card-accent-cyan{ data: { job_invitation_tools: true } }
         .card-body.p-4
           %h5.fw-semibold.mb-2 Invite Someone
@@ -186,9 +195,10 @@
             .input-group
               = form.email_field :email, class: "form-control", required: true, placeholder: "person@example.com", aria: { label: "Email address" }, styled: true
               = form.submit "Send invitation", class: "btn btn-primary"
-          .input-group{ data: { controller: "clipboard" } }
-            = text_field_tag :public_job_posting_url, public_job_posting_url(@job), class: "form-control", readonly: true, data: { clipboard_target: "source" }, aria: { label: "Public posting link" }
-            %button.btn.btn-outline-primary{ type: "button", data: { action: "clipboard#copy", clipboard_target: "button" } } Copy link
+          - if @job.public_listing?
+            .input-group{ data: { controller: "clipboard" } }
+              = text_field_tag :public_job_posting_url, public_job_posting_url(@job), class: "form-control", readonly: true, data: { clipboard_target: "source" }, aria: { label: "Public posting link" }
+              %button.btn.btn-outline-primary{ type: "button", data: { action: "clipboard#copy", clipboard_target: "button" } } Copy link
 
 = render Usr::JobCrewRecommendationsComponent.new(results: @crew_recommendations, profiles_path: @crew_recommendations_path)
 

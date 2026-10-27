@@ -67,7 +67,7 @@ class JobInvitation < ApplicationRecord
   end
 
   def job_must_be_invitable
-    return if job&.publicly_visible?
+    return if job&.invitable?
 
     errors.add(:job, "must be an active published job")
   end

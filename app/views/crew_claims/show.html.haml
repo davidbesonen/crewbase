@@ -1,0 +1,36 @@
+.container.py-5
+  .row.justify-content-center
+    .col-12.col-md-8.col-lg-6
+      .card.border-0.shadow-sm
+        .card-body.p-4.p-lg-5
+          %h1.h3.fw-bold.mb-3 Your Crew Profile Is Started
+          %p #{@member.company.name} invited #{@member.full_name} to KnowShow. Review your imported details and finish setting up your own profile.
+          %p.small.text-muted Company notes and their working history with you remain private. Claiming this profile does not accept any job or booking.
+          - if current_user
+            %p Signed in as #{current_user.email}.
+            - if @matching_account
+              = button_to "Claim And Complete My Profile", crew_claim_path(params[:token]), method: :post, class: "btn btn-primary w-100"
+            - else
+              .alert.alert-warning{ role: "alert" } You are signed in to a different account. Use the email address this invitation was sent to before claiming this profile.
+              = button_to "Use A Different Account", switch_account_crew_claim_path(params[:token]), method: :post, class: "btn btn-primary w-100"
+          - else
+            %h2.h5.mt-4 Create Your Account
+            = form_with scope: :user, url: user_registration_path do |form|
+              .row.g-3
+                .col-sm-6
+                  = form.label :first_name, "First name", class: "form-label"
+                  = form.text_field :first_name, value: @member.first_name, required: true, autocomplete: "given-name", class: "form-control", styled: true
+                .col-sm-6
+                  = form.label :last_name, "Last name", class: "form-label"
+                  = form.text_field :last_name, value: @member.last_name, required: true, autocomplete: "family-name", class: "form-control", styled: true
+                .col-12
+                  = form.label :email, "Email", class: "form-label"
+                  = form.email_field :email, value: @member.email, required: true, autocomplete: "email", class: "form-control", styled: true
+                .col-12
+                  = form.label :password, "Password (6 characters minimum)", class: "form-label"
+                  = form.password_field :password, required: true, minlength: 6, autocomplete: "new-password", class: "form-control", styled: true
+                .col-12
+                  = form.label :password_confirmation, "Confirm password", class: "form-label"
+                  = form.password_field :password_confirmation, required: true, minlength: 6, autocomplete: "new-password", class: "form-control", styled: true
+                .col-12= form.submit "Create Account", class: "btn btn-primary w-100"
+            = link_to "Already have an account? Sign in", new_user_session_path, class: "d-block mt-3"

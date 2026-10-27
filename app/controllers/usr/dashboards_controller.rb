@@ -88,7 +88,7 @@ class Usr::DashboardsController < ApplicationController
 
   def post_job_path
     return select_company_usr_jobs_path if @owned_companies.many?
-    return new_usr_company_job_path(@owned_companies.first) if @owned_companies.one?
+    return new_usr_company_job_placement_path(@owned_companies.first) if @owned_companies.one?
 
     new_usr_company_path
   end

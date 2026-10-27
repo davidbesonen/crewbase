@@ -1,4 +1,6 @@
 namespace :usr do
+  get "staff-a-gig", to: "staffing_starts#new", as: :new_staffing_start
+  post "staff-a-gig", to: "staffing_starts#create", as: :staffing_start
   resource :onboarding, only: [ :show, :update ], controller: "onboarding"
   resources :recommendation_feedback, only: :index
   resources :reports, only: [ :index, :new, :create ]
@@ -23,6 +25,10 @@ namespace :usr do
     get :my_postings, on: :collection
     resource :saved_job, only: [ :create, :destroy ]
     resource :crew, only: :show, controller: "job_crews"
+    resource :production, only: [ :show, :update ], controller: "job_productions"
+    resource :brief, only: :show, controller: "job_briefs"
+    resources :production_days, only: [ :create, :update, :destroy ], shallow: false
+    resources :crew_holds, only: [ :create, :destroy ], shallow: false
     resources :crew_positions, only: :create
     resources :job_invitations, only: :create
     resources :contracts, only: [ :create, :destroy ], controller: "job_contracts" do
@@ -31,10 +37,14 @@ namespace :usr do
   end
   resources :crew_positions, only: :destroy do
     resources :crew_assignments, only: :create
+    resources :crew_holds, only: [ :create, :destroy ]
   end
   resources :crew_assignments, only: [ :update, :destroy ]
   resources :saved_jobs, only: [ :index ]
   resources :projects, only: [ :show, :edit, :update, :destroy ] do
+    resources :project_shows, except: [ :index, :show ]
+    resources :crew_plans, only: [ :new, :create ], controller: "project_crew_plans"
+    resource :tour_stops, only: [ :new, :create ], controller: "tour_stops"
     get :select_company, on: :collection
     patch :archive, on: :member
     patch :restore, action: :unarchive, on: :member
@@ -68,7 +78,18 @@ namespace :usr do
     get :next_form, on: :collection, defaults: { format: :turbo_stream }
     get :previous_form, on: :collection, defaults: { format: :turbo_stream }
     get :search, on: :collection, defaults: { format: :json }
+    resource :job_placement, only: [ :new, :create ], controller: "job_placements"
     resource :manager, only: :show, controller: "company_managers"
+    resource :staffing, only: :show, controller: "company_staffing"
+    resources :gig_reuses, only: [ :new, :create ]
+    resources :gig_templates, only: [ :index, :create, :destroy ], shallow: false
+    resources :venues, except: :show, shallow: false
+    resources :crew_members, shallow: false do
+      post :invitation, on: :member
+    end
+    resources :crew_imports, only: [ :new, :create, :show, :update ], shallow: false do
+      get :template, on: :collection
+    end
     resource :plan, only: :show, controller: "company_plans"
     resource :billing_checkout, only: :create, controller: "company_billing_checkouts"
     resource :billing_portal, only: :create, controller: "company_billing_portals"

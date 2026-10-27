@@ -21,9 +21,14 @@ class Marketing::HomepageComponentTest < ViewComponent::TestCase
     assert_selector ".marketing-footer__brand", text: "Know your gigs. Own the show."
     assert_selector "#how-it-works article", count: 3
     assert_selector "#how-it-works h3", text: "Confirm Bookings Together"
+    assert_selector "#tour-staffing article", count: 4
+    assert_selector "#tour-staffing", text: /start as Projects/
+    assert_selector "#tour-staffing", text: /tentative until the worker accepts/
     assert_selector "#for-crew .marketing-feature", count: 3
     assert_selector "#for-crew h2", text: "Looking For Your Next Gig?"
     assert_selector "#for-companies .marketing-feature", count: 3
+    assert_selector "#for-companies", text: /crew spreadsheet/
+    assert_selector "#for-companies", text: /show brief/
     assert_selector "#pricing .marketing-price-card", count: 2
     assert_selector "#pricing", text: /Start Staffing Free/
     assert_selector "#pricing", text: /\$19/

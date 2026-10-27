@@ -54,6 +54,9 @@ gem "simple_form"
 # Files
 gem "shrine"
 gem "aws-sdk-s3", require: false
+gem "roo", "~> 2.10"
+gem "caxlsx", "~> 4.1"
+gem "csv"
 
 # User authentication and management
 gem "devise"

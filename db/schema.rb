@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_201000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -225,6 +225,60 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.index ["profile_id"], name: "index_crew_assignments_on_profile_id"
   end
 
+  create_table "crew_holds", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "crew_member_id", null: false
+    t.bigint "crew_position_id"
+    t.bigint "job_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["crew_member_id"], name: "index_crew_holds_on_crew_member_id"
+    t.index ["crew_position_id", "crew_member_id"], name: "index_crew_holds_on_crew_position_id_and_crew_member_id", unique: true
+    t.index ["crew_position_id"], name: "index_crew_holds_on_crew_position_id"
+    t.index ["job_id", "crew_member_id"], name: "index_crew_holds_on_job_id_and_crew_member_id", unique: true, where: "(crew_position_id IS NULL)"
+    t.index ["job_id"], name: "index_crew_holds_on_job_id"
+  end
+
+  create_table "crew_imports", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "imported_at"
+    t.integer "imported_count", default: 0, null: false
+    t.jsonb "rows", default: [], null: false
+    t.datetime "updated_at", null: false
+    t.bigint "uploaded_by_id", null: false
+    t.index ["company_id"], name: "index_crew_imports_on_company_id"
+    t.index ["uploaded_by_id"], name: "index_crew_imports_on_uploaded_by_id"
+  end
+
+  create_table "crew_members", force: :cascade do |t|
+    t.string "city"
+    t.datetime "claimed_at"
+    t.bigint "company_id", null: false
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.string "department"
+    t.string "email"
+    t.text "equipment_text"
+    t.string "first_name", null: false
+    t.string "invitation_nonce"
+    t.string "last_name", null: false
+    t.text "notes"
+    t.string "phone"
+    t.string "phone_key"
+    t.bigint "profile_id"
+    t.string "role"
+    t.text "skills_text"
+    t.string "state"
+    t.datetime "updated_at", null: false
+    t.decimal "years_experience", precision: 4, scale: 1
+    t.decimal "years_with_company", precision: 4, scale: 1
+    t.index ["company_id", "email"], name: "index_crew_members_on_company_id_and_email", unique: true, where: "(email IS NOT NULL)"
+    t.index ["company_id", "phone_key"], name: "index_crew_members_on_company_id_and_phone_key", unique: true, where: "(phone_key IS NOT NULL)"
+    t.index ["company_id", "profile_id"], name: "index_crew_members_on_company_id_and_profile_id", unique: true, where: "(profile_id IS NOT NULL)"
+    t.index ["company_id"], name: "index_crew_members_on_company_id"
+    t.index ["profile_id"], name: "index_crew_members_on_profile_id"
+  end
+
   create_table "crew_positions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -233,9 +287,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.float "pay_max"
     t.float "pay_min"
     t.integer "pay_period"
+    t.bigint "production_day_id"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["job_id"], name: "index_crew_positions_on_job_id"
+    t.index ["production_day_id"], name: "index_crew_positions_on_production_day_id"
   end
 
   create_table "crew_shortlist_memberships", force: :cascade do |t|
@@ -290,6 +346,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["profile_id"], name: "index_experiences_on_profile_id"
+  end
+
+  create_table "gig_templates", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.jsonb "setup", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_gig_templates_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_gig_templates_on_company_id"
   end
 
   create_table "industries", force: :cascade do |t|
@@ -369,10 +435,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.datetime "responded_at"
     t.string "role", null: false
     t.bigint "sender_id", null: false
+    t.jsonb "show_itinerary", default: [], null: false
     t.datetime "starts_at", null: false
     t.integer "status", default: 0, null: false
     t.text "terms"
     t.datetime "updated_at", null: false
+    t.date "work_dates", default: [], null: false, array: true
     t.index ["cancelled_by_id"], name: "index_job_offers_on_cancelled_by_id"
     t.index ["crew_position_id"], name: "index_job_offers_on_crew_position_id"
     t.index ["job_application_id"], name: "index_job_offers_on_job_application_id"
@@ -394,13 +462,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.index ["job_id"], name: "index_job_requirements_on_job_id"
     t.index ["requirement_type", "requirement_id"], name: "index_job_requirements_on_requirement"
     t.check_constraint "importance = ANY (ARRAY[0, 1])", name: "job_requirements_valid_importance"
-    t.check_constraint "requirement_type::text = ANY (ARRAY['Occupation'::character varying::text, 'Skill'::character varying::text, 'Equipment'::character varying::text])", name: "job_requirements_supported_requirement_type"
+    t.check_constraint "requirement_type::text = ANY (ARRAY['Occupation'::character varying, 'Skill'::character varying, 'Equipment'::character varying]::text[])", name: "job_requirements_supported_requirement_type"
     t.check_constraint "source = ANY (ARRAY[0, 1])", name: "job_requirements_valid_source"
+  end
+
+  create_table "job_shows", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "job_id", null: false
+    t.bigint "project_show_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id", "project_show_id"], name: "index_job_shows_on_job_id_and_project_show_id", unique: true
+    t.index ["job_id"], name: "index_job_shows_on_job_id"
+    t.index ["project_show_id"], name: "index_job_shows_on_project_show_id"
   end
 
   create_table "jobs", force: :cascade do |t|
     t.datetime "application_deadline"
     t.datetime "archived_at"
+    t.integer "audience", default: 0, null: false
+    t.text "briefing_notes"
     t.datetime "closed_at"
     t.integer "company_id"
     t.datetime "completed_at"
@@ -420,6 +500,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.string "preferred_equipment_family_keys", default: [], null: false, array: true
     t.text "preferred_equipment_text"
     t.text "preferred_skills_text"
+    t.string "production_contact_email"
+    t.string "production_contact_name"
+    t.string "production_contact_phone"
     t.bigint "project_id"
     t.datetime "published_at"
     t.jsonb "questions", default: []
@@ -430,15 +513,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.boolean "requires_travel"
     t.datetime "restricted_at"
     t.boolean "schedule_has_times", default: true, null: false
+    t.integer "show_coverage", default: 0, null: false
     t.datetime "starts_at"
     t.integer "status", default: 1
     t.string "title"
     t.datetime "updated_at", null: false
+    t.bigint "venue_id"
     t.date "work_dates", default: [], null: false, array: true
     t.integer "workplace_type"
     t.index ["project_id"], name: "index_jobs_on_project_id"
     t.index ["restricted_at"], name: "index_jobs_on_restricted_at"
     t.index ["title"], name: "index_jobs_on_title_trigram", opclass: :gin_trgm_ops, using: :gin
+    t.index ["venue_id"], name: "index_jobs_on_venue_id"
   end
 
   create_table "location_assignments", force: :cascade do |t|
@@ -586,6 +672,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.index ["user_id"], name: "index_product_events_on_user_id"
   end
 
+  create_table "production_days", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.integer "day_type", default: 1, null: false
+    t.datetime "ends_at"
+    t.bigint "job_id", null: false
+    t.string "label"
+    t.text "notes"
+    t.datetime "starts_at"
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_production_days_on_job_id"
+  end
+
   create_table "profiles", force: :cascade do |t|
     t.text "bio"
     t.string "capability_keys", default: [], null: false, array: true
@@ -613,6 +712,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.text "work_examples"
   end
 
+  create_table "project_shows", force: :cascade do |t|
+    t.string "city", null: false
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.date "ends_on"
+    t.string "name", null: false
+    t.bigint "project_id", null: false
+    t.date "starts_on", null: false
+    t.string "state"
+    t.datetime "updated_at", null: false
+    t.string "venue_name"
+    t.index ["project_id", "starts_on"], name: "index_project_shows_on_project_id_and_starts_on"
+    t.index ["project_id"], name: "index_project_shows_on_project_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.datetime "archived_at"
     t.bigint "company_id", null: false
@@ -620,6 +734,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.text "description"
     t.date "ends_on"
     t.string "name", null: false
+    t.integer "project_type", default: 0, null: false
     t.date "starts_on"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
@@ -788,6 +903,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
     t.index ["restricted_at"], name: "index_users_on_restricted_at"
   end
 
+  create_table "venues", force: :cascade do |t|
+    t.string "address"
+    t.string "city"
+    t.bigint "company_id", null: false
+    t.string "contact_email"
+    t.string "contact_name"
+    t.string "contact_phone"
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.text "load_in_notes"
+    t.string "name", null: false
+    t.text "parking_notes"
+    t.string "postal_code"
+    t.string "state"
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_venues_on_company_id"
+  end
+
   create_table "visits", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.inet "sign_in_ip"
@@ -810,11 +943,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
   add_foreign_key "crew_assignments", "crew_positions"
   add_foreign_key "crew_assignments", "job_offers"
   add_foreign_key "crew_assignments", "profiles"
+  add_foreign_key "crew_holds", "crew_members"
+  add_foreign_key "crew_holds", "crew_positions"
+  add_foreign_key "crew_holds", "jobs"
+  add_foreign_key "crew_imports", "companies"
+  add_foreign_key "crew_imports", "users", column: "uploaded_by_id"
+  add_foreign_key "crew_members", "companies"
+  add_foreign_key "crew_members", "profiles"
   add_foreign_key "crew_positions", "jobs"
+  add_foreign_key "crew_positions", "production_days"
   add_foreign_key "crew_shortlist_memberships", "crew_shortlists"
   add_foreign_key "crew_shortlist_memberships", "profiles"
   add_foreign_key "crew_shortlists", "companies"
   add_foreign_key "crew_shortlists", "users", column: "created_by_id"
+  add_foreign_key "gig_templates", "companies"
   add_foreign_key "industry_assignments", "industries"
   add_foreign_key "job_contracts", "jobs"
   add_foreign_key "job_contracts", "users", column: "uploaded_by_id"
@@ -827,7 +969,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
   add_foreign_key "job_offers", "users", column: "cancelled_by_id"
   add_foreign_key "job_offers", "users", column: "sender_id"
   add_foreign_key "job_requirements", "jobs"
+  add_foreign_key "job_shows", "jobs"
+  add_foreign_key "job_shows", "project_shows"
   add_foreign_key "jobs", "projects"
+  add_foreign_key "jobs", "venues"
   add_foreign_key "moderation_decisions", "safety_reports"
   add_foreign_key "moderation_decisions", "users", column: "moderator_id"
   add_foreign_key "network_connections", "users", column: "recipient_id"
@@ -840,6 +985,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
   add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "product_events", "jobs"
   add_foreign_key "product_events", "users"
+  add_foreign_key "production_days", "jobs"
+  add_foreign_key "project_shows", "projects"
   add_foreign_key "projects", "companies"
   add_foreign_key "recommendation_feedbacks", "jobs"
   add_foreign_key "recommendation_feedbacks", "users"
@@ -850,4 +997,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
   add_foreign_key "user_blocks", "users", column: "blocker_id"
   add_foreign_key "user_subscriptions", "user_plans"
   add_foreign_key "user_subscriptions", "users"
+  add_foreign_key "venues", "companies"
 end

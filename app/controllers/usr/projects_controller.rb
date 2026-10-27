@@ -9,15 +9,17 @@ class Usr::ProjectsController < ApplicationController
   end
 
   def show
-    @jobs = @project.jobs.includes(:locations, :job_applications).order(created_at: :desc)
+    @overview = ProjectStaffingOverview.new(project: @project)
+    @jobs = @overview.jobs
+    @workspace_view = params[:view].presence_in(%w[shows roles crew]) || (@project.multi_show? ? "shows" : "roles")
   end
 
   def new
-    @project = @company.projects.new
+    @project = @company.projects.new(project_type: :multi_show)
   end
 
   def create
-    @project = @company.projects.new(project_params)
+    @project = @company.projects.new(project_params.merge(project_type: :multi_show))
 
     unless active_project_capacity_available?(@project)
       @project.errors.add(:base, active_project_limit_message)
@@ -25,7 +27,11 @@ class Usr::ProjectsController < ApplicationController
     end
 
     if @project.save
-      destination = params[:next_step] == "post_job" ? new_usr_company_job_path(@company, project_id: @project.id) : usr_project_path(@project)
+      destination = case params[:next_step]
+      when "post_job" then new_usr_company_job_path(@company, project_id: @project.id)
+      when "add_shows" then new_usr_project_project_show_path(@project)
+      else usr_project_path(@project)
+      end
       redirect_to destination, notice: "Project created successfully."
     else
       render :new, status: :unprocessable_entity
@@ -52,7 +58,7 @@ class Usr::ProjectsController < ApplicationController
 
   def destroy
     company = @project.company
-    @project.destroy!
+    RemoveProject.new(project: @project).call
     redirect_to usr_company_projects_path(company), notice: "Project deleted successfully."
   end
 
@@ -99,16 +105,16 @@ class Usr::ProjectsController < ApplicationController
   end
 
   def active_project_capacity_available?(project)
-    return true unless project.status.in?(%w[planning active]) && capacity_enforced?
-
-    @entitlement.within_limit?(:active_projects)
+    !project.status.in?(%w[planning active]) || project_capacity.available?
   end
 
   def capacity_enforced?
-    @entitlement.current_plan&.data&.key?("projects_limit")
+    project_capacity.enforced?
   end
 
   def active_project_limit_message
-    "#{@entitlement.current_plan.name} plan allows #{@entitlement.limit(:active_projects)} active projects. Archive or complete a project, or upgrade your plan."
+    project_capacity.message
   end
+
+  def project_capacity = @project_capacity ||= CompanyProjectCapacity.new(company: @company)
 end

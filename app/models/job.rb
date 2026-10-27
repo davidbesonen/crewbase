@@ -12,6 +12,19 @@ class Job < ApplicationRecord
 
   belongs_to :company, optional: true
   belongs_to :project, optional: true
+  has_many :job_shows, dependent: :destroy
+  has_many :project_shows, through: :job_shows
+  enum :show_coverage, { independent: 0, all_shows: 1, selected_shows: 2 }, validate: true
+  belongs_to :venue, optional: true
+  has_many :production_days, dependent: :destroy
+  has_many :crew_holds, dependent: :destroy
+  enum :audience, { public_listing: 0, invite_only: 1 }
+  validates :briefing_notes, length: { maximum: 8000 }
+  validates :production_contact_name, :production_contact_phone, length: { maximum: 255 }
+  validates :production_contact_email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validate do
+    errors.add(:venue, "must belong to this company") if venue && venue.company_id != company_id
+  end
 
   has_many :job_applications, dependent: :destroy
   has_many :credits, dependent: :nullify
@@ -114,10 +127,11 @@ class Job < ApplicationRecord
 
   scope :not_moderated, -> { where(restricted_at: nil, company_id: Company.where(restricted_at: nil).select(:id)) }
 
-  scope :accepting_applications, lambda {
+  scope :open_for_invitations, lambda {
     not_moderated.not_ended.where(is_active: true, status: :published)
       .where("application_deadline IS NULL OR application_deadline >= ?", Time.current)
   }
+  scope :accepting_applications, -> { open_for_invitations.public_listing }
 
   scope :upcoming, lambda {
     accepting_applications
@@ -126,11 +140,19 @@ class Job < ApplicationRecord
   }
 
   def accepting_applications?
-    publicly_visible? && !conversation_archived? && (application_deadline.nil? || application_deadline >= Time.current)
+    public_listing? && invitable?
   end
 
   def publicly_visible?
-    is_active? && published? && !on_hold?
+    public_listing? && active_posting?
+  end
+
+  def invitable? = active_posting? && !conversation_archived? && (application_deadline.nil? || application_deadline >= Time.current)
+  def active_posting? = is_active? && published? && !on_hold?
+
+  def invited?(user)
+    return false unless user && invite_only?
+    JobInvitation.received_by(user).where(job_id: id).exists? || job_applications.where(profile_id: user.profiles.select(:id)).exists?
   end
 
   def on_hold?
@@ -236,6 +258,7 @@ class Job < ApplicationRecord
   end
 
   def posting_type_label
+    return "Crew Posting" if multi_position? && project_id?
     multi_position? ? "Multi-position gig" : "Single job posting"
   end
 

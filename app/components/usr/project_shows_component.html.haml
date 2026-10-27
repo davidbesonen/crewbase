@@ -1,0 +1,28 @@
+.card.border-0.shadow-sm{ data: { project_schedule: true } }
+  .card-body.p-4
+    .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+      %div
+        %h2.h5.fw-bold.mb-1 Shows & Cities
+        %p.text-muted.small.mb-0 Add your route, then plan touring roles and local crew around it. A festival can have several stages or days in the same city.
+      = link_to "Add Shows", new_usr_project_project_show_path(@project), class: "btn btn-primary"
+    - if @overview.shows.empty?
+      .empty-state.text-center.py-4
+        %i.bi.bi-calendar-range.fs-1.text-primary{ aria: { hidden: true } }
+        %h3.h5.fw-semibold.mt-3 Add Your First Show
+        %p.text-muted.mb-0 Your Project is the tour or festival. Shows hold its cities and dates; roles describe the crew you need.
+    - else
+      .d-flex.flex-column.gap-3
+        - @overview.shows.each do |show|
+          .border.rounded-3.p-3{ data: { project_show: show.id } }
+            .d-flex.flex-column.flex-lg-row.justify-content-between.gap-3
+              %div
+                %h3.h6.fw-semibold.mb-1= show.name
+                .small.text-muted= [show.city, show.state, show.venue_name].compact_blank.join(" · ")
+                .small.text-muted= [show.starts_on.to_fs(:long), show.ends_on&.to_fs(:long)].compact.uniq.join(" – ")
+                .small.mt-2= coverage(show)
+              .d-flex.flex-wrap.align-items-start.gap-2
+                = link_to "Add Role For This Show", posting_path(show), class: "btn btn-sm btn-outline-primary"
+                = link_to "View Crew", usr_project_path(@project, view: "crew", show_id: show.id), class: "btn btn-sm btn-outline-primary"
+                = link_to "Edit Show", edit_usr_project_project_show_path(@project, show), class: "btn btn-sm btn-quiet"
+                - if @overview.rows_for(show).empty?
+                  = button_to "Remove", usr_project_project_show_path(@project, show), method: :delete, class: "btn btn-sm btn-quiet", form: { data: { turbo_confirm: "Remove this show?" } }

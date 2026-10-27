@@ -26,7 +26,7 @@ class Usr::ProjectJobsControllerTest < ActionDispatch::IntegrationTest
     get new_usr_company_job_path(company, project_id: project.id)
 
     assert_response :success
-    assert_select "select[name='job[project_id]'] option[selected][value='#{project.id}']"
+    assert_select "input[type='hidden'][name='job[project_id]'][value='#{project.id}']"
 
     assert_difference "project.jobs.count", 1 do
       post usr_company_jobs_path(company), params: {

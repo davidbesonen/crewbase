@@ -1,0 +1,4 @@
+= render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :roster, entitlement: @entitlement)
+= render Usr::CrewRosterComponent.new(company: @company, members: @members, query: params[:q])
+- if @pagy.pages > 1
+  .mt-4!= pagy_bootstrap_nav(@pagy)

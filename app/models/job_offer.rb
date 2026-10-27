@@ -41,10 +41,6 @@ class JobOffer < ApplicationRecord
     profile.user_id == user&.id
   end
 
-  def work_dates
-    []
-  end
-
   private
 
   def valid_dates
@@ -58,7 +54,7 @@ class JobOffer < ApplicationRecord
   end
 
   def immutable_terms
-    fields = %w[job_application_id profile_id sender_id crew_position_id role starts_at ends_at rate currency pay_unit terms expires_at]
+    fields = %w[job_application_id profile_id sender_id crew_position_id role starts_at ends_at rate currency pay_unit terms expires_at work_dates show_itinerary]
     errors.add(:base, "Offer terms cannot be edited. Send a new offer for changed terms.") if (changes.keys & fields).any?
   end
 end

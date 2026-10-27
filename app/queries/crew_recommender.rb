@@ -49,7 +49,8 @@ class CrewRecommender
   end
 
   def active_jobs
-    @active_jobs ||= TouringMarketplace.jobs(Job.accepting_applications)
+    owner_private_jobs = Job.open_for_invitations.invite_only.where(company_id: @user.owned_companies.select(:id))
+    @active_jobs ||= TouringMarketplace.jobs(Job.accepting_applications.or(owner_private_jobs))
       .where(id: requested_job_ids)
       .includes(:locations, :rich_text_description, { job_requirements: :requirement }, company: :locations)
       .order(starts_at: :asc, published_at: :desc)

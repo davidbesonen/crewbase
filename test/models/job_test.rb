@@ -39,6 +39,11 @@ class JobTest < ActiveSupport::TestCase
     assert_equal "18:45", job.ends_at.strftime("%H:%M")
   end
 
+  test "project crew postings describe roles instead of another gig" do
+    assert_equal "Crew Posting", Job.new(posting_type: :multi_position, project_id: 123).posting_type_label
+    assert_equal "Multi-position gig", Job.new(posting_type: :multi_position).posting_type_label
+  end
+
   test "requires an owner to choose a posting type" do
     job = build_job(posting_type: nil)
 

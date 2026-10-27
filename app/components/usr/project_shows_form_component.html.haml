@@ -1,0 +1,30 @@
+.staffing-form
+  %p.small.text-muted.mb-2= @project.name
+  %h1.fw-bold.mb-2= @show ? "Edit Show" : "Add Shows & Cities"
+  %p.text-muted.mb-4 Build the schedule first. Shows are dates and places; add the roles and crew separately, for the whole run or selected shows.
+  = form_with url: form_url, method: @show ? :patch : :post, builder: ActionView::Helpers::FormBuilder, data: { controller: "tour-stops" } do |form|
+    .d-flex.flex-column.gap-3{ data: { tour_stops_target: "rows" } }
+      - @rows.each do |row|
+        .card.border-0.shadow-sm{ data: { tour_stop_row: true } }
+          .card-body.p-4
+            .row.g-3
+              - fields.each do |field, (label, placeholder)|
+                .col-12.col-md-6
+                  = label_tag row.id(field), label, class: "form-label"
+                  = text_field_tag row.name(field), row.values[field.to_s], id: row.id(field), class: "form-control", required: field.in?([:name, :city]), maxlength: 150, placeholder: placeholder
+              .col-12.col-md-6
+                = label_tag row.id(:starts_on), "Show Date", class: "form-label"
+                = date_field_tag row.name(:starts_on), row.values["starts_on"], id: row.id(:starts_on), class: "form-control", required: true
+              .col-12.col-md-6
+                = label_tag row.id(:ends_on), "End Date (If Several Days)", class: "form-label"
+                = date_field_tag row.name(:ends_on), row.values["ends_on"], id: row.id(:ends_on), class: "form-control"
+            - unless @show
+              %button.btn.btn-sm.btn-quiet.mt-3{ type: "button", data: { action: "tour-stops#remove" } } Remove Show
+    .staffing-form__actions.mt-4
+      = link_to "Back To Project", usr_project_path(@project), class: "btn btn-quiet"
+      .d-flex.flex-wrap.gap-2
+        - unless @show
+          %button.btn.btn-outline-primary{ type: "button", data: { action: "tour-stops#add" } }
+            %i.bi.bi-plus-lg.me-1{ aria: { hidden: true } }
+            Add Another Show
+        = form.submit @show ? "Save Show" : "Save Shows", class: "btn btn-primary"

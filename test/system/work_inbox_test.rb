@@ -38,7 +38,7 @@ class WorkInboxTest < ApplicationSystemTestCase
     click_link "View booking"
     assert_selector "a[href='#{calendar_usr_job_offer_path(confirmed)}'][data-turbo='false']", text: "Add to calendar"
     assert_no_selector "textarea[name='reason']", visible: true
-    find("summary", text: "Cancel this booking").click
+    find("summary", text: "Cancel This Booking").click
     assert_field "Cancellation reason"
 
     visit usr_job_offers_path

@@ -1,4 +1,9 @@
 class CrewPosition < ApplicationRecord
+  belongs_to :production_day, optional: true
+  has_many :crew_holds, dependent: :destroy
+  validate do
+    errors.add(:production_day, "must belong to this gig") if production_day && production_day.job_id != job_id
+  end
   include Compensated
 
   belongs_to :job

@@ -25,3 +25,40 @@
   .staffing-form__actions > .d-flex { width: 100%; }
   .staffing-form__actions > .d-flex > .btn { flex: 1; }
 }
+
+.staffing-choice {
+  display: grid;
+  grid-template-columns: auto 2.75rem minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: .9rem;
+  cursor: pointer;
+  background: var(--bs-body-bg);
+
+  .form-check-input { margin-top: .35rem; }
+  &:hover { border-color: rgba(var(--bs-primary-rgb), .55); }
+  &:has(input:checked) {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 1px var(--bs-primary);
+    background: rgba(var(--bs-primary-rgb), .04);
+  }
+  &:focus-within { outline: 2px solid var(--bs-primary); outline-offset: 3px; }
+}
+
+.staffing-choice__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: .75rem;
+  color: var(--bs-primary);
+  background: rgba(var(--bs-primary-rgb), .1);
+  font-size: 1.25rem;
+}
+
+@media (max-width: 575.98px) {
+  .staffing-choice { grid-template-columns: auto minmax(0, 1fr); gap: .75rem; padding: 1rem; }
+  .staffing-choice__icon { display: none; }
+}

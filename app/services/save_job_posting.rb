@@ -1,19 +1,21 @@
 class SaveJobPosting
   LOCATION_FIELDS = %i[address_line_1 address_line_2 city state zip_code country].freeze
 
-  def initialize(job:, actor:, requirements: {}, location: nil, replace_location: false)
+  def initialize(job:, actor:, requirements: {}, location: nil, replace_location: false, show_ids: nil)
     @job = job
     @actor = actor
     @requirements = requirements
     @location = location
     @replace_location = replace_location
+    @show_ids = show_ids
   end
 
   def call
     job.transaction do
       stamp_status
+      ProjectJobSchedule.new(job:, show_ids: @show_ids).call
       job.save!
-      save_location if @replace_location
+      save_location if @replace_location && job.independent?
       JobRequirementsUpdater.new(job:, selections: @requirements).call if @requirements.any?
       JobCompletion.new(job:).call if job.completed?
       ProductEvent.record(user: @actor, name: "job_published", subject: job, event_key: job.id) if job.published?

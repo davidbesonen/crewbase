@@ -17,6 +17,10 @@ class Company < ApplicationRecord
   has_many :credits, dependent: :nullify
   has_many :projects, dependent: :destroy
   has_many :crew_shortlists, dependent: :destroy
+  has_many :crew_members, dependent: :destroy
+  has_many :crew_imports, dependent: :destroy
+  has_many :venues, dependent: :destroy
+  has_many :gig_templates, dependent: :destroy
 
   has_many :location_assignments, as: :locationable, dependent: :destroy
   has_many :locations, through: :location_assignments

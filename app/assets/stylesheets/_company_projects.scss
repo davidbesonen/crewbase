@@ -32,3 +32,32 @@
     overflow-wrap: anywhere;
   }
 }
+
+.project-crew-matrix {
+  max-height: 36rem;
+
+  th, td { min-width: 7rem; padding: 1rem; }
+  th:first-child { min-width: 16rem; }
+  thead th { position: sticky; top: 0; background: var(--bs-body-bg); z-index: 1; }
+}
+
+.project-crew-matrix {
+  th:first-child {
+    position: sticky;
+    left: 0;
+    min-width: 12rem;
+    max-width: 18rem;
+    background: var(--bs-body-bg);
+    z-index: 2;
+  }
+
+  thead th:first-child { z-index: 3; }
+}
+
+@media (max-width: 575px) {
+  .project-summary-metrics {
+    --bs-gutter-x: 0.5rem;
+    .card-body { padding: 0.75rem; }
+    .small { font-size: 0.7rem; }
+  }
+}

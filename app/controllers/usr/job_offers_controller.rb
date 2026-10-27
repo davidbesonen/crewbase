@@ -18,8 +18,12 @@ class Usr::JobOffersController < ApplicationController
 
   def new
     pay_source = @position || @application.job
+    phase = @position&.production_day
     @offer = @application.job_offers.build(role: pay_source.title, starts_at: @application.job.starts_at,
       ends_at: @application.job.ends_at, rate: pay_source.pay_min, currency: "USD", pay_unit: pay_source.pay_period || "daily")
+    @offer.starts_at = phase.starts_at || phase.date.in_time_zone if phase
+    @offer.ends_at = phase.ends_at || phase.date.in_time_zone.end_of_day if phase
+    @offer.assign_attributes(OfferShowSchedule.new(job: @application.job, starts_at: @offer.starts_at, ends_at: @offer.ends_at).attributes)
   end
 
   def create
@@ -54,6 +58,11 @@ class Usr::JobOffersController < ApplicationController
     if params[:job_application_id].present?
       @application = JobApplication.joins(job: :company).where(jobs: { company_id: current_user.owned_companies.select(:id) }).find(params[:job_application_id])
       @position = @application.job.crew_positions.find(params[:crew_position_id]) if params[:crew_position_id].present?
+    elsif params[:job_id].present?
+      job = Job.where(company_id: current_user.owned_companies.select(:id)).find(params[:job_id])
+      @position = job.crew_positions.find(params[:crew_position_id]) if params[:crew_position_id].present?
+      profile = JobCrewCandidateQuery.new(job:, user: current_user).profiles.find(params[:profile_id])
+      @application = job.job_applications.find_or_initialize_by(profile:)
     else
       @position = CrewPosition.joins(job: :company).where(jobs: { company_id: current_user.owned_companies.select(:id) }).find(params[:crew_position_id])
       profile = JobCrewCandidateQuery.new(job: @position.job, user: current_user).profiles.find(params[:profile_id])

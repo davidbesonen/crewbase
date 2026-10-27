@@ -120,6 +120,27 @@ class JobOfferWorkflowTest < ActiveSupport::TestCase
     assert offer.reload.accepted?
   end
 
+  test "show-based offers freeze itinerary and only reserve their actual work dates" do
+    project = @company.projects.create!(name: "October Run", project_type: :multi_show)
+    first = project.project_shows.create!(name: "First", city: "Austin", starts_on: 5.days.from_now.to_date)
+    second = project.project_shows.create!(name: "Second", city: "Dallas", starts_on: 8.days.from_now.to_date)
+    @job.update!(project:, show_coverage: :all_shows)
+    SaveJobPosting.new(job: @job, actor: @owner).call
+    offer = issue(starts_at: @job.starts_at, ends_at: @job.ends_at)
+    assert_equal [ first.starts_on, second.starts_on ], offer.work_dates
+    assert_equal [ "Austin", "Dallas" ], offer.show_itinerary.map { |show| show["city"] }
+    assert respond(offer, "accept").success?
+    calendar = Icalendar::Calendar.parse(BookingCalendar.new(offer:, url: "https://example.com/booking").to_ical).sole
+    assert_equal [ first.starts_on, second.starts_on ], calendar.events.map { |event| event.dtstart.to_date }
+    off_day = Job.new(starts_at: 6.days.from_now.beginning_of_day, ends_at: 6.days.from_now.end_of_day)
+    assert_empty BookingConflicts.new(profile: @worker.user_profile, schedule: off_day).dates
+    agreed_dates = offer.work_dates
+    SaveProjectShows.new(project:, show: second, rows: [ { city: "Fort Worth", starts_on: 9.days.from_now.to_date } ]).call
+    assert_equal agreed_dates, offer.reload.work_dates
+    assert_equal "Dallas", offer.show_itinerary.last["city"]
+    assert_not offer.update(work_dates: [ first.starts_on ])
+  end
+
   private
 
   def issue(**overrides)

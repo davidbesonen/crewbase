@@ -78,7 +78,7 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     uncheck "Allow company editors to edit this job"
     fill_in "City", with: "Chicago"
     select "United States", from: "Country"
-    click_button "Publish job", exact: true
+    click_button "Publish Job", exact: true
     assert_text "Job created successfully!"
     job = company.jobs.find_by!(title: "Browser audio role")
     assert_equal [ occupation.id ], job.required_occupations.ids
@@ -118,7 +118,7 @@ class JobPostingPersistenceTest < ApplicationSystemTestCase
     assert_field "Gig title", with: "Browser multi-position gig"
     fill_in "Gig title", with: "Browser multi-position gig"
     find("trix-editor").set("Staff the stage.")
-    click_button "Publish job", exact: true
+    click_button "Publish Job", exact: true
     assert_text "Job created successfully!"
     gig = company.jobs.find_by!(title: "Browser multi-position gig")
     assert_equal [ [ "Stage Manager", 3 ] ], gig.crew_positions.pluck(:title, :headcount)

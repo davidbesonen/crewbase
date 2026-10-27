@@ -3,3 +3,9 @@
     .col-sm-6
       %div.text-muted.small= entry[:label]
       %div.fw-semibold= entry[:text]
+- if shows.any?
+  .mt-3{ data: { job_show_schedule: true } }
+    %div.text-muted.small Shows & Cities
+    .d-flex.flex-column.gap-1.mt-1
+      - shows.each do |show|
+        .small= show.display_name

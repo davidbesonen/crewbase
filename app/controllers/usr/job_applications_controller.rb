@@ -83,6 +83,9 @@ class Usr::JobApplicationsController < ApplicationController
     @job = Job.includes(:company, :locations).find(params[:job_id])
     raise ActiveRecord::RecordNotFound unless @job.is_active? && @job.published?
     return if @job.accepting_applications?
+    return if @job.invite_only? && @job.invitable? && !@job.conversation_archived? && @job.invited?(current_user) && (@job.application_deadline.nil? || @job.application_deadline >= Time.current)
+
+    raise ActiveRecord::RecordNotFound if @job.invite_only? && !@job.invited?(current_user)
 
     redirect_to usr_job_path(@job), alert: "This job is no longer accepting applications."
   end

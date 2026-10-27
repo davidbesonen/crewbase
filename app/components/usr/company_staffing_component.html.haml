@@ -1,0 +1,100 @@
+.d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Staffing Board
+    %p.text-muted.mb-0 See upcoming gigs, open roles, crew plans and booking replies for #{@company.name}.
+  .d-flex.flex-wrap.gap-2
+    = link_to "Crew Roster", usr_company_crew_members_path(@company), class: "btn btn-outline-primary"
+    = link_to "Create Gig", new_usr_company_job_path(@company, audience: "invite_only"), class: "btn btn-primary"
+.staffing-metrics.mb-4
+  - metrics.each do |key, label|
+    .staffing-metric
+      .small.text-muted= label
+      .fs-4.fw-bold= @summary.fetch(key)
+.card.border-0.shadow-sm.mb-4
+  .card-body
+    %details{ open: params[:q].present? || params[:project_id].present? }
+      %summary.fw-semibold Filter Gigs & Dates
+      = form_with url: usr_company_staffing_path(@company), method: :get, class: "row g-3 align-items-end mt-1" do |form|
+        = hidden_field_tag :project_id, params[:project_id] if params[:project_id].present?
+        .col-12.col-md-3
+          = form.label :from, "Four weeks starting", class: "form-label"
+          = form.date_field :from, value: @board.from, class: "form-control", styled: true
+        .col-12.col-md-6
+          = form.label :q, "Find a gig", class: "form-label"
+          = form.search_field :q, value: params[:q], class: "form-control", placeholder: "Gig title", styled: true
+        .col-12.col-md-3= form.submit "Update View", class: "btn btn-outline-primary w-100"
+    .d-flex.flex-wrap.gap-3.mt-3
+      = link_to "Today", board_path(from: Date.current), class: "small"
+      - if params[:q].present? || params[:project_id].present?
+        = link_to "Clear Filters", usr_company_staffing_path(@company, from: @board.from), class: "small"
+    .d-flex.flex-wrap.justify-content-between.gap-2.mt-3
+      = link_to "Previous Four Weeks", board_path(from: @board.from - 28), class: "small"
+      %span.small.text-muted.staffing-date-range #{@board.from.strftime("%b %-d")} – #{@board.to.strftime("%b %-d, %Y")} · Includes undated gigs
+      = link_to "Next Four Weeks", board_path(from: @board.from + 28), class: "small"
+- if @rows_by_job.empty?
+  .card.border-0.shadow-sm
+    .card-body.p-5.text-center
+      %h2.h5 No Gigs In This Window
+      %p.text-muted.mb-0 Change the date range or create a gig to start planning.
+.d-flex.flex-column.gap-4
+  - @rows_by_job.each do |job, rows|
+    .card.border-0.shadow-sm{ data: { staffing_gig: job.id } }
+      .card-body.p-4
+        .d-flex.flex-wrap.justify-content-between.gap-3.mb-3
+          %div
+            %h2.h5.fw-bold.mb-1= link_to job.title, usr_job_path(job)
+            .small.text-muted= date_range(job)
+            .small.text-muted= job.venue&.name || job.formatted_location
+          .d-flex.flex-wrap.align-items-start.gap-2
+            %span.status-badge.status-draft= job.invite_only? ? "Invite only" : "Public listing"
+            %span.status-badge.status-draft= job.status.humanize
+            = link_to "Production", usr_job_production_path(job), class: "btn btn-sm btn-outline-primary"
+            = link_to "Show Brief", usr_job_brief_path(job), class: "btn btn-sm btn-quiet"
+        - rows.each do |row|
+          .border.rounded-3.p-3.mb-3{ data: { staffing_position: row.position&.id } }
+            .d-flex.flex-wrap.justify-content-between.gap-2.mb-2
+              %div
+                %h3.h6.fw-semibold.mb-1= row.position&.title || (job.multi_position? ? "Add Your First Role" : "Staffing")
+                - if row.position&.production_day
+                  .small.text-muted= row.position.production_day.display_name
+                .small #{row.confirmed} confirmed · #{row.open_count} open · #{row.tentative} tentative
+              - if job.multi_position?
+                = link_to "Find Crew / Send Offers", usr_job_crew_path(job), class: "btn btn-sm btn-outline-primary"
+              - else
+                = link_to "Find Crew", usr_profiles_path(recommended: "1"), class: "btn btn-sm btn-outline-primary"
+            - booking_people(row).each do |person|
+              .d-flex.flex-wrap.justify-content-between.align-items-start.gap-2.border-top.py-2
+                %div
+                  .fw-semibold= person.name
+                  .small.text-muted= person.status
+                .d-flex.flex-wrap.align-items-start.gap-2
+                  %span.status-badge{ class: person.availability_state == :unavailable ? "status-unavailable" : "status-draft" }= person.availability_label
+                  - if person.offer
+                    = link_to pending_soon?(person) ? "Reply Due Soon" : "View Offer", usr_job_offer_path(person.offer), class: "btn btn-sm btn-quiet"
+            - if row.declined_count.positive?
+              %p.small.text-muted.mb-2 #{row.declined_count} declined offer(s). Open spots still need staffing.
+            - visible_holds(row).each do |hold|
+              .d-flex.flex-wrap.justify-content-between.align-items-center.gap-2.border-top.py-3
+                %div
+                  .fw-semibold= hold.crew_member.full_name
+                  .small.text-muted Tentative · Not a booking
+                  .small.text-muted= hold_person(row, hold).availability_label
+                .d-flex.flex-wrap.gap-2
+                  - if hold.crew_member.profile_id? && job.invitable?
+                    = link_to "Send Offer", new_usr_job_offer_path(job_id: job.id, profile_id: hold.crew_member.profile_id, crew_position_id: row.position&.id), class: "btn btn-sm btn-outline-primary"
+                  - elsif !hold.crew_member.profile_id?
+                    = link_to "Invite To KnowShow", usr_company_crew_member_path(@company, hold.crew_member), class: "btn btn-sm btn-outline-primary"
+                  - elsif job.draft?
+                    = link_to "Activate Gig To Send Offers", edit_usr_company_job_path(@company, job), class: "btn btn-sm btn-outline-primary"
+                  = button_to "Remove Tentative", remove_hold_path(row, hold), method: :delete, class: "btn btn-sm btn-quiet"
+            - if !job.multi_position? || row.position
+              - if @members.any? && available_members(row).any?
+                %details.mt-3
+                  %summary.small.fw-semibold Plan From Your Roster
+                  %p.form-text Tentative crew are suggestions for your plan. Send an offer to confirm their dates and terms. People without an account need to claim their profile first.
+                  = form_with url: hold_path(row), class: "roster-plan-form d-flex flex-wrap gap-2", builder: ActionView::Helpers::FormBuilder do |form|
+                    = label_tag roster_field_id(row), "Roster crew member", class: "visually-hidden"
+                    = form.select :crew_member_id, available_members(row), { prompt: "Choose a crew member" }, class: "form-select", required: true, id: roster_field_id(row)
+                    = form.submit "Add Tentative Crew", class: "btn btn-sm btn-outline-primary"
+              - elsif @members.empty?
+                = link_to "Add Your Crew Roster", usr_company_crew_members_path(@company), class: "small"

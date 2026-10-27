@@ -1,0 +1,18 @@
+= render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :venues, entitlement: @entitlement)
+.d-flex.flex-wrap.justify-content-between.gap-3.mb-4
+  %div
+    %h1.fw-bold.mb-1 Saved Venues & Contacts
+    %p.text-muted.mb-0 Reuse arrival instructions and venue contacts across your gigs. Attach a venue in the Production workspace.
+  = link_to "Add Venue", new_usr_company_venue_path(@company), class: "btn btn-primary"
+.row.g-3
+  - @venues.each do |venue|
+    .col-12.col-md-6
+      .card.border-0.shadow-sm.h-100
+        .card-body.p-4
+          %h2.h5= venue.name
+          %p.text-muted= venue.formatted_address
+          .d-flex.flex-wrap.gap-2
+            = link_to "Edit", edit_usr_company_venue_path(@company, venue), class: "btn btn-outline-primary"
+            = button_to "Remove", usr_company_venue_path(@company, venue), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "Remove this venue? Gigs using it will need their venue information reviewed." } }
+- if @venues.empty?
+  %p.text-muted No saved venues yet. Add the locations you work with regularly.

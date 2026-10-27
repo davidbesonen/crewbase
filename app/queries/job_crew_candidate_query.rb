@@ -33,7 +33,7 @@ class JobCrewCandidateQuery
   def candidate_profile_ids
     (
       job.job_applications.where.not(status: :rejected).select(:profile_id).pluck(:profile_id) +
-      shortlisted_profile_ids +
+      shortlisted_profile_ids + roster_profile_ids +
       recommended_profile_ids
     ).uniq - rejected_profile_ids
   end
@@ -68,6 +68,10 @@ class JobCrewCandidateQuery
       .joins(:crew_shortlist)
       .where(crew_shortlists: { company_id: job.company_id })
       .pluck(:profile_id)
+  end
+
+  def roster_profile_ids
+    job.company.crew_members.where.not(profile_id: nil).pluck(:profile_id)
   end
 
   def recommended_profile_ids

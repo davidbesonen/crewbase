@@ -7,10 +7,13 @@ class Usr::Company::JobFormComponent < ApplicationComponent
   option :company
   option :job
   option :projects, default: proc { [] }
+  option :project_shows, default: proc { [] }
   option :occupations, default: proc { [] }
   option :requirement_selections, default: proc { {} }
   option :entitlement
   option :form_location, optional: true
+  option :staffing_kind, optional: true
+  option :staffing_project_name, optional: true
 
   attr_reader :initial_crew_position, :location, :question_fields, :work_date_fields
 
@@ -21,10 +24,27 @@ class Usr::Company::JobFormComponent < ApplicationComponent
     @work_date_fields = Array(job.work_dates).presence || [ nil ]
   end
 
-  def posting_title_label = job.multi_position? ? "Gig title" : "Job title"
+  def posting_title_label = job.multi_position? ? multi_title_label : "Job title"
+  def multi_title_label = job.project.present? ? "Crew posting title" : "Gig title"
   def posting_title_placeholder = job.multi_position? ? "e.g. Summer tour production crew" : "e.g. FOH Audio Engineer"
-  def cancel_label = job.project ? "Back to project" : "Back to company"
-  def cancel_path = job.project ? usr_project_path(job.project) : usr_company_path(company)
+  def private_publication_label = job.project ? "Activate Private Posting" : "Activate Private Gig"
+  def audience_label = job.project ? "Who can see this posting?" : "Who can see this gig?"
+  def publication_label = job.invite_only? ? private_publication_label : "Publish Job"
+  def publication_hint = job.invite_only? ? "Drafts stay private to your company. Activate this gig when you are ready to send offers. It stays hidden from public search." : "Drafts stay private to your company. Publish when you are ready to receive applications."
+  def cancel_label = staffing_kind ? "Back To Gig Type" : (job.project ? "Back to project" : "Back to company")
+  def cancel_path = staffing_kind ? usr_new_staffing_start_path(company_id: company.id, kind: staffing_kind) : (job.project ? usr_project_path(job.project) : usr_company_path(company))
+  def new_multi_show? = staffing_kind == "multi_show"
+  def show_project_selector? = projects.any? && !new_multi_show? && !job.project
+  def posting_choice_heading = job.project.present? ? "Roles Needed For These Shows" : (staffing_kind ? "Staffing Needs" : "What Are You Posting?")
+  def single_role_label = staffing_kind ? "One Person" : "Single job posting"
+  def multi_role_label = job.project.present? ? "Several Roles / People For The Same Shows" : (staffing_kind ? "Multiple People Or Roles" : "Multi-position gig")
+  def posting_choice_hint
+    return "This posting is a crew need within #{job.project.name}, not another event. Everyone on it shares the selected shows. Create separate role plans for people with different cities." if job.project.present?
+    staffing_kind ? "Choose one person, or add roles and headcounts for a crew. This applies to the show you’re setting up." : "Start with one role, or switch to a gig with several positions."
+  end
+
+  def show_coverage_choices = [ [ "Entire run — including shows added later", "all_shows" ], [ "Selected shows / cities", "selected_shows" ], [ "Custom dates — not linked to shows", "independent" ] ]
+  def selected_show?(show) = job.project_show_ids.include?(show.id)
 
   def project_schedule_prefilled?
     job.new_record? && job.project && (job.project.starts_on || job.project.ends_on)

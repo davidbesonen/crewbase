@@ -1,10 +1,11 @@
 module Usr
   class JobCrewComponent < ApplicationComponent
-    def initialize(job:, positions:, candidates:, schedule_rows:)
+    def initialize(job:, positions:, candidates:, schedule_rows:, production_days: [])
       @job = job
       @positions = positions
       @candidates = candidates
       @schedule_rows = schedule_rows
+      @production_days = production_days
     end
 
     private

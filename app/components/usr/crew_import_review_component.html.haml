@@ -1,0 +1,59 @@
+.mb-4
+  %h1.fw-bold.mb-2 Review Crew Import
+  %p.text-muted.mb-1 #{@review.rows.size} people found. Check their details, edit a person, or uncheck anyone you don’t want to add.
+  %p.small.text-muted Each person needs a name and email or phone. Your roster stays private. No accounts or invitations are created. This review expires after 24 hours.
+= form_with url: usr_company_crew_import_path(@company, @import), method: :patch, multipart: true, html: { novalidate: true }, data: { controller: "crew-import-review", action: "formdata->crew-import-review#serialize" } do
+  .card.border-0.shadow-sm.mb-3
+    .card-body.p-3.p-md-4
+      .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+        %div
+          .fw-semibold #{@review.rows.size} people · #{@review.needs_review_count} to review
+          .small.text-muted Fix flagged rows or leave them unchecked. All selected details are checked again when you add crew.
+        .d-flex.flex-wrap.gap-2
+          %button.btn.btn-sm.btn-outline-primary{ type: "button", data: { action: "crew-import-review#selectReady" } } Select Ready Rows
+          %button.btn.btn-sm.btn-quiet{ type: "button", data: { action: "crew-import-review#selectAll" } } Select All
+          %button.btn.btn-sm.btn-quiet{ type: "button", data: { action: "crew-import-review#selectNone" } } Clear Selection
+      .mt-3
+        = label_tag :crew_import_search, "Find a person in this spreadsheet", class: "visually-hidden"
+        = search_field_tag :crew_import_search, nil, placeholder: "Find a name, role or contact", class: "form-control", data: { crew_import_review_target: "search", action: "input->crew-import-review#filter" }
+  .d-flex.flex-column.gap-3.mb-4
+    - @review.rows.each do |row|
+      .card.border-0.shadow-sm.crew-import-row{ data: { import_row: row.number, crew_import_review_target: "row", ready: row.needs_review? ? "false" : "true" } }
+        .card-body.p-3.p-md-4
+          .d-flex.align-items-center.gap-2.mb-2
+            = hidden_field_tag row.field_name("include"), "0", id: nil
+            = check_box_tag row.field_name("include"), "1", row.selected, id: row.field_id("include"), class: "form-check-input mt-0", data: { crew_import_review_target: "selection", action: "crew-import-review#update" }
+            = label_tag row.field_id("include"), "Include row #{row.number}", class: "form-check-label small text-muted"
+            %span.badge.ms-auto{ class: row.needs_review? ? "text-bg-warning" : "text-bg-light" }= row.needs_review? ? "Review details" : "Ready to add"
+          %details{ open: row.needs_review? }
+            %summary
+              %span.fw-semibold= row.name
+              %span.small.text-muted.d-block.mt-1.text-break= row.summary
+            - if row.messages.any?
+              .alert.alert-warning.py-2.mt-3{ role: "status" }= row.messages.to_sentence
+            .row.g-3.mt-1
+              - primary_fields.each do |key, label|
+                .col-12.col-md-6.col-xl-3
+                  = label_tag row.field_id(key), label, class: "form-label small"
+                  = text_field_tag row.field_name(key), row.value(key), **field_options(row, key), type: field_type(key)
+                  - if row.field_error(key)
+                    .invalid-feedback{ id: row.field_id("#{key}_error") }= row.field_error(key)
+            %details.mt-3{ open: row.additional_errors? }
+              %summary.fw-semibold Additional Details
+              .row.g-3.mt-1
+                - additional_fields.each do |key, label|
+                  .col-12.col-md-6
+                    = label_tag row.field_id(key), label, class: "form-label small"
+                    - if key.in?(%w[skills_text equipment_text notes])
+                      = text_area_tag row.field_name(key), row.value(key), **field_options(row, key), rows: 3
+                    - else
+                      = text_field_tag row.field_name(key), row.value(key), **field_options(row, key), inputmode: ("decimal" if key.start_with?("years_"))
+                    - if row.field_error(key)
+                      .invalid-feedback{ id: row.field_id("#{key}_error") }= row.field_error(key)
+  %p.text-muted.text-center.py-4{ hidden: true, data: { crew_import_review_target: "empty" } } No matching people. Try a different name, role or contact.
+  .crew-import-actions.card.border-0.shadow-sm
+    .card-body.d-flex.flex-wrap.justify-content-between.align-items-center.gap-3.p-3
+      %div{ role: "status", aria: { live: "polite" }, data: { crew_import_review_target: "count" } } #{@review.selected_count} selected
+      .d-flex.flex-wrap.gap-2
+        = link_to "Cancel Import", usr_company_crew_members_path(@company), class: "btn btn-quiet"
+        = submit_tag "Add Selected Crew To Roster", class: "btn btn-primary", data: { crew_import_review_target: "submit" }

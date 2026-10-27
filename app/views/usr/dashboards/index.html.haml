@@ -12,7 +12,7 @@
   .dashboard-discovery{ data: { dashboard_search_row: true } }
     = render Usr::Dashboard::QuickSearchComponent.new(search_path: quick_search_usr_dashboards_path)
     - if @owned_companies.any?
-      = render Usr::Dashboard::CompanyToolsComponent.new(post_job_path: @post_job_path, create_project_path: @start_project_path, job_postings_path: my_postings_usr_jobs_path, projects_path: @projects_navigation_path, companies_path: usr_companies_path)
+      = render Usr::Dashboard::CompanyToolsComponent.new(staff_gig_path: usr_new_staffing_start_path, post_job_path: @post_job_path, create_project_path: @start_project_path, job_postings_path: my_postings_usr_jobs_path, projects_path: @projects_navigation_path, companies_path: usr_companies_path)
     - else
       = render Usr::Dashboard::HelpfulToolsComponent.new(jobs_path: usr_jobs_path, people_path: usr_profiles_path, saved_jobs_path: usr_saved_jobs_path, availability_path: edit_calendar_usr_profile_path(@profile), profile_path: usr_profile_path(@profile))
 

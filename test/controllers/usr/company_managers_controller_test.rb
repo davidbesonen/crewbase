@@ -26,7 +26,7 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-company-owner-nav]", count: 1 do
       assert_select "a[href='#{usr_company_manager_path(@company)}'][aria-current='page']", text: /Manager/
       assert_select "a[href='#{usr_company_path(@company)}']", text: /Profile/
-      assert_select "a[href='#{new_usr_company_job_path(@company)}']", text: /Post a Job/
+      assert_select "a[href='#{new_usr_company_job_placement_path(@company)}']", text: /Post a Job/
       assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Manage Projects/
       assert_select "a[href='#{edit_usr_company_path(@company)}']", text: /Edit Company/
     end
@@ -69,7 +69,7 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-company-owner-nav]", count: 1 do
       assert_select "a[href='#{usr_company_path(@company)}']", text: /Profile/
       assert_select "a[href='#{usr_company_manager_path(@company)}']", text: /Manager/
-      assert_select "a[href='#{new_usr_company_job_path(@company)}']", text: /Post a Job/
+      assert_select "a[href='#{new_usr_company_job_placement_path(@company)}']", text: /Post a Job/
       assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Manage Projects/
       assert_select "a[href='#{edit_usr_company_path(@company)}']", text: /Edit Company/
     end

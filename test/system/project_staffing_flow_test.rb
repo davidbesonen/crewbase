@@ -19,7 +19,7 @@ class ProjectStaffingFlowTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1440, 1100)
     visit new_usr_company_project_path(@company)
     assert_selector "details[data-project-options]:not([open])"
-    fill_in "Project name", with: "Autumn tour"
+    fill_in "Tour, festival or project name", with: "Autumn tour"
     find("[data-project-options] > summary").click
     fill_in "Starts on", with: Date.new(2030, 2, 10)
     fill_in "Ends on", with: Date.new(2030, 2, 12)
@@ -27,6 +27,7 @@ class ProjectStaffingFlowTest < ApplicationSystemTestCase
     assert_text "Project created successfully."
     project = @company.projects.find_by!(name: "Autumn tour")
     assert_current_path new_usr_company_job_path(@company, project_id: project.id)
+    select "Custom dates — not linked to shows", from: "Where Is This Crew Needed?"
     assert_field "Start date (optional)", with: "2030-02-10"
     assert_field "End date (optional)", with: "2030-02-12"
     assert_checked_field "Single job posting"
@@ -41,7 +42,7 @@ class ProjectStaffingFlowTest < ApplicationSystemTestCase
     visit edit_usr_company_job_path(@company, job)
     assert_selectable_status "Draft"
     find("trix-editor").set("Mix live audio for the tour.")
-    click_button "Publish job"
+    click_button "Publish Job"
     assert_current_path usr_project_path(project)
     assert job.reload.published?
     assert job.is_active?
@@ -52,19 +53,20 @@ class ProjectStaffingFlowTest < ApplicationSystemTestCase
   test "a company owner can publish a simple job on mobile without opening extra options" do
     page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 390, height: 900, deviceScaleFactor: 1, mobile: true)
     visit new_usr_company_project_path(@company)
-    fill_in "Project name", with: "Festival weekend"
+    fill_in "Tour, festival or project name", with: "Festival weekend"
     page.save_screenshot("/private/tmp/knowshow-staffing-project-mobile.png")
     click_button "Create project only"
     assert_text "Project created successfully."
     project = @company.projects.find_by!(name: "Festival weekend")
     assert_current_path usr_project_path(project)
-    click_link "Add Job Posting"
+    click_link "Post A Job"
     fill_in "Job title", with: "Stage Technician"
     find("trix-editor").set("Set up and strike the main stage.")
     assert_selector "details[data-additional-experience]:not([open])"
     assert_selector "details[data-posting-options]:not([open])"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, 390
-    click_button "Publish job"
+    select "Public listing — accept applications", from: "Who can see this posting?"
+    click_button "Publish Job"
     assert_current_path usr_project_path(project)
     job = project.jobs.find_by!(title: "Stage Technician")
     assert job.published?

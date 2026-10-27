@@ -1,15 +1,19 @@
 .staffing-form
   .row.mb-4
     .col-sm-12
-      %h1.fw-bold.mb-1= @job.project ? "Add A Job Posting" : "Create A New Job"
+      - if @staffing_kind
+        %p.small.text-muted.mb-2 Step 2 of 2 · Set Up & Start Staffing
+      %h1.fw-bold.mb-1= @form_heading
       %p.text-muted.mb-0
-        - if @job.project
+        - if @staffing_kind
+          Add the dates and roles you need for #{@company.name}. Your gig starts private; you can also choose to publish it for applications.
+        - elsif @job.project
           Add a role to #{@job.project.name} for #{@company.name}.
         - else
           Add a new role for #{@company.name}.
 
   .row.mt-4
     .col-sm-12
-      = render Usr::Company::JobFormComponent.new(company: @company, job: @job, projects: @projects, occupations: @occupations, requirement_selections: @requirement_selections, entitlement: @entitlement, form_location: @form_location) do |section|
+      = render Usr::Company::JobFormComponent.new(company: @company, job: @job, projects: @projects, project_shows: @project_shows, occupations: @occupations, requirement_selections: @requirement_selections, entitlement: @entitlement, form_location: @form_location, staffing_kind: @staffing_kind, staffing_project_name: @staffing_project_name) do |section|
         - section.with_experience_categories do
           = render Usr::ExperienceCategoryFieldsComponent.new(record: @job, scope: :job, occupations: @occupations, selected_occupation_ids: section.selected_requirement_ids(:occupation, :required))

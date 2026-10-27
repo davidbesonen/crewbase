@@ -2,8 +2,8 @@ class PublicJobPostingsController < ApplicationController
   skip_before_action :authenticate_user!
 
   def show
-    @job = Job.includes(:locations, { job_requirements: :requirement }, company: :industries)
-      .not_moderated.where(is_active: true, status: :published)
+    @job = Job.includes(:locations, :project_shows, { job_requirements: :requirement }, company: :industries)
+      .not_moderated.where(is_active: true, status: :published, audience: :public_listing)
       .find(params[:id])
     @experience_requirements = JobExperienceRequirements.new(@job).entries
     @marketing_page = true

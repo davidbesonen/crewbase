@@ -37,7 +37,7 @@ class Usr::JobsController < ApplicationController
     owned_company_ids = current_user.owned_companies.select(:id)
     raise ActiveRecord::RecordNotFound unless owned_company_ids.exists?
 
-    @jobs = Job.includes(:locations, :company)
+    @jobs = Job.includes(:locations, :project_shows, :company)
       .where(company_id: owned_company_ids)
       .order(created_at: :desc, id: :desc)
   end
@@ -51,9 +51,9 @@ class Usr::JobsController < ApplicationController
   private
 
   def set_job
-    @job = Job.includes(:locations, { job_requirements: :requirement }, company: :industries).find(params[:id])
+    @job = Job.includes(:locations, :project_shows, { job_requirements: :requirement }, company: :industries).find(params[:id])
     return if @job.publicly_visible?
-    return if @job.editable_by?(current_user) || @job.hired?(current_user)
+    return if @job.editable_by?(current_user) || @job.hired?(current_user) || @job.invited?(current_user)
 
     raise ActiveRecord::RecordNotFound
   end

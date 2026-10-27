@@ -3,6 +3,8 @@ class Usr::JobScheduleComponent < ApplicationComponent
     @job = job
   end
 
+  def shows = @job.project_shows.to_a.sort_by { |show| [ show.starts_on, show.id ] }
+
   def entries
     [ [ "Starts", @job.starts_at ], [ "Ends", @job.ends_at ] ].map do |label, value|
       { label: label, text: schedule_text(value) }

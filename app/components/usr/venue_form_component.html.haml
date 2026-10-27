@@ -1,0 +1,18 @@
+%h1.fw-bold.mb-2= @venue.persisted? ? "Edit Saved Venue" : "Add Saved Venue"
+%p.text-muted Save a venue, arrival instructions and its contact for reuse. Edits update the briefs of gigs using this venue.
+- if @venue.errors.any?
+  .alert.alert-danger{ role: "alert" }= @venue.errors.full_messages.to_sentence
+.card.border-0.shadow-sm
+  .card-body.p-4
+    = form_with model: @venue, url: form_url, builder: ActionView::Helpers::FormBuilder do |form|
+      .row.g-3
+        - Venue::FIELDS.each do |key|
+          .col-12{ class: key.to_s.end_with?("notes") ? "col-lg-12" : "col-md-6" }
+            = form.label key, key.to_s.humanize, class: "form-label"
+            - if key.to_s.end_with?("notes")
+              = form.text_area key, rows: 3, class: "form-control", maxlength: 4000
+            - else
+              = form.public_send(input_type(key), key, required: key == :name, class: "form-control")
+      .d-flex.gap-2.mt-4
+        = form.submit "Save Venue", class: "btn btn-primary"
+        = link_to "Cancel", usr_company_venues_path(@company), class: "btn btn-quiet"

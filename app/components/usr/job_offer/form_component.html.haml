@@ -10,6 +10,7 @@
         = form_with model: @offer, url: usr_job_offers_path, builder: ActionView::Helpers::FormBuilder do |form|
           = hidden_field_tag :job_application_id, @application.id
           = hidden_field_tag :profile_id, @application.profile_id
+          = hidden_field_tag :job_id, @application.job_id unless @application.persisted?
           - if @application.job.multi_position?
             .mb-3
               = label_tag :crew_position_id, "Position", class: "form-label"
@@ -24,6 +25,12 @@
             .col-md-6
               = form.label :ends_at, "Work ends", class: "form-label"
               = form.datetime_local_field :ends_at, class: "form-control", required: true
+          - if @offer.show_itinerary.any?
+            .border.rounded-3.p-3.mb-3
+              %h2.h6 Shows Included In This Offer
+              %p.small.text-muted Only these work dates are reserved; days between shows are not booked.
+              - @offer.show_itinerary.each do |show|
+                .small= [show["name"], show["city"], show["starts_on"], show["ends_on"]].compact_blank.join(" · ")
           %p.small.text-muted Dates use #{Time.zone.name} time.
           .row.g-3.mb-3{ data: { controller: "currency-prefix" } }
             .col-md-4
@@ -47,5 +54,7 @@
             = form.submit "Send offer", class: "btn btn-primary"
             - if @application.persisted?
               = link_to "Back to application", usr_job_application_path(@application), class: "btn btn-outline-secondary"
-            - else
+            - elsif @application.job.multi_position?
               = link_to "Back to crew", usr_job_crew_path(@application.job), class: "btn btn-outline-secondary"
+            - else
+              = link_to "Back to gig", usr_job_path(@application.job), class: "btn btn-outline-secondary"

@@ -1,0 +1,83 @@
+%article.show-brief{ data: { show_brief: true, controller: "print" } }
+  .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4.d-print-none
+    %div
+      %h1.fw-bold.mb-1 Show Brief
+      %p.text-muted.mb-0 The latest venue, schedule and confirmed crew for this gig.
+    .d-flex.flex-wrap.gap-2
+      %button.btn.btn-primary{ type: "button", data: { action: "print#print" } }
+        %i.bi.bi-printer.me-2{ aria: { hidden: true } }
+        Print / Save PDF
+      = link_to "Back To Gig", usr_job_path(@job), class: "btn btn-quiet"
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4.p-lg-5
+      .text-uppercase.small.fw-semibold.text-primary.mb-2 KnowShow · Show Brief
+      %h2.h2.fw-bold.mb-2= @job.title
+      %p.mb-1.fw-semibold= @job.company.name
+      %p.mb-1= date_range
+      %p.small.text-muted.mb-0 Updated #{l(@brief.updated_at, format: :long)} · Times use #{Time.zone.name}
+      %p.small.text-muted.mt-2.mb-0 Printed copies are snapshots. Check KnowShow for the latest information. Accepted offer times remain your booking terms.
+  .row.g-4.mb-4
+    .col-12.col-md-6
+      .card.h-100.border-0.shadow-sm
+        .card-body.p-4
+          %h3.h5.fw-bold.mb-3 Venue & Arrival
+          - if @job.venue
+            %p.fw-semibold.mb-1= @job.venue.name
+            %p= @job.venue.formatted_address
+            - if @job.venue.load_in_notes.present?
+              %h4.h6.fw-semibold Load-In Instructions
+              = simple_format(@job.venue.load_in_notes)
+            - if @job.venue.parking_notes.present?
+              %h4.h6.fw-semibold Parking
+              = simple_format(@job.venue.parking_notes)
+          - else
+            %p= @job.formatted_location
+    .col-12.col-md-6
+      .card.h-100.border-0.shadow-sm
+        .card-body.p-4
+          %h3.h5.fw-bold.mb-3 Production Contact
+          - @brief.production_contact.each do |label, value|
+            %p.mb-1
+              %span.text-muted #{label}:
+              = contact_value(label, value)
+          - if @brief.production_contact.empty?
+            %p.text-muted Contact details to be confirmed.
+          - if @brief.venue_contact.any?
+            %h4.h6.fw-semibold.mt-3 Venue Contact
+            - @brief.venue_contact.each do |label, value|
+              %p.mb-1
+                %span.text-muted #{label}:
+                = contact_value(label, value)
+  - if @job.briefing_notes.present?
+    .card.border-0.shadow-sm.mb-4
+      .card-body.p-4
+        %h3.h5.fw-bold Show Notes
+        = simple_format(@job.briefing_notes)
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      %h3.h5.fw-bold.mb-3 Production Schedule
+      - @brief.days.each do |day|
+        .border-top.py-3
+          .fw-semibold= day.display_name
+          - if day.starts_at || day.ends_at
+            .small= "#{formatted_time(day.starts_at)} – #{formatted_time(day.ends_at)}"
+          - if day.notes.present?
+            = simple_format(day.notes, class: "small text-muted mb-0 mt-2")
+      - if @brief.days.empty?
+        %p.text-muted.mb-0 Detailed schedule to be confirmed.
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-4
+      %h3.h5.fw-bold.mb-3 Confirmed Crew & Call Times
+      - @brief.crew.each do |person|
+        .border-top.py-3
+          .fw-semibold= person.name
+          %div= person.role
+          .small.text-muted= "#{formatted_time(person.starts_at)} – #{formatted_time(person.ends_at)}"
+      - if @brief.crew.empty?
+        %p.text-muted.mb-0 No confirmed crew yet. Tentative plans and pending offers are not confirmed bookings.
+  - if @brief.documents.any?
+    .card.border-0.shadow-sm
+      .card-body.p-4
+        %h3.h5.fw-bold.mb-3 Gig Documents
+        - @brief.documents.each do |document|
+          .py-2= link_to document.title, download_usr_job_contract_path(@job, document), data: { turbo: false }

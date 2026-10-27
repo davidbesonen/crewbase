@@ -1,0 +1,52 @@
+.card.border-0.shadow-sm{ data: { project_crew_matrix: true } }
+  .card-body.p-4
+    .d-flex.flex-wrap.justify-content-between.gap-3.mb-3
+      %div
+        %h2.h5.fw-bold.mb-1 Crew By Show
+        %p.text-muted.small.mb-0 Plan touring crew for the entire run and local crew for selected cities. A tentative plan becomes confirmed only when the worker accepts an offer.
+      = link_to "Plan Crew / Add Open Role", new_usr_project_crew_plan_path(@project), class: "btn btn-primary"
+    = form_with url: usr_project_path(@project), method: :get, class: "d-flex flex-wrap gap-2 align-items-end mb-4", builder: ActionView::Helpers::FormBuilder do |form|
+      = hidden_field_tag :view, "crew"
+      %div
+        = form.label :show_id, "Show / City", class: "form-label small"
+        = form.select :show_id, @overview.shows.map { |show| [show.display_name, show.id] }, { include_blank: "All shows", selected: @selected_show&.id }, class: "form-select"
+      = form.submit "Update View", class: "btn btn-outline-primary"
+    - if rows.empty?
+      .empty-state.text-center.py-4
+        %h3.h5.fw-semibold No Crew Needs Yet
+        %p.text-muted.mb-0 Add a role and choose the shows it covers. Pick someone from your roster now or leave the role open to hire later.
+    - else
+      %p.small.text-muted.d-lg-none Swipe across the table to see every show.
+      .table-responsive.project-crew-matrix
+        %table.table.align-middle.mb-0
+          %caption.visually-hidden Crew coverage by show. Confirmed bookings and tentative roster plans are shown separately.
+          %thead
+            %tr
+              %th{ scope: "col" } Role & Crew
+              - shows.each do |show|
+                %th.text-center{ scope: "col" }
+                  .small= show.city
+                  .small.fw-normal= show.starts_on.strftime("%b %-d")
+              %th{ scope: "col" } Manage
+          %tbody
+            - rows.each do |row|
+              %tr{ data: { crew_show_row: row.job.id } }
+                %th{ scope: "row" }
+                  .fw-semibold= row.job.title
+                  .small.fw-normal= names(row)
+                  .small.text-muted.fw-normal= status(row)
+                  .small.text-muted.fw-normal= coverage_label(row)
+                - shows.each do |show|
+                  %td.text-center
+                    - if row.show_ids.include?(show.id)
+                      %span.status-badge.status-draft{ data: { show_covered: show.id }, title: show_status(row, show) }
+                        %i.bi.bi-check2{ aria: { hidden: true } }
+                        %span.visually-hidden Needed in #{show.city}
+                        .small= "#{row.confirmed_for(show)}/#{row.needed}"
+                    - else
+                      %span.text-muted{ aria: { label: "Not scheduled" } } —
+                %td
+                  .d-flex.flex-column.gap-2.align-items-start
+                    = link_to "Edit Shows / Role", edit_usr_company_job_path(@project.company, row.job), class: "btn btn-sm btn-outline-primary"
+                    = link_to "Manage Staffing", row.job.multi_position? ? usr_job_crew_path(row.job) : usr_company_staffing_path(@project.company, project_id: @project.id, from: row.job.starts_at&.to_date || Date.current), class: "btn btn-sm btn-quiet"
+    %p.form-text.mt-3.mb-0 Each posting has one show selection shared by its crew. Use separate role plans when two people have different cities. Changing shows updates posting dates and locations; existing offers keep their agreed terms.

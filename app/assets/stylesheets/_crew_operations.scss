@@ -1,0 +1,106 @@
+// Crew planning shares the application palette in both appearance modes.
+.staffing-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.staffing-metric {
+  min-width: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1rem;
+  background: var(--bs-body-bg);
+}
+
+.crew-import-actions {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 5;
+  border: 1px solid var(--bs-border-color) !important;
+  background: var(--bs-body-bg);
+}
+
+.crew-import-row[hidden] { display: none; }
+.crew-import-row--excluded { border-left: 3px solid var(--bs-border-color) !important; }
+.crew-import-row summary, .schedule-editor summary { cursor: pointer; }
+.crew-import-row summary:focus-visible, .schedule-editor summary:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 4px;
+  border-radius: .25rem;
+}
+
+.roster-plan-form .form-select { flex: 1 1 14rem; width: auto; min-width: 0; }
+.company-workspace-nav [aria-current="page"] {
+  background: rgba(var(--bs-primary-rgb), .12);
+  border-color: rgba(var(--bs-primary-rgb), .25);
+  color: var(--bs-primary);
+}
+
+@media (max-width: 767.98px) {
+  .staffing-metrics { gap: .5rem; }
+  .staffing-metric { padding: .75rem .5rem; text-align: center; border-radius: .75rem; }
+  .staffing-metric .small { font-size: .7rem; line-height: 1.25; min-height: 2.5em; }
+  .crew-import-actions { bottom: .5rem; }
+  .crew-import-actions .btn { font-size: .8rem; }
+}
+
+@media (max-width: 359.98px) {
+  .staffing-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.crew-roster-search { flex: 1 1 16rem; width: auto; min-width: 0; }
+
+@media (max-width: 767.98px) {
+  .crew-roster-table {
+    display: block;
+    thead { display: none; }
+    tbody { display: block; }
+    tr {
+      display: block;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--bs-border-color);
+    }
+    td {
+      display: flex;
+      gap: .75rem;
+      align-items: baseline;
+      padding: .4rem 0;
+      border: 0;
+      overflow-wrap: anywhere;
+    }
+    td[data-label]::before {
+      content: attr(data-label);
+      flex: 0 0 4.5rem;
+      font-size: .8rem;
+      color: var(--bs-secondary-color);
+    }
+    .crew-roster-table__name { padding-bottom: .75rem; font-size: 1.1rem; }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .staffing-date-range { order: -1; width: 100%; }
+}
+
+// Keep navigation, appearance and account controls on one row on crew phones.
+@media (max-width: 575.98px) {
+  .app-top-nav {
+    > .container-fluid { flex-wrap: nowrap; }
+    > .container-fluid > .d-flex { gap: .5rem !important; min-width: 0; }
+    .navbar-brand { margin-right: 0; }
+    .brand-wordmark img { height: 1.2rem; }
+    .theme-picker > i { display: none; }
+    .theme-picker .form-select { width: 5.1rem; font-size: .75rem; padding-inline: .5rem 1.5rem; background-position: right .4rem center; }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .crew-import-actions .card-body {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    gap: .5rem !important;
+    > .d-flex { display: contents !important; }
+    input[type="submit"] { grid-column: 1 / -1; width: 100%; }
+  }
+}

@@ -1,1 +1,6 @@
-= render Usr::ProjectDashboardComponent.new(project: @project, jobs: @jobs)
+= render Usr::Company::OwnerNavigationComponent.new(company: @company, active: :projects, entitlement: @entitlement)
+= render Usr::ProjectDashboardComponent.new(project: @project, jobs: @jobs, workspace_view: @workspace_view, show_count: @overview.shows.size)
+- if @workspace_view == "shows"
+  = render Usr::ProjectShowsComponent.new(overview: @overview)
+- elsif @workspace_view == "crew"
+  = render Usr::ProjectCrewMatrixComponent.new(overview: @overview, selected_show_id: params[:show_id])
