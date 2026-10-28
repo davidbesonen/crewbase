@@ -85,8 +85,11 @@ replay an unverified payload copied from a support message.
 
 ## Backups and restoration
 
-Production currently uses local Active Storage. Back up its persistent `storage/`
-volume as well as the primary database; database-only backups lose uploaded files.
+Production uses hosted S3-compatible storage when `S3_BUCKET` is configured and
+falls back to local Active Storage otherwise. The Render demo uses hosted storage.
+Back up the configured object bucket (including Shrine uploads), or the persistent
+`storage/` volume for a local-storage deployment, as well as the primary database;
+database-only backups lose uploaded files.
 Also protect the queue database and encrypted credentials/deployment secret store.
 Use encrypted, access-controlled backups with retention and off-site copies.
 

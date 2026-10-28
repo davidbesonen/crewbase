@@ -11,16 +11,11 @@ class Usr::Company::OwnerNavigationComponentTest < ViewComponent::TestCase
 
   test "workspace destinations mark the current page without competing with primary actions" do
     destinations = {
-      profile: usr_company_path(@company),
       manager: usr_company_manager_path(@company),
       post_job: new_usr_company_job_placement_path(@company),
       projects: usr_company_projects_path(@company),
-      edit: edit_usr_company_path(@company),
       staffing: usr_company_staffing_path(@company),
-      roster: usr_company_crew_members_path(@company),
-      templates: usr_company_gig_templates_path(@company),
-      venues: usr_company_venues_path(@company),
-      plan: usr_company_plan_path(@company)
+      roster: usr_company_crew_members_path(@company)
     }
 
     destinations.each do |active, path|
@@ -38,7 +33,7 @@ class Usr::Company::OwnerNavigationComponentTest < ViewComponent::TestCase
     end
   end
 
-  test "unavailable manager remains disabled" do
+  test "all owners can reach manager while secondary pages stay out of the navbar" do
     @company.company_plans.delete_all
     render_inline(
       Usr::Company::OwnerNavigationComponent.new(
@@ -46,7 +41,10 @@ class Usr::Company::OwnerNavigationComponentTest < ViewComponent::TestCase
       )
     )
 
-    assert_selector "[data-feature-upgrade='staffing-analytics'][aria-disabled='true']"
-    assert_no_selector "a[href='#{usr_company_manager_path(@company)}']"
+    assert_selector "nav a", count: 5
+    assert_selector "a[href='#{usr_company_manager_path(@company)}']"
+    assert_no_selector "a[href='#{edit_usr_company_path(@company)}']"
+    assert_no_selector "a[href='#{usr_company_plan_path(@company)}']"
+    assert_selector "select option[selected][disabled]", text: "Company Profile", visible: :all
   end
 end

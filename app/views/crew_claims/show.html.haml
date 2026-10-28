@@ -3,9 +3,11 @@
     .col-12.col-md-8.col-lg-6
       .card.border-0.shadow-sm
         .card-body.p-4.p-lg-5
-          %h1.h3.fw-bold.mb-3 Your Crew Profile Is Started
-          %p #{@member.company.name} invited #{@member.full_name} to KnowShow. Review your imported details and finish setting up your own profile.
+          %h1.h3.fw-bold.mb-3 Finish Your KnowShow Profile
+          %p #{@member.company.name} added #{@member.full_name} to its private crew roster. Create an account or sign in, then claim the record to review your imported details and finish your own profile.
           %p.small.text-muted Company notes and their working history with you remain private. Claiming this profile does not accept any job or booking.
+          - if @member.email.blank?
+            %p.small.text-muted Your invitation was shared by phone. Enter an email address for your KnowShow account; no text verification code is required.
           - if current_user
             %p Signed in as #{current_user.email}.
             - if @matching_account

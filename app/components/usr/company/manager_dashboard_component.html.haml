@@ -1,25 +1,16 @@
 .container-fluid.py-4
-  .d-flex.flex-wrap.justify-content-between.align-items-start.gap-3.mb-4
-    %div
-      -# %p.text-uppercase.text-primary.fw-semibold.small.mb-1 Company Workspace
-      %h1.mb-1= "#{company.name} Company Manager"
-      %p.text-muted.mb-0 Staffing totals and upcoming work, with an activity chart for the last 30 days.
-
-  - if crew_roster_upload?
-    .mb-4= crew_roster_upload
-
+  %h2.h4.mb-3 Staffing Analytics
   .row.g-3.mb-4
     - self.class::METRICS.each do |key, (label, icon)|
       .col-6.col-xl-2
-        .card.h-100.border-0.shadow-sm{ data: { company_manager_metric: key } }
+        = link_to metric_path(key), class: "card h-100 border-0 shadow-sm company-manager-metric text-reset text-decoration-none", data: { company_manager_metric: key } do
           .card-body
-            .d-flex.align-items-center.gap-2.text-muted.small.text-uppercase.fw-semibold.mb-2
-              %i.bi{ class: icon }
-              - if key == :pending_invitations
-                = link_to label, usr_job_invitations_path, class: "text-reset text-decoration-none"
-              - else
-                = label
+            .company-manager-metric__label.d-flex.align-items-center.gap-2.text-muted.small.text-uppercase.fw-semibold.mb-2
+              %i.bi{ class: icon, aria: { hidden: true } }
+              = label
             .display-6.fw-bold= number_with_delimiter(dashboard[:summary].fetch(key))
+
+  %p.small.text-muted.mb-4 Company Users counts owners and employees with company access. Crew roster contacts are separate and do not count toward this total.
 
   .row.g-4.mb-4
     .col-12.col-xl-8

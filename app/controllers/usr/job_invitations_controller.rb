@@ -2,7 +2,9 @@ class Usr::JobInvitationsController < ApplicationController
   before_action :set_recipient_invitation, only: [ :accept, :decline ]
 
   def index
-    @invitations = JobInvitationInbox.new(user: current_user).call
+    @company = current_user.owned_companies.find(params[:company_id]) if params[:company_id].present?
+    @status = params[:status].to_s.presence_in(JobInvitation.statuses.keys)
+    @invitations = JobInvitationInbox.new(user: current_user, company: @company, status: @status).call
   end
 
   def create

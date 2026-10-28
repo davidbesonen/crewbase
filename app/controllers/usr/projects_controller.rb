@@ -6,6 +6,11 @@ class Usr::ProjectsController < ApplicationController
     projects = @company.projects.includes(:jobs).order(updated_at: :desc)
     @projects = projects.active
     @archived_projects = projects.archived
+    @active_only = params[:view] == "active"
+    if @active_only
+      @projects = @projects.in_progress
+      @archived_projects = Project.none
+    end
   end
 
   def show

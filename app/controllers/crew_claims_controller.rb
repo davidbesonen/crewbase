@@ -16,7 +16,7 @@ class CrewClaimsController < ApplicationController
   end
 
   def create
-    result = ClaimCrewMember.new(member: @member, user: current_user).call
+    result = ClaimCrewMember.new(member: @member, user: current_user, token: params[:token]).call
     if result.success?
       redirect_to edit_usr_profile_path(@member.reload.profile, source: "crew_roster"), notice: "Your imported details are ready. Review your profile and finish setting it up."
     else
@@ -28,7 +28,7 @@ class CrewClaimsController < ApplicationController
 
   def set_member
     @member = CrewMember.find_by_token_for!(:claim, params[:token])
-    raise ActiveRecord::RecordNotFound if @member.invitation_nonce.blank? || @member.profile_id? || @member.company.restricted_at?
+    raise ActiveRecord::RecordNotFound unless @member.invitation_active? && !@member.company.restricted_at?
     response.headers["Cache-Control"] = "private, no-store"
     response.headers["Referrer-Policy"] = "no-referrer"
   rescue ActiveRecord::RecordNotFound, ActiveSupport::MessageVerifier::InvalidSignature

@@ -25,16 +25,34 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-company-owner-nav]", count: 1 do
       assert_select "a[href='#{usr_company_manager_path(@company)}'][aria-current='page']", text: /Manager/
-      assert_select "a[href='#{usr_company_path(@company)}']", text: /Profile/
       assert_select "a[href='#{new_usr_company_job_placement_path(@company)}']", text: /Post a Job/
-      assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Manage Projects/
-      assert_select "a[href='#{edit_usr_company_path(@company)}']", text: /Edit Company/
+      assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Projects/
     end
     assert_select "h1", text: /Company Manager/
     assert_select "[data-company-manager-metric]", minimum: 6
     assert_select "[data-studio-benefit]", count: 0
     assert_select ".card", text: /Next Steps/
     assert_select "canvas[data-controller='admin-chart']", count: 1
+  end
+
+  test "free owners can use manager tools without accessing analytics" do
+    @company.company_plans.delete_all
+    sign_in @owner, scope: :user
+
+    get usr_company_manager_path(@company)
+
+    assert_response :success
+    assert_select "[data-company-management-tools]" do
+      assert_select "a[href='#{usr_company_path(@company)}']", text: /Company Profile/
+      assert_select "a[href='#{edit_usr_company_path(@company)}']", text: /Edit Company/
+      assert_select "a[href='#{usr_company_gig_templates_path(@company)}']", text: /Templates/
+      assert_select "a[href='#{usr_company_venues_path(@company)}']", text: /Venues/
+      assert_select "a[href='#{usr_company_plan_path(@company)}']", text: /Plan & Billing/
+    end
+    assert_select "[data-crew-roster-upload]"
+    assert_select "[data-company-manager-metric]", count: 0
+    assert_select "canvas[data-controller='admin-chart']", count: 0
+    assert_select "[data-analytics-upgrade]"
   end
 
   test "Studio owner can open the company manager dashboard with actionable next steps" do
@@ -67,11 +85,9 @@ class Usr::CompanyManagersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-company-owner-nav]", count: 1 do
-      assert_select "a[href='#{usr_company_path(@company)}']", text: /Profile/
       assert_select "a[href='#{usr_company_manager_path(@company)}']", text: /Manager/
       assert_select "a[href='#{new_usr_company_job_placement_path(@company)}']", text: /Post a Job/
-      assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Manage Projects/
-      assert_select "a[href='#{edit_usr_company_path(@company)}']", text: /Edit Company/
+      assert_select "a[href='#{usr_company_projects_path(@company)}']", text: /Projects/
     end
     assert_select ".app-hero a[href='#{usr_company_manager_path(@company)}']", count: 0
     assert_select ".user-sidenav-card a[href='#{usr_company_manager_path(@company)}']", count: 0

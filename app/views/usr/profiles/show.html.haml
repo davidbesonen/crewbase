@@ -19,11 +19,11 @@
               %span.badge.text-bg-light.border.ms-2
                 Your Profile
           .profile-hero__socials.d-flex.flex-wrap.gap-2.mt-3
-            - if @profile.website_url.present?
-              = link_to @profile.website_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Website" }, title: "Website" do
+            - if @website_url.present?
+              = link_to @website_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Website" }, title: "Website" do
                 %i.bi.bi-globe{ aria: { hidden: true } }
-            - if @profile.linkedin_url.present?
-              = link_to @profile.linkedin_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "LinkedIn" }, title: "LinkedIn" do
+            - if @linkedin_url.present?
+              = link_to @linkedin_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "LinkedIn" }, title: "LinkedIn" do
                 %i.bi.bi-linkedin{ aria: { hidden: true } }
             - if @profile.twitter_handle.present?
               = link_to "https://twitter.com/#{@profile.twitter_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "X (Twitter)" }, title: "X (Twitter)" do
@@ -31,8 +31,8 @@
             - if @profile.instagram_handle.present?
               = link_to "https://instagram.com/#{@profile.instagram_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Instagram" }, title: "Instagram" do
                 %i.bi.bi-instagram{ aria: { hidden: true } }
-            - if @profile.spotify_profile_url.present?
-              = link_to @profile.spotify_profile_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Spotify" }, title: "Spotify" do
+            - if @spotify_url.present?
+              = link_to @spotify_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Spotify" }, title: "Spotify" do
                 %i.bi.bi-spotify{ aria: { hidden: true } }
       .profile-hero__actions
         - if current_user != @profile.user

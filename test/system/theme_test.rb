@@ -10,14 +10,23 @@ class ThemeTest < ApplicationSystemTestCase
     page.execute_script("localStorage.removeItem('crewbase.theme')")
     visit new_user_session_path
     assert_selector "html[data-bs-theme='dark']"
+    assert_no_selector "[data-theme-choice]"
+    user = User.create!(first_name: "Theme", last_name: "Crew", email: "theme-crew@example.com", password: "password123")
+    user.roles << Role.find_or_create_by!(name: "user")
+    user.profiles.create!(profile_type: "user", completed_at: Time.current)
+    user.visits.create!
+    login_as user, scope: :user
+    visit usr_settings_path
     assert_select_theme "system"
     select "Light", from: "Appearance"
     assert_selector "html[data-bs-theme='light']"
     page.refresh
     assert_selector "html[data-bs-theme='light']"
     select "Dark", from: "Appearance"
-    visit root_path
+    visit welcome_path
     assert_selector "html[data-bs-theme='dark']"
+    assert_no_selector "[data-theme-choice]"
+    visit usr_settings_path
     assert_select_theme "dark"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth")
     page.save_screenshot("/private/tmp/crewbase-dark-home.png")
@@ -26,6 +35,7 @@ class ThemeTest < ApplicationSystemTestCase
     assert_selector "html[data-bs-theme='light']"
   ensure
     page.execute_script("localStorage.removeItem('crewbase.theme')")
+    Warden.test_reset!
     page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: [])
   end
 
@@ -37,8 +47,9 @@ class ThemeTest < ApplicationSystemTestCase
     user.profiles.create!(profile_type: "user", completed_at: Time.current)
     user.visits.create!
     login_as user, scope: :user
-    visit admin_users_path
+    visit usr_settings_path
     select "Dark", from: "Appearance"
+    visit admin_users_path
     click_link user.full_name
     assert_selector "textarea"
     assert_selector "html[data-bs-theme='dark']"
@@ -49,9 +60,11 @@ class ThemeTest < ApplicationSystemTestCase
     assert_current_path usr_dashboards_path
     assert_selector "html[data-bs-theme='dark']"
     page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 390, height: 1000, deviceScaleFactor: 1, mobile: true)
-    assert_select_theme "dark"
+    assert_no_selector "[data-theme-choice]"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, 390
     page.save_screenshot("/private/tmp/crewbase-dark-workspace-mobile.png")
+    visit usr_settings_path
+    assert_select_theme "dark"
     select "Light", from: "Appearance"
     assert_selector "html[data-bs-theme='light']"
   ensure

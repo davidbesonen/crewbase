@@ -179,7 +179,7 @@
             %div
               %div.text-muted.small Company Size
               %div.fw-semibold= "#{@job.company.employee_range} employees"
-            - if @job.company.website_url.present?
+            - if @job.company.normalized_website_url.present?
               %div
                 = link_to @job.company.normalized_website_url, target: "_blank", rel: "noopener", class: "btn btn-quiet w-100" do
                   Visit Website

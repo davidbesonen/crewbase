@@ -20,11 +20,11 @@ class Usr::CompanyPlansControllerTest < ActionDispatch::IntegrationTest
     sign_in @owner, scope: :user
   end
 
-  test "owner can review upgrade options from company navigation" do
-    get usr_company_path(@company)
+  test "owner can review upgrade options from company manager" do
+    get usr_company_manager_path(@company)
 
     assert_response :success
-    assert_select "[data-company-owner-nav] a[href='#{usr_company_plan_path(@company)}']", text: /Upgrade Plan/
+    assert_select "[data-company-management-tools] a[href='#{usr_company_plan_path(@company)}']", text: /Plan & Billing/
 
     get usr_company_plan_path(@company)
 

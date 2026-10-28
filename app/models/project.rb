@@ -13,6 +13,7 @@ class Project < ApplicationRecord
   }
 
   scope :active, -> { where(archived_at: nil) }
+  scope :in_progress, -> { active.where(status: %i[planning active]) }
   scope :archived, -> { where.not(archived_at: nil) }
 
   validates :name, presence: true

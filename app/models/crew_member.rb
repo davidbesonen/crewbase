@@ -1,4 +1,5 @@
 class CrewMember < ApplicationRecord
+  INVITATION_LIFETIME = 7.days
   FIELDS = %w[first_name last_name email phone city state country role department years_with_company years_experience skills_text equipment_text notes].freeze
   belongs_to :company
   belongs_to :profile, optional: true
@@ -17,16 +18,17 @@ class CrewMember < ApplicationRecord
   validate :contact_required
   validate :valid_phone
 
-  generates_token_for :claim, expires_in: 7.days do
-    [ invitation_nonce, email, phone_key, profile_id ]
+  generates_token_for :claim, expires_in: INVITATION_LIFETIME do
+    [ invitation_nonce, email, phone_key, profile_id, invitation_expires_at ]
   end
 
   def full_name = [ first_name, last_name ].join(" ")
   def location_label = [ city, state, country ].compact_blank.join(", ")
   def invitation_email_matches?(user) = email.blank? || email == user.email.to_s.downcase
+  def invitation_active? = invitation_nonce.present? && profile_id.nil? && invitation_expires_at&.future?
 
   def invitation_token!
-    update!(invitation_nonce: SecureRandom.hex(20))
+    update!(invitation_nonce: SecureRandom.hex(20), invitation_expires_at: INVITATION_LIFETIME.from_now)
     generate_token_for(:claim)
   end
 
@@ -44,5 +46,8 @@ class CrewMember < ApplicationRecord
 
   def valid_phone
     errors.add(:phone, "must contain 7 to 15 digits") if phone.present? && !phone_key.to_s.length.between?(7, 15)
+    if phone.present? && !phone.match?(/\A\+?[\d\s().-]+\z/)
+      errors.add(:phone, "must use digits, spaces, +, parentheses or hyphens; omit extensions")
+    end
   end
 end

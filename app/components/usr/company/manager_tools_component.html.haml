@@ -1,0 +1,22 @@
+.container-fluid.pt-4
+  %h1.mb-2= "#{company.name} Company Manager"
+  %p.text-muted.mb-4 Manage your company, prepare future gigs, and keep staffing on track.
+  %section.mb-4{ data: { company_management_tools: true }, aria: { label: "Company management tools" } }
+    %h2.h5 Company Tools
+    .row.g-3
+      - tools.each do |tool|
+        .col-12.col-md-6.col-xl-4
+          = link_to tool.path, class: "card h-100 text-reset text-decoration-none" do
+            .card-body.d-flex.align-items-start.gap-3
+              %i.text-primary.fs-4{ class: "bi bi-#{tool.icon}", aria: { hidden: true } }
+              %div
+                %h3.h6.mb-1= tool.title
+                %p.small.text-muted.mb-0= tool.description
+              %i.bi.bi-chevron-right.ms-auto{ aria: { hidden: true } }
+  - unless analytics_available
+    .card.mb-4{ data: { analytics_upgrade: true } }
+      .card-body.d-flex.flex-wrap.align-items-center.justify-content-between.gap-3
+        %div
+          %h2.h5.mb-1 Staffing Analytics
+          %p.text-muted.mb-0 Track staffing activity and hiring trends with a Team plan.
+        = link_to "Compare Plans", usr_company_plan_path(company), class: "btn btn-outline-primary"

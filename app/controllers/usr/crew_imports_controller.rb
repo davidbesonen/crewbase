@@ -37,7 +37,7 @@ class Usr::CrewImportsController < ApplicationController
     selected = rows.reject { |row| row["include"] == "0" }
     result = CrewRosterImport.new(import: @import, rows: selected).call
     if result.success?
-      redirect_to @roster_return_path, notice: "Added #{@import.imported_count} crew to your private roster. No accounts or invitations were sent."
+      redirect_to @roster_return_path, notice: "Added #{@import.imported_count} crew to your private roster. No accounts were created and no invitations were sent."
     else
       @import.update!(rows:) unless @import.imported_at?
       @review = CrewRosterReview.new(company: @company, rows:)
@@ -70,7 +70,9 @@ class Usr::CrewImportsController < ApplicationController
       raise InvalidReview if params[:rows_payload].bytesize > 16.megabytes
       JSON.parse(params[:rows_payload])
     else
-      params.fetch(:rows, ActionController::Parameters.new).values
+      form_rows = params.fetch(:rows, ActionController::Parameters.new)
+      raise InvalidReview unless form_rows.is_a?(ActionController::Parameters)
+      form_rows.values
     end
     raise InvalidReview unless rows.is_a?(Array) && rows.size.between?(1, CrewRosterSpreadsheet::MAX_ROWS)
     rows.map do |row|

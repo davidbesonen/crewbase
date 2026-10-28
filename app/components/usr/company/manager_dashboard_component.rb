@@ -1,5 +1,4 @@
 class Usr::Company::ManagerDashboardComponent < ApplicationComponent
-  renders_one :crew_roster_upload
   METRICS = {
     company_users: [ "Company users", "bi-people" ],
     active_jobs: [ "Active jobs", "bi-briefcase" ],
@@ -18,6 +17,17 @@ class Usr::Company::ManagerDashboardComponent < ApplicationComponent
   private
 
   attr_reader :company, :plan, :dashboard
+
+  def metric_path(key)
+    case key
+    when :company_users then usr_company_path(company, anchor: "company-employees")
+    when :active_jobs then usr_company_jobs_path(company, view: "active")
+    when :active_projects then usr_company_projects_path(company, view: "active")
+    when :applications then usr_company_applications_path(company)
+    when :accepted_hires then usr_company_applications_path(company, status: "accepted")
+    when :pending_invitations then usr_job_invitations_path(company_id: company.id, status: "pending")
+    end
+  end
 
   def chart_data
     activity = dashboard[:daily_activity]

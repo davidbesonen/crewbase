@@ -87,11 +87,11 @@ class CrewOperationsFlowTest < ApplicationSystemTestCase
     fill_in "Find a person in this spreadsheet", with: ""
     page.save_screenshot("/private/tmp/knowshow-crew-import-review.png")
     page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width: 390, height: 900, deviceScaleFactor: 1, mobile: true)
-    select "Dark", from: "Appearance"
+    page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: [ { name: "prefers-color-scheme", value: "dark" } ])
     assert_selector "html[data-bs-theme='dark']"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, 390
     page.save_screenshot("/private/tmp/knowshow-crew-import-review-dark-mobile.png")
-    select "Light", from: "Appearance"
+    page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: [ { name: "prefers-color-scheme", value: "light" } ])
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
     click_button "Add Selected Crew To Roster"
     assert_text "Added 1 crew to your private roster."
@@ -190,7 +190,8 @@ class CrewOperationsFlowTest < ApplicationSystemTestCase
     assert_select "Company Workspace", selected: "Staffing Board"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, 390
     page.save_screenshot("/private/tmp/knowshow-staffing-board-mobile.png")
-    select "Venues", from: "Company Workspace"
+    select "Manager", from: "Company Workspace"
+    within("[data-company-management-tools]") { click_link "Venues" }
     assert_text "Saved Venues & Contacts"
   ensure
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")

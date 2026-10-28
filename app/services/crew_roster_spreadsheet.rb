@@ -5,20 +5,23 @@ class CrewRosterSpreadsheet
   class InvalidFile < StandardError; end
   MAX_ROWS = 500
   MAX_BYTES = 5.megabytes
+  MAX_EXPANDED_BYTES = 25.megabytes
 
   def initialize(file:)
     @file = file
   end
 
   def rows
-    raise InvalidFile, "Choose an Excel (.xlsx) or CSV spreadsheet up to 5 MB." unless file && file.size.positive? && file.size <= MAX_BYTES
+    unless file.respond_to?(:original_filename) && file.respond_to?(:path) && file.respond_to?(:size) && file.size.positive? && file.size <= MAX_BYTES
+      raise InvalidFile, "Choose an Excel (.xlsx) or CSV spreadsheet up to 5 MB."
+    end
     table = case File.extname(file.original_filename).downcase
     when ".xlsx" then excel_rows
     when ".csv" then csv_rows
     else raise InvalidFile, "Use an Excel (.xlsx) or CSV spreadsheet. Export older .xls files as .xlsx first."
     end
     convert(table)
-  rescue CSV::MalformedCSVError, EncodingError, Zip::Error, Nokogiri::XML::SyntaxError, ArgumentError
+  rescue CSV::MalformedCSVError, EncodingError, Zip::Error, Nokogiri::XML::SyntaxError, Roo::FileNotFound, ArgumentError
     raise InvalidFile, "This spreadsheet could not be read. Save it as .xlsx or UTF-8 CSV and try again."
   end
 
@@ -28,8 +31,17 @@ class CrewRosterSpreadsheet
 
   def excel_rows
     Zip::File.open(file.path) do |archive|
-      if archive.entries.size > 1000 || archive.entries.sum(&:size) > 25.megabytes
+      if archive.entries.size > 1000 || archive.entries.sum(&:size) > MAX_EXPANDED_BYTES
         raise InvalidFile, "This workbook is too large. Upload a simple sheet with up to 500 crew."
+      end
+      # Roo recovers malformed XML, which can disguise damage as missing headers.
+      remaining = MAX_EXPANDED_BYTES
+      archive.each do |entry|
+        next if entry.directory?
+        contents = entry.get_input_stream { |stream| stream.read(remaining + 1) }.to_s
+        remaining -= contents.bytesize
+        raise InvalidFile, "This workbook is too large. Upload a simple sheet with up to 500 crew." if remaining.negative?
+        Nokogiri::XML(contents) { |config| config.strict.nonet } if entry.name.end_with?(".xml", ".rels")
       end
     end
     sheet = Roo::Excelx.new(file.path).sheet(0)

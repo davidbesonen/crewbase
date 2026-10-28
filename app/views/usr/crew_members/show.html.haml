@@ -30,12 +30,17 @@
             %p.small.text-muted They are still completing their personal profile. You can plan them on your staffing board.
         - else
           %p Invite this person to create an account and review the imported profile details. Your company notes and years worked with stay private.
+          %p.small.text-muted Importing this contact did not create a login or send an email. Create a link and send it directly to this person when you are ready.
+          - if @member.email.blank?
+            %p.small.text-muted This is a phone-only contact. Send the link to their phone; they will add an email address when creating their KnowShow account. Anyone with the link can claim this contact, so share it privately.
+          - else
+            %p.small.text-muted They must sign up or sign in using #{@member.email} to claim this record.
           = button_to "Create Invitation Link", invitation_usr_company_crew_member_path(@company, @member), method: :post, class: "btn btn-primary"
           - if @invitation_url
             .mt-3{ data: { controller: "clipboard" } }
               = label_tag :crew_claim_link, "Invitation link", class: "form-label"
               = text_field_tag :crew_claim_link, @invitation_url, readonly: true, class: "form-control", data: { clipboard_target: "source" }
               %button.btn.btn-outline-primary.mt-2{ type: "button", data: { action: "clipboard#copy", clipboard_target: "button" } } Copy Link
-              %p.form-text Send this link directly to their email or phone. It expires in 7 days. Creating another link replaces this one.
+              %p.form-text No email or text was sent. Send this link directly to the person. It expires on #{@member.invitation_expires_at.strftime("%b %-d, %Y at %-I:%M %p %Z")}. Creating another link replaces this one.
 .mt-4
   = button_to "Remove From Roster", usr_company_crew_member_path(@company, @member), method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "Remove this private crew record? Their KnowShow account will remain." } }

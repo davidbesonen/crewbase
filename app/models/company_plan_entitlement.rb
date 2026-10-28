@@ -66,10 +66,10 @@ class CompanyPlanEntitlement
   end
 
   def active_jobs_usage
-    company.jobs.not_ended.where(is_active: true, status: :published).count
+    company.jobs.active_postings.count
   end
 
   def active_projects_usage
-    company.projects.active.where(status: %i[planning active]).count
+    company.projects.in_progress.count
   end
 end

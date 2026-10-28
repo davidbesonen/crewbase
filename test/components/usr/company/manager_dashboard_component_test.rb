@@ -10,7 +10,18 @@ class Usr::Company::ManagerDashboardComponentTest < ViewComponent::TestCase
     render_inline Usr::Company::ManagerDashboardComponent.new(company:, plan:, dashboard: dashboard)
 
     assert_selector "[data-company-manager-metric='active_jobs']", text: "4"
-    assert_selector "[data-company-manager-metric='pending_invitations'] a.text-decoration-none[href='/usr/job_invitations']", text: "Pending invitations"
+    {
+      company_users: "/usr/companies/42#company-employees",
+      active_jobs: "/usr/companies/42/jobs?view=active",
+      active_projects: "/usr/companies/42/projects?view=active",
+      applications: "/usr/companies/42/applications",
+      accepted_hires: "/usr/companies/42/applications?status=accepted",
+      pending_invitations: "/usr/job_invitations?company_id=42&status=pending"
+    }.each do |key, path|
+      assert_selector "a[data-company-manager-metric='#{key}'][href='#{path}']"
+      assert_no_selector "a[data-company-manager-metric='#{key}'] a"
+    end
+    assert_text "Crew roster contacts are separate"
     assert_selector "[data-studio-benefit]", count: 0
     assert_selector "a[href='/usr/companies/42/applications']", text: "Review applications"
     assert_text "Application acceptance"

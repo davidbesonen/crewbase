@@ -9,6 +9,7 @@ class CompanyManagerDashboardTest < ActiveSupport::TestCase
       other_company = companies(:two)
       company.company_assignments.create!(user: users(:one), role: "owner")
       company.company_assignments.create!(user: users(:two), role: "member")
+      company.crew_members.create!(first_name: "Roster", last_name: "Only", email: "roster-only@example.com")
 
       active_job = create_job(company:, title: "Tour manager", starts_at: 5.days.from_now)
       create_job(company:, title: "Archived role", status: :archived, is_active: false)

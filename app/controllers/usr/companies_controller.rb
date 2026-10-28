@@ -87,12 +87,17 @@ class Usr::CompaniesController < ApplicationController
 
   def show
     @company = visible_companies.find(params[:id])
+    @website_url = @company.normalized_website_url
+    @linkedin_url = WebUrl.normalize(@company.linkedin_url)
+    @facebook_url = WebUrl.normalize(@company.facebook_url)
+    @youtube_url = WebUrl.normalize(@company.youtube_url)
     @can_upload_roster = Company.roster_uploadable_by(current_user).where(id: @company.id).exists?
     @can_browse_roster = @company.is_owner?(current_user)
     @entitlement = CompanyPlanEntitlement.new(@company)
     @company_plan = @company.company_plans.includes(:plan).order(created_at: :desc, id: :desc).first&.plan
     @ratings = @company.ratings
     @jobs = @company.jobs.accepting_applications.includes(:project, :locations).order(created_at: :desc)
+    @company_assignments = @company.company_assignments.includes(:user).order(:role, :id).to_a
     @job_applications = if @company.is_owner?(current_user)
       JobApplication
         .includes(:profile, { profile: :user }, job: :company)

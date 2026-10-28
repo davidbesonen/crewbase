@@ -2,8 +2,6 @@
 = render Marketing::HomepageComponent.new(primary_cta_label: @primary_cta_label, primary_cta_path: @primary_cta_path, show_auth_links: current_user.blank?, brand_concept: @brand_concept) do |homepage|
   - homepage.with_brand do
     = render Shared::BrandWordmarkComponent.new(concept: @brand_concept)
-  - homepage.with_appearance do
-    = render Shared::ThemePickerComponent.new
   - homepage.with_concert_scene do
     = render Marketing::ConcertSceneComponent.new
   - homepage.with_workspace_preview do

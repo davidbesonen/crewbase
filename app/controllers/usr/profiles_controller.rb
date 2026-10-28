@@ -51,6 +51,9 @@ class Usr::ProfilesController < ApplicationController
   end
 
   def show
+    @website_url = WebUrl.normalize(@profile.website_url)
+    @linkedin_url = WebUrl.normalize(@profile.linkedin_url)
+    @spotify_url = WebUrl.normalize(@profile.spotify_profile_url)
   end
 
   # def new

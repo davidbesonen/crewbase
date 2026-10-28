@@ -16,6 +16,17 @@ class Usr::ProfilesControllerTest < ActionDispatch::IntegrationTest
     @user.visits.create!
   end
 
+  test "profile social links exclude unsafe stored URLs and normalize bare domains" do
+    profile = @user.user_profile
+    profile.update!(website_url: "javascript:alert(1)", linkedin_url: "linkedin.com/in/crew", spotify_profile_url: "data:text/html,test")
+    sign_in @user, scope: :user
+    get usr_profile_path(profile)
+    assert_response :success
+    assert_select "a.social-link[aria-label='Website']", count: 0
+    assert_select "a.social-link[aria-label='Spotify']", count: 0
+    assert_select "a.social-link[aria-label='LinkedIn'][href='https://linkedin.com/in/crew']", count: 1
+  end
+
   test "retired occupations cannot be added through picker or profile parameters" do
     sign_in @user, scope: :user
     actor = Occupation.create!(name: "Actor")

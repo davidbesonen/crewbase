@@ -7,7 +7,6 @@
       = link_to usr_dashboards_path, class: "navbar-brand" do
         = render Shared::BrandWordmarkComponent.new
     .d-flex.align-items-center.gap-3
-      = render Shared::ThemePickerComponent.new
       .dropdown
         = button_tag type: "button", class: "avatar-toggle dropdown-toggle", data: { bs_toggle: "dropdown" }, aria: { expanded: "false" } do
           = render Usr::Shared::UserAvatarIconComponent.new(user: current_user, size: 40)

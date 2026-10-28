@@ -126,9 +126,10 @@ class Job < ApplicationRecord
   }
 
   scope :not_moderated, -> { where(restricted_at: nil, company_id: Company.where(restricted_at: nil).select(:id)) }
+  scope :active_postings, -> { not_ended.where(is_active: true, status: :published) }
 
   scope :open_for_invitations, lambda {
-    not_moderated.not_ended.where(is_active: true, status: :published)
+    not_moderated.active_postings
       .where("application_deadline IS NULL OR application_deadline >= ?", Time.current)
   }
   scope :accepting_applications, -> { open_for_invitations.public_listing }

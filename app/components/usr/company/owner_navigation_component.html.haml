@@ -8,11 +8,6 @@
         %i.bi.bi-building-gear.me-1{ aria: { hidden: true } }
         Company Workspace
       - destinations.each do |item|
-        - if item.disabled
-          %span.btn.btn-sm.btn-outline-secondary.disabled{ aria: { disabled: "true" }, data: { feature_upgrade: "staffing-analytics" }, title: "Available on Team plans" }
-            %i.bi.bi-lock-fill.me-1{ aria: { hidden: true } }
-            = item.label
-        - else
-          = link_to item.path, class: button_class(item.key, secondary: item.secondary), aria: { current: current_destination(item.key) } do
-            %i.me-1{ class: "bi bi-#{item.icon}", aria: { hidden: true } }
-            = item.label
+        = link_to item.path, class: button_class(item.key), aria: { current: current_destination(item.key) } do
+          %i.me-1{ class: "bi bi-#{item.icon}", aria: { hidden: true } }
+          = item.label

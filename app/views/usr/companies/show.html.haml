@@ -26,11 +26,11 @@
             %span.badge.text-bg-light.border
               Owner
         .company-profile-socials.d-flex.flex-wrap.gap-2.mt-3
-          - if @company.website_url.present?
-            = link_to @company.website_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Website" }, title: "Website" do
+          - if @website_url.present?
+            = link_to @website_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Website" }, title: "Website" do
               %i.bi.bi-globe{ aria: { hidden: true } }
-          - if @company.linkedin_url.present?
-            = link_to @company.linkedin_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "LinkedIn" }, title: "LinkedIn" do
+          - if @linkedin_url.present?
+            = link_to @linkedin_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "LinkedIn" }, title: "LinkedIn" do
               %i.bi.bi-linkedin{ aria: { hidden: true } }
           - if @company.twitter_handle.present?
             = link_to "https://twitter.com/#{@company.twitter_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "X (Twitter)" }, title: "X (Twitter)" do
@@ -38,11 +38,11 @@
           - if @company.instagram_handle.present?
             = link_to "https://instagram.com/#{@company.instagram_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Instagram" }, title: "Instagram" do
               %i.bi.bi-instagram{ aria: { hidden: true } }
-          - if @company.facebook_url.present?
-            = link_to @company.facebook_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Facebook" }, title: "Facebook" do
+          - if @facebook_url.present?
+            = link_to @facebook_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "Facebook" }, title: "Facebook" do
               %i.bi.bi-facebook{ aria: { hidden: true } }
-          - if @company.youtube_url.present?
-            = link_to @company.youtube_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "YouTube" }, title: "YouTube" do
+          - if @youtube_url.present?
+            = link_to @youtube_url, target: "_blank", rel: "noopener", class: "social-link", aria: { label: "YouTube" }, title: "YouTube" do
               %i.bi.bi-youtube{ aria: { hidden: true } }
           - if @company.tiktok_handle.present?
             = link_to "https://www.tiktok.com/@#{@company.tiktok_handle.delete_prefix("@")}", target: "_blank", rel: "noopener", class: "social-link", aria: { label: "TikTok" }, title: "TikTok" do
@@ -60,7 +60,7 @@
 .row.mt-3
   .col-sm-12
     .card.border-0.shadow-sm.card-accent.card-accent-cyan
-      .card-body
+      .card-body{ data: { controller: "linked-tabs", action: "hashchange@window->linked-tabs#select" } }
         .row.g-3
           %h3.fw-bold.mb-0 Company Details
           -# %p.text-muted.mt-1.mb-3 Update your company's information to keep your profile accurate and up-to-date.
@@ -75,7 +75,7 @@
                 %button.nav-link.text-reset{ id: "company-applications-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-applications" }, aria: { controls: "company-applications", selected: "false" } }
                   Applications
             %li.fw-semibold.text-muted{ role: "presentation" }
-              %button.nav-link.text-reset{ id: "company-employees-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-employees" }, aria: { controls: "company-employees", selected: "false" } } Employees
+              %button.nav-link.text-reset{ id: "company-employees-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-employees" }, aria: { controls: "company-employees", selected: "false" } } Company Team
             %li.fw-semibold.text-muted{ role: "presentation" }
               %button.nav-link.text-reset{ id: "company-ratings-tab", type: "button", role: "tab", data: { bs_toggle: "tab", bs_target: "#company-ratings" }, aria: { controls: "company-ratings", selected: "false" } } Ratings
 
@@ -84,7 +84,7 @@
             = render Usr::Company::JobsTabComponent.new(company: @company, jobs: @jobs)
             - if @company.is_owner?(current_user)
               = render Usr::Company::ApplicationsTabComponent.new(company: @company, job_applications: @job_applications, pipeline_available: @entitlement.allowed?(:shortlists_pipeline))
-            = render Usr::Company::EmployeesTabComponent.new(company: @company)
+            = render Usr::Company::EmployeesTabComponent.new(company: @company, assignments: @company_assignments)
             = render Usr::Company::RatingsTabComponent.new(company: @company, ratings: @ratings)
 
 .mt-4

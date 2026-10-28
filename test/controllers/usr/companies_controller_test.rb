@@ -18,6 +18,17 @@ class Usr::CompaniesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user, scope: :user
   end
 
+  test "company social links hide unsafe URLs and normalize bare domains" do
+    company = Company.create!(name: "Safe Links", contact_email: @user.email, industries: [ Industry.music_touring! ], is_public: true,
+      website_url: "javascript:alert(1)", linkedin_url: "linkedin.com/company/safe", facebook_url: "data:text/html,test", youtube_url: "https://youtube.com/@safe")
+    get usr_company_path(company)
+    assert_response :success
+    assert_select "a.social-link[aria-label='Website']", count: 0
+    assert_select "a.social-link[aria-label='Facebook']", count: 0
+    assert_select "a.social-link[href='https://linkedin.com/company/safe']", count: 1
+    assert_select "a.social-link[href='https://youtube.com/@safe']", count: 1
+  end
+
   test "index shows companies and filters by name" do
     alpha = Company.create!(
       name: "Alpha Audio",

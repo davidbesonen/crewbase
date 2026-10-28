@@ -146,10 +146,7 @@ class Company < ApplicationRecord
   end
 
   def normalized_website_url
-    return if website_url.blank?
-    return website_url if website_url.match?(/\Ahttps?:\/\//i)
-
-    "https://#{website_url}"
+    WebUrl.normalize(website_url)
   end
 
   def primary_industry

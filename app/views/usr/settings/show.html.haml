@@ -5,11 +5,18 @@
         .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
           %div
             %h1.fw-bold.mb-1 Settings
-            %p.text-muted.mb-0 Manage your account details and the notifications you receive.
+            %p.text-muted.mb-0 Manage your appearance, account details, and notifications.
           = link_to usr_settings_billing_path, class: "btn btn-outline-primary" do
             %i.bi.bi-credit-card.me-2
             Billing & plans
 
 .row
   .col-12
+    %section.card.border-0.shadow-sm.mb-4{ data: { appearance_preferences: true }, aria: { labelledby: "appearance-heading" } }
+      .card-body.p-4
+        .d-flex.flex-wrap.justify-content-between.align-items-center.gap-3
+          %div
+            %h2.h5.fw-bold.mb-1#appearance-heading Appearance
+            %p.text-muted.mb-0 Choose light, dark, or your device’s system setting. Changes apply immediately and are saved on this device.
+          = render Shared::ThemePickerComponent.new
     = render Usr::SettingsFormComponent.new(user: current_user)

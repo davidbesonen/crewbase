@@ -113,6 +113,17 @@ class CrewRosterImportTest < ActiveSupport::TestCase
     assert_match /80 characters/i, result.error
   end
 
+  test "validation identifies people instead of misleading row numbers and bounds the summary" do
+    batch = @company.crew_imports.create!(uploaded_by: @owner, rows: [])
+    rows = 5.times.map { |i| attributes.merge("first_name" => "Missing#{i}") }
+    result = CrewRosterImport.new(import: batch, rows:).call
+    assert_not result.success?
+    assert_match /Missing0 Audio/, result.error
+    assert_match /2 more crew/, result.error
+    refute_match /Row 1:/, result.error
+    assert_nil batch.reload.imported_at
+  end
+
   private
 
   def attributes

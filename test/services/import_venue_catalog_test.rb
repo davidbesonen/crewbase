@@ -3,6 +3,32 @@ require "test_helper"
 class ImportVenueCatalogTest < ActiveSupport::TestCase
   self.fixture_table_names = []
 
+  test "unchanged bundled catalogs skip writes and changed or missing catalogs refresh" do
+    cache = ActiveSupport::Cache::MemoryStore.new
+    Tempfile.create([ "venue-catalog", ".json" ]) do |file|
+      rows = [ { source_key: "audit/hall", name: "First Hall", city: "Austin", state: "TX", country: "US" } ]
+      file.write(rows.to_json)
+      file.flush
+      importer = ImportVenueCatalog.new(source_path: file.path, cache: cache)
+      assert_equal 1, importer.call
+      entry = VenueCatalogEntry.find_by!(source_key: "audit/hall")
+      entry.update!(name: "Unchanged import marker")
+      assert_equal 1, importer.call
+      assert_equal "Unchanged import marker", entry.reload.name
+
+      file.rewind
+      file.truncate(0)
+      file.write(rows.map { |row| row.merge(name: "Updated Hall") }.to_json)
+      file.flush
+      assert_equal 1, importer.call
+      assert_equal "Updated Hall", entry.reload.name
+
+      entry.destroy!
+      assert_equal 1, importer.call
+      assert_equal "Updated Hall", VenueCatalogEntry.find_by!(source_key: "audit/hall").name
+    end
+  end
+
   test "catalog refresh is idempotent and preserves company venue details" do
     assert Object.const_defined?(:ImportVenueCatalog), "The national venue catalog needs a repeatable import"
     rows = [ { "source_key" => "node/17", "name" => "Touring Hall", "city" => "Austin", "state" => "TX", "country" => "US" } ]

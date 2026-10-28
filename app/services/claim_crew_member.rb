@@ -1,13 +1,18 @@
 class ClaimCrewMember
   Result = Data.define(:success?, :error)
 
-  def initialize(member:, user:)
-    @member, @user = member, user
+  def initialize(member:, user:, token:)
+    @member, @user, @token = member, user, token
   end
 
   def call
     @member.with_lock do
       return failure("This profile has already been claimed.") if @member.profile && @member.profile.user_id != @user.id
+      return Result.new(success?: true, error: nil) if @member.profile&.user_id == @user.id
+      # Recheck after locking: the owner may have replaced the link since lookup.
+      unless @member.invitation_active? && !@member.company.restricted_at? && CrewMember.find_by_token_for(:claim, @token)&.id == @member.id
+        return failure("This invitation has expired or been replaced. Ask the company for a new link.")
+      end
       return failure("Sign in with the email address this invitation was sent to.") unless @member.invitation_email_matches?(@user)
       @user.with_lock do
         profile = @user.profiles.find_or_initialize_by(profile_type: "user")
@@ -19,7 +24,7 @@ class ClaimCrewMember
           profile.locations.build(city: @member.city, state: @member.state, country: @member.country)
         end
         profile.save!
-        @member.update!(profile:, claimed_at: Time.current, invitation_nonce: nil)
+        @member.update!(profile:, claimed_at: Time.current, invitation_nonce: nil, invitation_expires_at: nil)
       end
     end
     Result.new(success?: true, error: nil)

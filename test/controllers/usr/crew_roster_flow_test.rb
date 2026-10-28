@@ -125,4 +125,31 @@ class Usr::CrewRosterFlowTest < ActionDispatch::IntegrationTest
       assert_select "input[value='Original']"
     end
   end
+
+  test "malformed ordinary form rows return a correctable review instead of a server error" do
+    batch = @company.crew_imports.create!(uploaded_by: @owner, rows: [ { "first_name" => "Original", "last_name" => "Person", "phone" => "6155550144" } ])
+    [ "not rows", [ "not a row" ], 42 ].each do |rows|
+      assert_no_difference "CrewMember.count" do
+        patch usr_company_crew_import_path(@company, batch), params: { rows: }
+      end
+      assert_response :unprocessable_entity
+      assert_select ".alert", text: /Nothing was added/
+    end
+  end
+
+  test "viewing a generated invitation never extends its original seven day deadline" do
+    member = @company.crew_members.create!(first_name: "Expiry", last_name: "Crew", email: "expiry@example.com")
+    member.invitation_token!
+    refreshed_path = nil
+    travel 6.days do
+      get usr_company_crew_member_path(@company, member)
+      assert_response :success
+      refreshed_path = URI.parse(css_select("input#crew_claim_link").sole["value"]).path
+    end
+    travel 8.days do
+      sign_out @owner
+      get refreshed_path
+      assert_response :not_found
+    end
+  end
 end

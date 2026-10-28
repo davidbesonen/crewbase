@@ -8,6 +8,8 @@ class Usr::Companies::JobsController < ApplicationController
 
   def index
     @jobs = @company.jobs.order(created_at: :desc)
+    @active_only = params[:view] == "active"
+    @jobs = @jobs.active_postings if @active_only
   end
 
   def new

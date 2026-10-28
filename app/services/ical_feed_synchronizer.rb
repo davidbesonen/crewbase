@@ -6,6 +6,9 @@ require "resolv"
 
 class IcalFeedSynchronizer
   Result = Data.define(:success?, :error)
+  MAX_FEED_BYTES = 2.megabytes
+  MAX_EVENT_DAYS = 3_660
+  MAX_BLOCKOUTS = 10_000
 
   def initialize(profile:, fetcher: nil)
     @profile = profile
@@ -14,8 +17,14 @@ class IcalFeedSynchronizer
 
   def call
     attempted_at = Time.current
-    calendars = Icalendar::Calendar.parse(@fetcher.call(profile.normalized_ical_feed_url))
-    attributes = calendars.flat_map(&:events).flat_map { |event| blockout_attributes(event) }
+    feed = @fetcher.call(profile.normalized_ical_feed_url)
+    ensure_feed_size!(feed.bytesize)
+    calendars = Icalendar::Calendar.parse(feed)
+    raise ArgumentError, "Feed does not contain a calendar." if calendars.empty?
+    attributes = calendars.flat_map(&:events).each_with_object([]) do |event, rows|
+      rows.concat(blockout_attributes(event))
+      raise ArgumentError, "Calendar contains too many blockout days (maximum #{MAX_BLOCKOUTS})." if rows.size > MAX_BLOCKOUTS
+    end
 
     profile.transaction do
       sync_events(attributes)
@@ -40,7 +49,14 @@ class IcalFeedSynchronizer
 
   def fetch(url)
     ensure_public_host!(URI.parse(url).host)
-    URI.open(url, open_timeout: 5, read_timeout: 10, redirect: false).read
+    # open-uri downloads before yielding its stream. Check progress as well as
+    # Content-Length so absent or dishonest headers cannot bypass the limit.
+    URI.open(url, open_timeout: 5, read_timeout: 10, redirect: false,
+      content_length_proc: method(:ensure_feed_size!), progress_proc: method(:ensure_feed_size!)) { |stream| stream.read(MAX_FEED_BYTES + 1) }
+  end
+
+  def ensure_feed_size!(bytes)
+    raise ArgumentError, "Calendar feed is too large (maximum 2 MB)." if bytes && bytes > MAX_FEED_BYTES
   end
 
   def ensure_public_host!(host)
@@ -67,6 +83,8 @@ class IcalFeedSynchronizer
   end
 
   def blockout_attributes(event)
+    return [] if text(event.status).upcase == "CANCELLED" || text(event.transp).upcase == "TRANSPARENT"
+
     dates = event_dates(event).select { |date| date >= Time.zone.today }
     uid = text(event.uid).presence || Digest::SHA256.hexdigest(event.to_ical)
     name = text(event.summary).presence || "Calendar blockout"
@@ -89,6 +107,7 @@ class IcalFeedSynchronizer
     first_date = starts_at.to_date
     last_date = ends_at.to_date
     last_date -= 1 if date_value?(event.dtstart) && date_value?(event.dtend) && last_date > first_date
+    raise ArgumentError, "Calendar event date range is too large (maximum #{MAX_EVENT_DAYS} days)." if last_date - first_date >= MAX_EVENT_DAYS
     (first_date..last_date).to_a
   end
 

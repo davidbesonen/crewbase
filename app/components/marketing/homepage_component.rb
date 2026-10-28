@@ -9,7 +9,6 @@ class Marketing::HomepageComponent < ApplicationComponent
   option :brand_concept, default: proc { BrandIdentity.default_concept.key }
 
   renders_one :brand
-  renders_one :appearance
   renders_one :concert_scene
   renders_one :workspace_preview
 

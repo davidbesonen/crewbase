@@ -21,6 +21,41 @@ class ButtonLayoutTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1440, 1100)
   end
 
+  test "company workspace keeps essentials visible and secondary tools discoverable on desktop and mobile" do
+    [ 1440, 390 ].each do |width|
+      page.driver.browser.execute_cdp("Emulation.setDeviceMetricsOverride", width:, height: 1100, deviceScaleFactor: 1, mobile: width == 390)
+      visit usr_company_manager_path(@company)
+      assert_selector "[data-company-management-tools] a", count: 5
+      if width == 1440
+        within "nav[aria-label='Company workspace']" do
+          assert_selector "a", count: 5
+          assert_no_link "Venues"
+          assert_no_link "Edit Company"
+        end
+      else
+        assert_select "Company Workspace", selected: "Manager"
+      end
+      assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, width
+      page.save_screenshot("/private/tmp/knowshow-manager-streamlined-#{width}.png")
+      within "[data-company-management-tools]" do
+        click_link "Venues"
+      end
+      assert_current_path usr_company_venues_path(@company)
+      if width == 390
+        assert_select "Company Workspace", selected: "Venues"
+        select "Manager", from: "Company Workspace"
+      else
+        within "nav[aria-label='Company workspace']" do
+          click_link "Manager"
+        end
+      end
+      assert_current_path usr_company_manager_path(@company)
+    end
+  ensure
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+    Warden.test_reset!
+  end
+
   test "venue action has natural height and form buttons align with links" do
     visit usr_company_venues_path(@company)
     add = find_link("Add Venue")
@@ -64,8 +99,9 @@ class ButtonLayoutTest < ApplicationSystemTestCase
         end
       end
     end
-    visit usr_company_venues_path(@company)
+    visit usr_settings_path
     select "Dark", from: "Appearance"
+    visit usr_company_venues_path(@company)
     assert_selector "html[data-bs-theme='dark']"
     page.save_screenshot("/private/tmp/knowshow-buttons-venues-mobile-dark.png")
   ensure

@@ -96,6 +96,32 @@ class Usr::CrewRosterUploadAccessTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "employees cannot generate invitations or view owner-only roster details" do
+    member = @company.crew_members.create!(first_name: "Private", last_name: "Crew", email: "private-invitation@example.com")
+    sign_in @employee
+    get usr_company_crew_member_path(@company, member)
+    assert_response :not_found
+    sign_in @employee
+    post invitation_usr_company_crew_member_path(@company, member)
+    assert_response :not_found
+    assert_nil member.reload.invitation_nonce
+  end
+
+  test "an import id cannot be used under another company even by an owner of both" do
+    other = Company.create!(name: "Other Import Company", contact_email: @owner.email, industries: @company.industries)
+    other.company_assignments.create!(user: @owner, role: "owner")
+    batch = @company.crew_imports.create!(uploaded_by: @owner, rows: [])
+    sign_in @owner
+    get usr_company_crew_import_path(other, batch)
+    assert_response :not_found
+    sign_in @owner
+    assert_no_difference "CrewMember.count" do
+      patch usr_company_crew_import_path(other, batch), params: { rows_payload: '[{"first_name":"Wrong","last_name":"Company","email":"wrong@example.com"}]' }
+    end
+    assert_response :not_found
+    assert_nil batch.reload.imported_at
+  end
+
   private
 
   def make_user(name)

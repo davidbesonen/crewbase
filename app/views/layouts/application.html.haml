@@ -31,15 +31,10 @@
     - if Rails.configuration.x.demo_mode
       = render Shared::DemoNoticeComponent.new
     - if @marketing_page
-      - unless controller_path == "marketing"
-        .d-flex.justify-content-end.p-3
-          = render Shared::ThemePickerComponent.new
       = render "layouts/flash"
       = yield
     - elsif current_user&.site_admin? && controller_path.start_with?("admin/")
-      = render Admin::NavigationComponent.new(section: controller_name) do |navigation|
-        - navigation.with_appearance do
-          = render Shared::ThemePickerComponent.new
+      = render Admin::NavigationComponent.new(section: controller_name)
       .app-content
         .container-fluid.p-4
           = render "layouts/flash"
@@ -65,8 +60,6 @@
                 #upload-errors{ aria: { live: "assertive" } }
                 = yield
     - else
-      .d-flex.justify-content-end.p-3
-        = render Shared::ThemePickerComponent.new
       .app-content
         = render "layouts/flash"
         = yield

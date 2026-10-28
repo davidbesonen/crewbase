@@ -1,6 +1,4 @@
 class Admin::NavigationComponent < ApplicationComponent
-  renders_one :appearance
-
   def initialize(section:)
     @section = section
   end

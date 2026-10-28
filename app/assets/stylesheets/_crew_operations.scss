@@ -51,6 +51,13 @@
 
 .crew-roster-search { flex: 1 1 16rem; width: auto; min-width: 0; }
 
+.card.company-manager-metric:hover,
+.card.company-manager-metric:focus-visible {
+  border-color: var(--bs-primary) !important;
+}
+
+.company-manager-metric__label { min-height: 2.75rem; }
+
 @media (max-width: 767.98px) {
   .crew-roster-table {
     display: block;
@@ -83,15 +90,13 @@
   .staffing-date-range { order: -1; width: 100%; }
 }
 
-// Keep navigation, appearance and account controls on one row on crew phones.
+// Keep navigation and account controls on one row on crew phones.
 @media (max-width: 575.98px) {
   .app-top-nav {
     > .container-fluid { flex-wrap: nowrap; }
     > .container-fluid > .d-flex { gap: .5rem !important; min-width: 0; }
     .navbar-brand { margin-right: 0; }
     .brand-wordmark img { height: 1.2rem; }
-    .theme-picker > i { display: none; }
-    .theme-picker .form-select { width: 5.1rem; font-size: .75rem; padding-inline: .5rem 1.5rem; background-position: right .4rem center; }
   }
 }
 

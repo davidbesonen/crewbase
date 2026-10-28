@@ -12,7 +12,7 @@ class Usr::CrewMembersController < ApplicationController
   end
 
   def show
-    @invitation_url = crew_claim_url(@member.generate_token_for(:claim)) if @member.invitation_nonce.present? && !@member.profile_id?
+    @invitation_url = crew_claim_url(@member.generate_token_for(:claim)) if @member.invitation_active?
   end
 
   def new

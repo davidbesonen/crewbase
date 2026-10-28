@@ -30,7 +30,7 @@ class KnowshowBrandingTest < ApplicationSystemTestCase
       })()
     JS
     page.driver.browser.manage.window.resize_to(1440, 1000)
-    select "Light", from: "Appearance"
+    page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: [ { name: "prefers-color-scheme", value: "light" } ])
     assert_selector "html[data-bs-theme='light']"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth")
     page.save_screenshot("/private/tmp/knowshow-hybrid-home-desktop.png")
@@ -39,7 +39,7 @@ class KnowshowBrandingTest < ApplicationSystemTestCase
     assert_selector ".marketing-nav .brand-wordmark"
     assert_operator page.evaluate_script("document.documentElement.scrollWidth"), :<=, page.evaluate_script("window.innerWidth")
     page.save_screenshot("/private/tmp/knowshow-hybrid-home-mobile.png")
-    select "Dark", from: "Appearance"
+    page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", features: [ { name: "prefers-color-scheme", value: "dark" } ])
     assert_selector "html[data-bs-theme='dark']"
     visit new_user_session_path
     assert_selector "[aria-label='KnowShow']"

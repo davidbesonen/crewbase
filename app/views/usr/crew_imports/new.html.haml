@@ -20,5 +20,7 @@
         %p Include First Name, Last Name, and an Email or Phone for every person. Keep phone numbers as text to preserve country codes and leading zeros.
         %p Optional columns include role, department, city, state, country, years worked with your company, years of experience, skills, equipment, and private notes. Unknown columns are ignored.
         %p.small.text-muted Use one skill or equipment name per line within a cell, up to 30 entries of 80 characters each.
+        %h3.h6.mt-4 How Crew Claim Their Profiles
+        %p.small.text-muted Import adds private roster contacts. After review, an owner opens a crew record, creates an invitation link, and shares it directly. The recipient creates an account or signs in, then claims and completes their profile. Email-only and phone-only contacts are supported; all KnowShow login accounts need an email address. Uploading does not send emails or texts.
         = link_to "Download Excel Template", template_usr_company_crew_imports_path(@company), class: "btn btn-outline-primary"
 .mt-4= link_to @roster_return_label, @roster_return_path, class: "btn btn-quiet"
