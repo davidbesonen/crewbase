@@ -25,6 +25,14 @@ class Usr::ProjectsControllerTest < ActionDispatch::IntegrationTest
     @company.company_plans.create!(plan: team)
   end
 
+  test "the entire company project card opens its project" do
+    project = @company.projects.create!(name: "Christmas tour")
+    sign_in @owner, scope: :user
+    get usr_company_projects_path(@company)
+    assert_response :success
+    assert_select ".project-link-card a.stretched-link[href='#{usr_project_path(project)}']", text: project.name
+  end
+
   test "company selection includes company context and only its current projects" do
     @company.locations << Location.create!(city: "Nashville", state: "TN", country: "United States")
     project = @company.projects.create!(name: "Autumn Sessions", description: "Record three live performances.", starts_on: Date.current + 14, status: :planning)

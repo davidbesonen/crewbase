@@ -8,6 +8,7 @@
     - if @job.multi_position?
       = link_to "Manage Crew", usr_job_crew_path(@job), class: "btn btn-outline-primary"
     = link_to "Back To Gig", usr_job_path(@job), class: "btn btn-quiet"
+= posting_controls
 - if @job.errors.any?
   .alert.alert-danger{ role: "alert" }= @job.errors.full_messages.to_sentence
 .row.g-4

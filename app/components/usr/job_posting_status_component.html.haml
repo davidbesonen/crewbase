@@ -1,0 +1,6 @@
+.d-flex.flex-column.align-items-start.gap-1{ data: { posting_status_controls: @job.id } }
+  = button_to usr_company_job_path(@job.company, @job), method: :patch, form: { class: "align-self-start" }, params: submission, class: "btn btn-outline-primary #{'btn-sm' if @compact}", title: hint do
+    %i.bi.me-1{ class: icon, aria: { hidden: true } }
+    = label
+  - unless @compact
+    %p.small.text-muted.mb-0= hint

@@ -16,9 +16,9 @@
       - if recent_projects.any?
         .d-flex.flex-column.gap-3
           - recent_projects.each do |project|
-            .company-project-card__project
+            .company-project-card__project.project-link-card
               .d-flex.flex-wrap.align-items-start.justify-content-between.gap-2.mb-2
-                = link_to project.name, helpers.usr_project_path(project), class: "fw-semibold text-dark text-decoration-none company-project-card__project-name"
+                = link_to project.name, helpers.usr_project_path(project), class: "fw-semibold text-dark text-decoration-none company-project-card__project-name stretched-link"
                 %span{ class: helpers.project_status_badge_class(project.status) }= project.status.humanize
               - if project.description.present?
                 %p.small.text-muted.mb-2= helpers.truncate(project.description, length: 140, separator: " ")

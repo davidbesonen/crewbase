@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Usr::ProjectDashboardComponent < ApplicationComponent
+  renders_many :posting_controls
+
   extend Dry::Initializer
 
   option :project

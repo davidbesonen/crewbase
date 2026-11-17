@@ -14,11 +14,11 @@
   .row.g-3{ data: { active_projects: true } }
     - @projects.each do |project|
       .col-12.col-lg-6
-        .card.border-0.shadow-sm.h-100.card-accent.card-accent-cyan
+        .card.border-0.shadow-sm.h-100.card-accent.card-accent-cyan.project-link-card
           .card-body.p-4
             .d-flex.justify-content-between.gap-3
               %div
-                %h4.fw-semibold.mb-1= link_to project.name, usr_project_path(project), class: "text-dark text-decoration-none"
+                %h4.fw-semibold.mb-1= link_to project.name, usr_project_path(project), class: "text-dark text-decoration-none stretched-link"
                 %p.text-muted.mb-2= project.description.presence || "No description added."
               %span.align-self-start{ class: project_status_badge_class(project.status) }= project.status.humanize
             %p.small.text-muted.mb-0= pluralize(project.jobs.size, "job posting")

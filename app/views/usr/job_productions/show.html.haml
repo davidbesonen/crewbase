@@ -1,1 +1,4 @@
-= render Usr::ProductionWorkspaceComponent.new(workspace: @workspace)
+= render Usr::ProductionWorkspaceComponent.new(workspace: @workspace) do |production|
+  - production.with_posting_controls do
+    .mb-4
+      = render Usr::JobPostingStatusComponent.new(job: @job, return_to: "production")

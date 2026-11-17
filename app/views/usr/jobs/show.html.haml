@@ -7,6 +7,9 @@
     = link_to "Duplicate Gig", new_usr_company_gig_reuse_path(@job.company, source_job_id: @job.id), class: "btn btn-quiet"
 - elsif @job.hired?(current_user)
   .mb-4= link_to "Show Brief", usr_job_brief_path(@job), class: "btn btn-primary"
+- if @job.company&.is_owner?(current_user)
+  .mb-4
+    = render Usr::JobPostingStatusComponent.new(job: @job)
 - if @job.on_hold?
   .alert.alert-warning{ role: "status" }
     %strong This posting is on an administrative hold.
@@ -151,7 +154,7 @@
               %div.fw-semibold= l(@job.primary_status_timestamp.to_date, format: :long)
           %div
             %div.text-muted.small Active Listing
-            %div.fw-semibold= @job.is_active? ? "Yes" : "No"
+            %div.fw-semibold{ data: { active_listing: true } }= @job.active_posting? ? "Yes" : "No"
           %div
             %div.text-muted.small Applications
             %div.fw-semibold

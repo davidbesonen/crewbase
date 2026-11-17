@@ -63,7 +63,7 @@
 
         - if jobs.any?
           .d-flex.flex-column.gap-3
-            - jobs.each do |job|
+            - jobs.each_with_index do |job, index|
               .border.rounded-3.p-3{ data: { project_job: job.id } }
                 .d-flex.flex-column.flex-lg-row.justify-content-between.gap-3
                   %div
@@ -77,6 +77,7 @@
                     .text-muted.small.mt-1
                       = link_to pluralize(job.job_applications.size, "applicant"), usr_company_applications_path(project.company, job_id: job.id), class: "text-muted"
                   .d-flex.flex-wrap.align-items-start.gap-2
+                    = posting_controls[index]
                     - if project.multi_show?
                       = link_to "Staff Crew", staffing_path(job), class: "btn btn-primary btn-sm"
                     = link_to "Production", usr_job_production_path(job), class: "btn btn-outline-primary btn-sm"

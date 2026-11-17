@@ -1,4 +1,6 @@
 class Usr::ProductionWorkspaceComponent < ApplicationComponent
+  renders_one :posting_controls
+
   def initialize(workspace:)
     @job, @venues, @days = workspace.job, workspace.venues, workspace.days
     @new_day = workspace.schedule_item unless workspace.schedule_item&.persisted?

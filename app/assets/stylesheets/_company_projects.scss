@@ -61,3 +61,14 @@
     .small { font-size: 0.7rem; }
   }
 }
+
+.project-link-card {
+  position: relative;
+
+  &:hover, &:focus-within {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+  }
+
+  .stretched-link::after { border-radius: inherit; }
+}

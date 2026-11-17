@@ -75,7 +75,7 @@ class Usr::Companies::JobsController < ApplicationController
     end
 
     if save_job_with_requirements
-      redirect_to job_destination(@job), notice: "Job updated successfully!"
+      redirect_to job_destination(@job), notice: update_notice
     else
       @job.locations.build if @job.locations.empty?
       prepare_projects
@@ -223,7 +223,21 @@ class Usr::Companies::JobsController < ApplicationController
     JobRequirementsUpdater::SELECTIONS.keys.any? { |key| job_params.key?(key) }
   end
 
+  def update_notice
+    return "Posting marked as filled. New applications are closed; existing offers and bookings are unchanged." if @job.saved_change_to_status? && @job.filled?
+    return "Posting reopened." if @job.saved_change_to_status? && @job.published? && @job.status_before_last_save.in?(%w[filled closed])
+
+    "Job updated successfully!"
+  end
+
   def job_destination(job)
+    case params[:posting_status_return]
+    when "posting" then return usr_job_path(job)
+    when "project_roles" then return usr_project_path(job.project, view: "roles") if job.project
+    when "production" then return usr_job_production_path(job)
+    when "company_jobs" then return usr_company_jobs_path(@company)
+    when "my_postings" then return my_postings_usr_jobs_path
+    end
     return usr_job_crew_path(job) if @staffing_kind == "single" && job.multi_position?
     return usr_company_staffing_path(@company, from: job.starts_at&.to_date || Date.current) if @staffing_kind == "single"
     job.project ? usr_project_path(job.project) : usr_company_path(@company)

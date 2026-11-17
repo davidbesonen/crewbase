@@ -51,6 +51,53 @@ class Usr::JobsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state.empty-state-sky"
   end
 
+  test "owner can mark an open posting filled and reopen it without creating bookings" do
+    job = create_job(@owned_company, "Fill This Job")
+    sign_in @owner, scope: :user
+    get usr_job_path(job)
+    assert_select "button", text: "Mark as Filled"
+
+    assert_no_difference [ "CrewAssignment.count", "JobOffer.count" ] do
+      patch usr_company_job_path(@owned_company, job), params: { posting_status_return: "posting", job: { status: "filled" } }
+    end
+    assert_redirected_to usr_job_path(job)
+    assert_match "marked as filled", flash[:notice]
+    assert job.reload.filled?
+    assert job.filled_at.present?
+    assert_not job.accepting_applications?
+    assert_not Job.active_postings.exists?(job.id)
+    get usr_job_path(job)
+    assert_select "[data-active-listing]", text: "No"
+    assert_select "button", text: "Reopen Posting"
+    assert_select "button", text: "Mark as Filled", count: 0
+
+    patch usr_company_job_path(@owned_company, job), params: { job: { status: "published", is_active: true } }
+    assert_response :redirect
+    assert job.reload.accepting_applications?
+  end
+
+  test "reopening a filled posting respects the company active posting limit" do
+    plan = Plan.create!(name: "Starter", key: "filled-test-starter", monthly_price_cents: 0, annual_price_cents: 0, active: true, data: { active_jobs_limit: 1 })
+    @owned_company.company_plans.create!(plan: plan)
+    create_job(@owned_company, "Existing Open Posting")
+    filled = create_job(@owned_company, "Already Filled", status: :filled)
+    sign_in @owner, scope: :user
+
+    patch usr_company_job_path(@owned_company, filled), params: { job: { status: "published", is_active: true } }
+    assert_response :unprocessable_entity
+    assert filled.reload.filled?
+  end
+
+  test "outsiders cannot mark another company posting filled" do
+    job = create_job(@owned_company, "Protected Job")
+    sign_in @outsider, scope: :user
+    get usr_job_path(job)
+    assert_select "button", text: "Mark as Filled", count: 0
+    patch usr_company_job_path(@owned_company, job), params: { job: { status: "filled" } }
+    assert_response :not_found
+    assert job.reload.published?
+  end
+
   private
 
   def create_user(label)

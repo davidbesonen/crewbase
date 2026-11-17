@@ -11,7 +11,7 @@ class Usr::Company::ProjectCardComponentTest < ViewComponent::TestCase
 
     assert_selector "h2", text: "Studio Company"
     assert_text "4 projects"
-    assert_selector "a[href='/usr/projects/1']", text: "Project 1"
+    assert_selector ".project-link-card a.stretched-link[href='/usr/projects/1']", text: "Project 1"
     assert_selector "a[href='/usr/projects/3']", text: "Project 3"
     assert_no_selector "a[href='/usr/projects/4']"
     assert_selector "a[href='/usr/companies/123/projects']", text: "View All Projects"
