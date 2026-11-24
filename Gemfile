@@ -72,7 +72,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # Hosted checkout, subscription lifecycle webhooks, and the customer billing portal.
-gem "stripe", "~> 18.0"
+gem "stripe", "~> 18.4"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
